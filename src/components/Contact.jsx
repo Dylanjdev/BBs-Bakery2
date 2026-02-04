@@ -1,34 +1,205 @@
 // Contact.jsx - BB's Bakery & Cafe
-import React from 'react';
-
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAddressBook, faLocationDot, faPhone, faEnvelope, faMapLocationDot } from '@fortawesome/free-solid-svg-icons';
+import { faLocationDot, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook } from '@fortawesome/free-brands-svg-icons';
 
 const Contact = () => (
-  <section id="contact" className="info-section contact-section" aria-labelledby="contact-heading">
-    <h2 id="contact-heading"><FontAwesomeIcon icon={faAddressBook} /> Contact</h2>
-    <div className="contact-grid" itemScope itemType="https://schema.org/Bakery">
-      <p><FontAwesomeIcon icon={faLocationDot} /> <strong>Address:</strong><br /><span itemProp="address" itemScope itemType="https://schema.org/PostalAddress"><span itemProp="streetAddress">103 Main St</span>, <span itemProp="addressLocality">Pennington Gap</span>, <span itemProp="addressRegion">Virginia</span> <span itemProp="postalCode">24277</span></span></p>
-      <p><FontAwesomeIcon icon={faPhone} /> <strong>Phone:</strong><br /><a href="tel:2765710891" itemProp="telephone">(276) 571-0891</a></p>
-      <p><FontAwesomeIcon icon={faEnvelope} /> <strong>Email:</strong><br /><a href="mailto:bbscafe25@outlook.com" itemProp="email">bbscafe25@outlook.com</a></p>
-      <p><FontAwesomeIcon icon={faFacebook} style={{ color: '#1877f2' }} /> <strong>Facebook:</strong><br /><a href="https://www.facebook.com/profile.php?id=61581654642389" target="_blank" rel="noopener noreferrer">Follow us on Facebook</a></p>
-    </div>
-    <div className="map-container">
-      <h3><FontAwesomeIcon icon={faMapLocationDot} /> Find Us</h3>
-      <div className="map-wrapper">
-        <iframe 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3176.9362687766876!2d-83.02847!3d36.75833!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x885a7e8c0e0e0e0e%3A0x0!2s103%20Main%20St%2C%20Pennington%20Gap%2C%20VA%2024277!5e0!3m2!1sen!2sus!4v1234567890" 
-          width="100%" 
-          height="400" 
-          style={{ border: 0 }} 
-          allowFullScreen=""
-          loading="lazy" 
-          referrerPolicy="no-referrer-when-downgrade"
-          title="BB's Bakery & Cafe location map - 103 Main St, Pennington Gap, VA 24277"
-        ></iframe>
+  <section id="contact" className="pv5 mw8 center" style={{padding: 'clamp(2.5rem, 10vw, 5rem) clamp(1rem, 3vw, 2rem)'}} aria-labelledby="contact-heading">
+    <h2 
+      id="contact-heading" 
+      className="f2 fw7 tc mb5" 
+      style={{
+        fontFamily: 'Playfair Display, serif',
+        background: 'linear-gradient(135deg, #d65a8c 0%, #6b8e6f 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        letterSpacing: '-0.8px',
+        fontSize: 'clamp(2rem, 6vw, 2.5rem)',
+        marginBottom: '2rem'
+      }}
+    >
+      📞 Contact
+    </h2>
+    
+    <div className="flex flex-wrap justify-center mb5" style={{gap: 'clamp(1rem, 3vw, 1.5rem)'}} itemScope itemType="https://schema.org/Bakery">
+      <div 
+        className="br4 pa4 tc" 
+        style={{
+          minWidth: '240px',
+          width: 'calc(50% - 0.75rem)',
+          maxWidth: '280px',
+          background: 'linear-gradient(135deg, #fce7f0 0%, rgba(255, 255, 255, 0.8) 100%)',
+          boxShadow: '0 8px 24px rgba(214, 90, 140, 0.1)',
+          border: '2px solid #d65a8c',
+          transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          padding: 'clamp(1rem, 3vw, 1rem)'
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = 'translateY(-8px)';
+          e.currentTarget.style.boxShadow = '0 16px 40px rgba(214, 90, 140, 0.2)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(214, 90, 140, 0.1)';
+        }}
+      >
+        <p className="f5 fw7 mb2" style={{color: '#d65a8c', fontFamily: 'Playfair Display, serif', margin: '0 0 1rem 0', fontSize: '1rem'}}>
+          <FontAwesomeIcon icon={faLocationDot} className="mr2" style={{fontSize: '1.2rem'}} /> Address
+        </p>
+        <span itemProp="address" itemScope itemType="https://schema.org/PostalAddress" style={{color: '#6d6d6d', fontSize: '0.95rem', fontFamily: 'Quicksand, sans-serif', lineHeight: '1.6'}}>
+          <span itemProp="streetAddress">103 Main St</span>, <span itemProp="addressLocality">Pennington Gap</span>, <span itemProp="addressRegion">VA</span> <span itemProp="postalCode">24277</span>
+        </span>
       </div>
+      
+      <div 
+        className="br4 pa4 tc" 
+        style={{
+          minWidth: '240px',
+          width: 'calc(50% - 0.75rem)',
+          maxWidth: '280px',
+          background: 'linear-gradient(135deg, #e8f0e8 0%, rgba(255, 255, 255, 0.8) 100%)',
+          boxShadow: '0 8px 24px rgba(107, 142, 111, 0.1)',
+          border: '2px solid #6b8e6f',
+          transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          padding: 'clamp(1rem, 3vw, 1rem)'
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = 'translateY(-8px)';
+          e.currentTarget.style.boxShadow = '0 16px 40px rgba(107, 142, 111, 0.2)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(107, 142, 111, 0.1)';
+        }}
+      >
+        <p className="f5 fw7 mb2" style={{color: '#6b8e6f', fontFamily: 'Playfair Display, serif', margin: '0 0 1rem 0', fontSize: '1rem'}}>
+          <FontAwesomeIcon icon={faPhone} className="mr2" style={{fontSize: '1.2rem'}} /> Phone
+        </p>
+        <a 
+          href="tel:2765710891" 
+          itemProp="telephone" 
+          className="link no-underline" 
+          style={{color: '#d65a8c', fontWeight: '700', fontFamily: 'Quicksand, sans-serif', fontSize: '0.95rem', transition: 'all 0.2s'}}
+          onMouseOver={(e) => {
+            e.target.style.opacity = '0.8';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.opacity = '1';
+          }}
+        >
+          (276) 571-0891
+        </a>
+      </div>
+      
+      <div 
+        className="br4 pa4 tc" 
+        style={{
+          minWidth: '240px',
+          width: 'calc(50% - 0.75rem)',
+          maxWidth: '280px',
+          background: 'linear-gradient(135deg, #fce7f0 0%, rgba(255, 255, 255, 0.8) 100%)',
+          boxShadow: '0 8px 24px rgba(214, 90, 140, 0.1)',
+          border: '2px solid #d65a8c',
+          transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          padding: 'clamp(1rem, 3vw, 1rem)'
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = 'translateY(-8px)';
+          e.currentTarget.style.boxShadow = '0 16px 40px rgba(214, 90, 140, 0.2)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(214, 90, 140, 0.1)';
+        }}
+      >
+        <p className="f5 fw7 mb2" style={{color: '#d65a8c', fontFamily: 'Playfair Display, serif', margin: '0 0 1rem 0', fontSize: '1rem'}}>
+          <FontAwesomeIcon icon={faEnvelope} className="mr2" style={{fontSize: '1.2rem'}} /> Email
+        </p>
+        <a 
+          href="mailto:bbscafe25@outlook.com" 
+          itemProp="email" 
+          className="link no-underline" 
+          style={{color: '#d65a8c', fontSize: '0.9rem', fontWeight: '700', fontFamily: 'Quicksand, sans-serif', transition: 'all 0.2s', wordBreak: 'break-all'}}
+          onMouseOver={(e) => {
+            e.target.style.opacity = '0.8';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.opacity = '1';
+          }}
+        >
+          bbscafe25@outlook.com
+        </a>
+      </div>
+      
+      <div 
+        className="br4 pa4 tc" 
+        style={{
+          minWidth: '240px',
+          width: 'calc(50% - 0.75rem)',
+          maxWidth: '280px',
+          background: 'linear-gradient(135deg, #e8f0e8 0%, rgba(255, 255, 255, 0.8) 100%)',
+          boxShadow: '0 8px 24px rgba(107, 142, 111, 0.1)',
+          border: '2px solid #6b8e6f',
+          transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          padding: 'clamp(1rem, 3vw, 1rem)'
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = 'translateY(-8px)';
+          e.currentTarget.style.boxShadow = '0 16px 40px rgba(107, 142, 111, 0.2)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(107, 142, 111, 0.1)';
+        }}
+      >
+        <p className="f5 fw7 mb2" style={{color: '#6b8e6f', fontFamily: 'Playfair Display, serif', margin: '0 0 1rem 0', fontSize: '1rem'}}>
+          <FontAwesomeIcon icon={faFacebook} className="mr2" style={{ color: '#1877f2', fontSize: '1.2rem' }} /> Social
+        </p>
+        <a 
+          href="https://www.facebook.com/profile.php?id=61581654642389" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          aria-label="Visit BB's Bakery on Facebook"
+          className="link no-underline" 
+          style={{color: '#1877f2', fontWeight: '700', fontFamily: 'Quicksand, sans-serif', fontSize: '0.95rem', transition: 'all 0.2s'}}
+          onMouseOver={(e) => {
+            e.target.style.opacity = '0.8';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.opacity = '1';
+          }}
+        >
+          Follow us
+        </a>
+      </div>
+    </div>
+    
+    <div 
+      className="br4 overflow-hidden" 
+      style={{
+        boxShadow: '0 12px 40px rgba(214, 90, 140, 0.15)',
+        border: '3px solid #d65a8c',
+        borderRadius: '24px',
+        transition: 'all 0.35s ease'
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.boxShadow = '0 16px 50px rgba(214, 90, 140, 0.25)';
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.boxShadow = '0 12px 40px rgba(214, 90, 140, 0.15)';
+      }}
+    >
+      <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3176.9362687766876!2d-83.02847!3d36.75833!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x885a7e8c0e0e0e0e%3A0x0!2s103%20Main%20St%2C%20Pennington%20Gap%2C%20VA%2024277!5e0!3m2!1sen!2sus!4v1234567890" 
+        width="100%" 
+        height="clamp(300px, 60vw, 400px)" 
+        style={{ border: 0 }} 
+        allowFullScreen=""
+        loading="lazy" 
+        referrerPolicy="no-referrer-when-downgrade"
+        title="BB's Bakery & Cafe location map - 103 Main St, Pennington Gap, VA 24277"
+      ></iframe>
     </div>
   </section>
 );

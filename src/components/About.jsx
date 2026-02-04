@@ -1,29 +1,121 @@
 // About.jsx - BB's Bakery & Cafe
-import React from 'react';
-
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faClock, faWheatAwn, faMugHot } from '@fortawesome/free-solid-svg-icons';
 
 const About = () => (
-  <section id="about" className="info-section about-section" aria-labelledby="about-heading">
-    <h2 id="about-heading"><FontAwesomeIcon icon={faHeart} /> About Us</h2>
-    <p className="about-intro">At BB's Bakery & Cafe, we believe every morning deserves something special. That's why we bake fresh pastries, breads, and treats daily, using quality ingredients and time-honored recipes.</p>
-    <div className="about-highlights">
-      <div className="highlight">
-        <FontAwesomeIcon icon={faClock} />
-        <h3>Fresh Daily</h3>
-        <p>Everything baked fresh each morning</p>
+  <section id="about" className="pv5 mw7 center" style={{padding: 'clamp(2rem, 8vw, 3rem) 1rem'}} aria-labelledby="about-heading">
+    <h2 
+      id="about-heading" 
+      className="f2 fw7 tc mb4" 
+      style={{
+        fontFamily: 'Playfair Display, serif',
+        background: 'linear-gradient(135deg, #d65a8c 0%, #6b8e6f 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        letterSpacing: '-0.8px',
+        fontSize: 'clamp(2rem, 6vw, 2.5rem)',
+        marginBottom: '1.5rem'
+      }}
+    >
+      🧁 About Us
+    </h2>
+    
+    <p 
+      className="fw5 mb5 tc lh-copy" 
+      style={{
+        color: '#6d6d6d',
+        maxWidth: '700px',
+        margin: '0 auto 3rem',
+        fontFamily: 'Quicksand, sans-serif',
+        fontSize: '1.05rem',
+        lineHeight: '1.8'
+      }}
+    >
+      At BB's Bakery & Cafe, we believe every morning deserves something special. That's why we bake fresh pastries, breads, and treats daily, using quality ingredients and time-honored recipes.
+    </p>
+    
+    <div 
+      className="flex flex-wrap justify-center" 
+      style={{gap: 'clamp(1.5rem, 4vw, 2rem)'}}
+    >
+      <div 
+        className="br4 pa4 tc" 
+        style={{
+          minWidth: '280px',
+          width: 'calc(50% - 1rem)',
+          maxWidth: '320px',
+          background: 'linear-gradient(135deg, #fce7f0 0%, rgba(255, 255, 255, 0.8) 100%)',
+          boxShadow: '0 8px 24px rgba(214, 90, 140, 0.1)',
+          border: '2px solid #d65a8c',
+          transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          position: 'relative',
+          overflow: 'hidden',
+          padding: 'clamp(1.5rem, 4vw, 2rem)'
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = 'translateY(-8px)';
+          e.currentTarget.style.boxShadow = '0 16px 40px rgba(214, 90, 140, 0.2)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(214, 90, 140, 0.1)';
+        }}
+      >
+        <div style={{fontSize: '2.8rem', marginBottom: '1rem'}}>⏰</div>
+        <h3 className="f4 fw7 mb2" style={{color: '#d65a8c', fontFamily: 'Playfair Display, serif', margin: '0 0 0.8rem 0', letterSpacing: '0.3px'}}>Fresh Daily</h3>
+        <p className="f5" style={{color: '#6d6d6d', fontFamily: 'Quicksand, sans-serif', margin: '0', fontSize: '0.95rem', lineHeight: '1.6'}}>Everything baked fresh each morning</p>
       </div>
-      <div className="highlight">
-        <FontAwesomeIcon icon={faWheatAwn} />
-        <h3>Quality Ingredients</h3>
-        <p>Only the finest, freshest ingredients</p>
+      
+      <div 
+        className="br4 pa4 tc" 
+        style={{
+          minWidth: '280px',
+          width: 'calc(50% - 1rem)',
+          maxWidth: '320px',
+          background: 'linear-gradient(135deg, #e8f0e8 0%, rgba(255, 255, 255, 0.8) 100%)',
+          boxShadow: '0 8px 24px rgba(107, 142, 111, 0.1)',
+          border: '2px solid #6b8e6f',
+          transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          position: 'relative',
+          overflow: 'hidden',
+          padding: 'clamp(1.5rem, 4vw, 2rem)'
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = 'translateY(-8px)';
+          e.currentTarget.style.boxShadow = '0 16px 40px rgba(107, 142, 111, 0.2)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(107, 142, 111, 0.1)';
+        }}
+      >
+        <div style={{fontSize: '2.8rem', marginBottom: '1rem'}}>🌾</div>
+        <h3 className="f4 fw7 mb2" style={{color: '#6b8e6f', fontFamily: 'Playfair Display, serif', margin: '0 0 0.8rem 0', letterSpacing: '0.3px'}}>Quality Ingredients</h3>
+        <p className="f5" style={{color: '#6d6d6d', fontFamily: 'Quicksand, sans-serif', margin: '0', fontSize: '0.95rem', lineHeight: '1.6'}}>Only the finest, freshest ingredients</p>
       </div>
-      <div className="highlight">
-        <FontAwesomeIcon icon={faMugHot} />
-        <h3>Amazing Coffee</h3>
-        <p>Perfectly brewed every time</p>
+      
+      <div 
+        className="br4 pa4 tc" 
+        style={{
+          width: '280px',
+          background: 'linear-gradient(135deg, #fef3e8 0%, rgba(255, 255, 255, 0.8) 100%)',
+          boxShadow: '0 8px 24px rgba(201, 169, 97, 0.1)',
+          border: '2px solid #c9a961',
+          transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = 'translateY(-8px)';
+          e.currentTarget.style.boxShadow = '0 16px 40px rgba(201, 169, 97, 0.2)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(201, 169, 97, 0.1)';
+        }}
+      >
+        <div style={{fontSize: '2.8rem', marginBottom: '1rem'}}>☕</div>
+        <h3 className="f4 fw7 mb2" style={{color: '#c9a961', fontFamily: 'Playfair Display, serif', margin: '0 0 0.8rem 0', letterSpacing: '0.3px'}}>Amazing Coffee</h3>
+        <p className="f5" style={{color: '#6d6d6d', fontFamily: 'Quicksand, sans-serif', margin: '0', fontSize: '0.95rem', lineHeight: '1.6'}}>Perfectly brewed every time</p>
       </div>
     </div>
   </section>

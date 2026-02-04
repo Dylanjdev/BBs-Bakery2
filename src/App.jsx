@@ -1,35 +1,42 @@
 
 import './App.css';
+import { lazy, Suspense } from 'react';
+import ErrorBoundary from './components/ErrorBoundary';
 
-// Component imports (to be created)
+// Eagerly load critical components
 import Header from './components/Header';
 import Hero from './components/Hero';
-import About from './components/About';
-import Menu from './components/Menu';
-// import PreOrder from './components/PreOrder';
-// import Croissants from './components/Croissants';
-// import Hours from './components/Hours';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
-// import Modal from './components/Modal';
-// import ImageModal from './components/ImageModal';
+
+// Lazy load below-the-fold components
+const About = lazy(() => import('./components/About'));
+const Menu = lazy(() => import('./components/Menu'));
+const PreOrder = lazy(() => import('./components/PreOrder'));
+const Hours = lazy(() => import('./components/Hours'));
+const Contact = lazy(() => import('./components/Contact'));
+const Footer = lazy(() => import('./components/Footer'));
 
 function App() {
   return (
-    <div className="App">
-      <Header />
-      <Hero />
-      <About />
-      <Menu />
-      {/* <PreOrder /> */}
-      {/* <Croissants /> */}
-      {/* <Hours /> */}
-      <Contact />
-      <Footer />
-      {/* <Modal /> */}
-      {/* <ImageModal /> */}
-      {/* Components will be implemented and imported above */}
-    </div>
+    <ErrorBoundary>
+      <div className="App">
+        <Header />
+        <main className="main-content-wrapper" id="main-content">
+          <Hero />
+          <Suspense fallback={<div style={{minHeight: '100vh', background: 'linear-gradient(135deg, var(--bg-very-light) 0%, var(--bg-light) 100%)'}} />}>
+            <div className="section-wrapper">
+              <About />
+              <Menu />
+              <PreOrder />
+              <Hours />
+              <Contact />
+            </div>
+          </Suspense>
+        </main>
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
+      </div>
+    </ErrorBoundary>
   );
 }
 

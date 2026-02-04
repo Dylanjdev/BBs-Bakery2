@@ -11,9 +11,68 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="footer">
-      <p>© <span id="currentYear"></span> BB's Bakery & Cafe — Made with ♥</p>
-      <p className="built-by">Built by <a href="https://smithdigitals.com" target="_blank" rel="noopener noreferrer">Smith Digitals</a></p>
+    <footer 
+      className="pv5 tc" 
+      style={{
+        background: 'linear-gradient(135deg, #fce7f0 0%, #e8f0e8 100%)',
+        borderTop: '3px solid #d65a8c',
+        marginTop: '4rem'
+      }}
+    >
+      <div style={{fontSize: '2.2rem', marginBottom: '1.5rem', letterSpacing: '0.5rem'}}>🧁☕🍰</div>
+      
+      <p 
+        className="mb3 f4 fw7" 
+        style={{
+          background: 'linear-gradient(135deg, #d65a8c 0%, #6b8e6f 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          fontFamily: 'Playfair Display, serif',
+          margin: '0 0 1rem 0',
+          letterSpacing: '0.3px',
+          fontSize: '1.1rem'
+        }}
+      >
+        © <span id="currentYear"></span> BB's Bakery & Cafe
+      </p>
+      
+      <p 
+        className="f6 fw6" 
+        style={{
+          color: '#6d6d6d',
+          fontFamily: 'Quicksand, sans-serif',
+          margin: '0',
+          fontSize: '0.95rem',
+          letterSpacing: '0.3px'
+        }}
+      >
+        Made with 💝 by{' '}
+        <a 
+          href="https://smithdigitals.com" 
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Smith Digitals website"
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="link no-underline" 
+          style={{
+            color: '#d65a8c',
+            fontWeight: '700',
+            transition: 'all 0.2s'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.opacity = '0.8';
+            e.target.style.textDecoration = 'underline';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.opacity = '1';
+            e.target.style.textDecoration = 'none';
+          }}
+        >
+          Smith Digitals
+        </a>
+      </p>
     </footer>
   );
 };
