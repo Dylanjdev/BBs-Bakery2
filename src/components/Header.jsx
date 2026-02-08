@@ -157,7 +157,53 @@ const Header = memo(() => {
             e.target.style.color = '#6d6d6d';
           }}
         >
-          Hours
+          Reviews
+        </a>
+        <a 
+          href="#faq" 
+          className="fw6 br-pill no-underline" 
+          style={{
+            color: '#6d6d6d',
+            transition: 'all 0.25s ease',
+            fontFamily: 'Quicksand, sans-serif',
+            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
+            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
+            display: 'inline-block',
+            whiteSpace: 'nowrap'
+          }} 
+          onMouseOver={(e) => {
+            e.target.style.background = '#f5f5f5';
+            e.target.style.color = '#1a1a1a';
+          }} 
+          onMouseOut={(e) => {
+            e.target.style.background = 'transparent';
+            e.target.style.color = '#6d6d6d';
+          }}
+        >
+          FAQ
+        </a>
+        <a 
+          href="#contact" 
+          className="fw6 br-pill no-underline" 
+          style={{
+            color: '#6d6d6d',
+            transition: 'all 0.25s ease',
+            fontFamily: 'Quicksand, sans-serif',
+            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
+            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
+            display: 'inline-block',
+            whiteSpace: 'nowrap'
+          }} 
+          onMouseOver={(e) => {
+            e.target.style.background = '#f5f5f5';
+            e.target.style.color = '#1a1a1a';
+          }} 
+          onMouseOut={(e) => {
+            e.target.style.background = 'transparent';
+            e.target.style.color = '#6d6d6d';
+          }}
+        >
+          Contact
         </a>
         <a 
           href="#contact" 
@@ -225,18 +271,19 @@ const Header = memo(() => {
       
       {/* Backdrop overlay - prevents interaction with page behind menu */}
       {menuOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 99998,
-            onClick: handleClose
-          }}
-        />
+          <div
+            onClick={handleClose}
+            aria-hidden="true"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.5)',
+              zIndex: 99998
+            }}
+          />
       )}
     </header>
     
@@ -319,6 +366,40 @@ const Header = memo(() => {
         onMouseOut={(e) => e.target.style.background = 'transparent'}
       >
         Hours
+      </a>
+      <a 
+        href="#reviews" 
+        className="no-underline" 
+        style={{
+          color: '#1a1a1a',
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid #f0f0f0',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onClick={handleClose}
+        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseOut={(e) => e.target.style.background = 'transparent'}
+      >
+        Reviews
+      </a>
+      <a 
+        href="#faq" 
+        className="no-underline" 
+        style={{
+          color: '#1a1a1a',
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid #f0f0f0',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onClick={handleClose}
+        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseOut={(e) => e.target.style.background = 'transparent'}
+      >
+        FAQ
       </a>
       <a 
         href="#contact" 

@@ -1,14 +1,6 @@
 // Footer.jsx - BB's Bakery & Cafe
-import React, { useEffect } from 'react';
-
 const Footer = () => {
-  useEffect(() => {
-    // Set current year in footer
-    const yearSpan = document.getElementById('currentYear');
-    if (yearSpan) {
-      yearSpan.textContent = new Date().getFullYear();
-    }
-  }, []);
+  const currentYear = new Date().getFullYear();
 
   return (
     <footer 
@@ -34,7 +26,7 @@ const Footer = () => {
           fontSize: '1.1rem'
         }}
       >
-        © <span id="currentYear"></span> BB's Bakery & Cafe
+        © {currentYear} BB's Bakery & Cafe
       </p>
       
       <p 
@@ -50,8 +42,6 @@ const Footer = () => {
         Made with 💝 by{' '}
         <a 
           href="https://smithdigitals.com" 
-          target="_blank"
-          rel="noopener noreferrer"
           aria-label="Visit Smith Digitals website"
           target="_blank" 
           rel="noopener noreferrer" 
