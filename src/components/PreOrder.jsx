@@ -160,7 +160,11 @@ function PreOrder() {
               transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
               background: 'white'
             }} 
-            onClick={() => {setImageModalOpen(true); setModalImage(img.src);}}
+            onClick={() => {
+              setImageModalOpen(true);
+              setModalImage(img.src);
+              window.dispatchEvent(new CustomEvent('bb-preorder-image-modal-toggle', { detail: { open: true } }));
+            }}
             onMouseOver={(e) => {
               e.currentTarget.style.boxShadow = '0 14px 45px rgba(214, 90, 140, 0.25)'; 
               e.currentTarget.style.transform = 'translateY(-8px)';
@@ -179,6 +183,8 @@ function PreOrder() {
               <img 
                 src={img.src} 
                 alt={img.alt} 
+                width="1545"
+                height="2000"
                 className="br3" 
                 style={{
                   width: '100%',
@@ -191,7 +197,7 @@ function PreOrder() {
             <div 
               className="f6 tc fw6 pb3" 
               style={{
-                color: '#d65a8c',
+                color: 'var(--accent-pink-strong)',
                 fontFamily: 'Quicksand, sans-serif',
                 letterSpacing: '0.3px',
                 paddingX: '1rem'
@@ -233,12 +239,13 @@ function PreOrder() {
       {/* Modal for PreOrder */}
       {modalOpen && (
         <div 
-          className="fixed top-0 left-0 w-100 h-100 flex items-center justify-center z-999" 
+          className="fixed top-0 left-0 w-100 h-100 flex items-center justify-center" 
           style={{
             backgroundColor: 'rgba(0, 0, 0, 0.6)',
             backdropFilter: 'blur(10px)',
             overflowY: 'auto',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: 'touch',
+            zIndex: 100000
           }}
           onClick={() => setModalOpen(false)}
         >
@@ -315,7 +322,7 @@ function PreOrder() {
               <span 
                 className="f6 fw5" 
                 style={{
-                  color: '#d65a8c',
+                  color: 'var(--accent-pink-strong)',
                   fontFamily: 'Quicksand, sans-serif'
                 }}
               >
@@ -427,12 +434,16 @@ function PreOrder() {
       {/* Modal for Image Expand */}
       {imageModalOpen && (
         <div 
-          className="fixed top-0 left-0 w-100 h-100 flex items-center justify-center z-999" 
+          className="fixed top-0 left-0 w-100 h-100 flex items-center justify-center" 
           style={{
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
-            backdropFilter: 'blur(8px)'
+            backdropFilter: 'blur(8px)',
+            zIndex: 100000
           }}
-          onClick={() => setImageModalOpen(false)}
+          onClick={() => {
+            setImageModalOpen(false);
+            window.dispatchEvent(new CustomEvent('bb-preorder-image-modal-toggle', { detail: { open: false } }));
+          }}
         >
           <div 
             className="br4 pa3 center relative" 
@@ -464,7 +475,10 @@ function PreOrder() {
                 transition: 'all 0.2s',
                 border: 'none'
               }} 
-              onClick={() => setImageModalOpen(false)}
+              onClick={() => {
+                setImageModalOpen(false);
+                window.dispatchEvent(new CustomEvent('bb-preorder-image-modal-toggle', { detail: { open: false } }));
+              }}
               onMouseOver={(e) => {
                 e.target.style.background = '#f5f5f5';
                 e.target.style.transform = 'scale(1.1)';

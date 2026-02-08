@@ -11,7 +11,7 @@ const Footer = () => {
         marginTop: '4rem'
       }}
     >
-      <div style={{fontSize: '2.2rem', marginBottom: '1.5rem', letterSpacing: '0.5rem'}}>🧁☕🍰</div>
+      <div style={{fontSize: '2.2rem', marginBottom: '1.5rem', letterSpacing: '0.5rem'}}></div>
       
       <p 
         className="mb3 f4 fw7" 

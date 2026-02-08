@@ -112,7 +112,7 @@ const Hero = () => (
             margin: '0 0 1rem 0'
           }}
         >
-          BB's Bakery & Cafe
+          BB's Bakery & Cafe in Pennington Gap, VA
         </h1>
         
         <p 
@@ -128,7 +128,7 @@ const Hero = () => (
             margin: '0 0 1.5rem 0'
           }}
         >
-          🍰 Fresh-baked goodness made with love every morning 🧁
+          Fresh-baked goodness made with love every morning
         </p>
         
         <p 
@@ -174,7 +174,7 @@ const Hero = () => (
               e.target.style.boxShadow = '0 6px 24px rgba(214, 90, 140, 0.25)';
             }}
           >
-            🎂 View Menu
+            View Menu
           </a>
           
           <a 

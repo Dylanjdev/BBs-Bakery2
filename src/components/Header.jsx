@@ -8,6 +8,20 @@ import { faPhone } from '@fortawesome/free-solid-svg-icons';
 
 const Header = memo(() => {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Close mobile menu when preorder image modal opens
+  React.useEffect(() => {
+    const handlePreorderImageModalToggle = (event) => {
+      if (event.detail && event.detail.open) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener('bb-preorder-image-modal-toggle', handlePreorderImageModalToggle);
+    return () => {
+      window.removeEventListener('bb-preorder-image-modal-toggle', handlePreorderImageModalToggle);
+    };
+  }, []);
+
   // Lock body scroll when menu is open
   React.useEffect(() => {
     if (menuOpen) {
