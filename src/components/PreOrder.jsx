@@ -1,5 +1,5 @@
 // PreOrder.jsx - BB's Bakery & Cafe
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const preorderItems = [
   {
@@ -66,6 +66,23 @@ function PreOrder() {
   const [modalOpen, setModalOpen] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState(null);
+
+  // Prevent background scroll when any PreOrder modal is open
+  useEffect(() => {
+    const shouldLockScroll = modalOpen || imageModalOpen;
+    if (shouldLockScroll) {
+      const { body, documentElement } = document;
+      const previousBodyOverflow = body.style.overflow;
+      const previousHtmlOverflow = documentElement.style.overflow;
+      body.style.overflow = 'hidden';
+      documentElement.style.overflow = 'hidden';
+
+      return () => {
+        body.style.overflow = previousBodyOverflow;
+        documentElement.style.overflow = previousHtmlOverflow;
+      };
+    }
+  }, [modalOpen, imageModalOpen]);
 
   return (
     <section 
@@ -219,7 +236,9 @@ function PreOrder() {
           className="fixed top-0 left-0 w-100 h-100 flex items-center justify-center z-999" 
           style={{
             backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(10px)'
+            backdropFilter: 'blur(10px)',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch'
           }}
           onClick={() => setModalOpen(false)}
         >
