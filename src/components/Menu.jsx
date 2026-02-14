@@ -69,6 +69,14 @@ const Menu = () => (
           </div>
           <span className="price">$4.50<small style={{opacity: 0.7, fontSize: '0.85em'}}>/slice</small></span>
         </div>
+
+        <div className="menu-item">
+          <div>
+            <h4>Cream Horns</h4>
+            <p>flaky pastry + sweet cream filling</p>
+          </div>
+          <span className="price">$4.50</span>
+        </div>
       </div>
 
       {/* Breakfast */}

@@ -1,6 +1,6 @@
 // Hero.jsx - BB's Bakery & Cafe
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLocationDot, faPhone, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
 
 const Hero = () => (
   <section 
@@ -208,36 +208,6 @@ const Hero = () => (
             Order Now
           </a>
           
-          <a 
-            href="#preorder" 
-            className="fw6 pv3 ph5 br-pill dib no-underline" 
-            style={{
-              transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              fontSize: 'clamp(0.85rem, 3vw, 1rem)',
-              padding: 'clamp(0.6rem, 3vw, 0.75rem) clamp(1rem, 4vw, 1.25rem)',
-              background: 'rgba(255, 255, 255, 0.8)',
-              color: '#d65a8c',
-              border: '2px solid #d65a8c',
-              boxShadow: '0 4px 16px rgba(214, 90, 140, 0.15)',
-              backdropFilter: 'blur(20px)',
-              letterSpacing: '0.3px',
-              fontWeight: '600',
-              whiteSpace: 'nowrap'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.background = 'rgba(255, 255, 255, 0.95)';
-              e.target.style.transform = 'translateY(-3px)';
-              e.target.style.boxShadow = '0 8px 24px rgba(214, 90, 140, 0.25)';
-            }}
-            onMouseOut={(e) => {
-              e.target.style.background = 'rgba(255, 255, 255, 0.8)';
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 16px rgba(214, 90, 140, 0.15)';
-            }}
-          >
-            <FontAwesomeIcon icon={faHeart} /> 
-            Special Orders
-          </a>
         </div>
       </div>
     </div>

@@ -11,7 +11,6 @@ import Hero from './components/Hero';
 const About = lazy(() => import('./components/About'));
 const Reviews = lazy(() => import('./components/Reviews'));
 const Menu = lazy(() => import('./components/Menu'));
-const PreOrder = lazy(() => import('./components/PreOrder'));
 const Hours = lazy(() => import('./components/Hours'));
 const FAQ = lazy(() => import('./components/FAQ'));
 const Contact = lazy(() => import('./components/Contact'));
@@ -29,7 +28,6 @@ function App() {
               <About />
               <Reviews />
               <Menu />
-              <PreOrder />
               <Hours />
               <FAQ />
               <Contact />
