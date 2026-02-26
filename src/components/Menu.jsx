@@ -22,10 +22,11 @@ const Menu = () => (
           <h4>✨ Special of the Day</h4>
           <ul>
             <li><i className="fa-solid fa-circle-xmark"></i> Sunday – Closed</li>
-            <li><i className="fa-solid fa-croissant"></i> Monday – Croissants</li>
+            <li><i className="fa-solid fa-bread-slice"></i> Monday – Croissants</li>
             <li><i className="fa-solid fa-mug-hot"></i> Tuesday – $10 Coffee Cake & Small/Medium Coffee (Hot or Iced)</li>
             <li><i className="fa-solid fa-cookie"></i> Wednesday – Danishes</li>
             <li><i className="fa-solid fa-blender"></i> Thursday – $7 Frappee</li>
+            <li><i className="fa-solid fa-egg"></i> Friday – Quiche Day</li>
             <li><i className="fa-solid fa-star"></i> Saturday – Baker's Choice</li>
           </ul>
         </div>
