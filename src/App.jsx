@@ -111,7 +111,7 @@ function App() {
     setCheckoutError('');
 
     try {
-      const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+      const apiBaseUrl = (import.meta.env.VITE_API_URL || 'https://bbbackend-ntbt.onrender.com').replace(/\/$/, '');
       const response = await fetch(`${apiBaseUrl}/create-checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
