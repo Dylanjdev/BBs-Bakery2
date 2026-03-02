@@ -74,10 +74,10 @@ const Hero = () => (
             fetchPriority="high"
             decoding="async"
             onMouseOver={(e) => {
-              e.style.transform = 'scale(1.03)';
+              e.currentTarget.style.transform = 'scale(1.03)';
             }}
             onMouseOut={(e) => {
-              e.style.transform = 'scale(1)';
+              e.currentTarget.style.transform = 'scale(1)';
             }}
           />
           {/* Overlay gradient for depth */}

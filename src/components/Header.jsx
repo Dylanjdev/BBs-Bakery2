@@ -2,12 +2,15 @@
 import React, { useState, memo } from 'react';
 import '../sticky-header.css';
 import '../burger-menu.css';
+import '../cart.css';
+import CartModal from './CartModal';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faPhone, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 
-const Header = memo(() => {
+const Header = memo(({ cart, onUpdateQuantity, onCheckout, isCheckingOut, checkoutError, totalCents }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Lock body scroll when menu is open
   React.useEffect(() => {
@@ -31,6 +34,8 @@ const Header = memo(() => {
   }, [menuOpen]);
   const handleToggle = () => setMenuOpen(!menuOpen);
   const handleClose = () => setMenuOpen(false);
+  const handleOpenCart = () => setIsCartOpen(true);
+  const handleCloseCart = () => setIsCartOpen(false);
   
   return (
     <>
@@ -206,35 +211,12 @@ const Header = memo(() => {
         >
           Contact
         </a>
-        <a 
-          href="#contact" 
-          className="fw6 br-pill no-underline" 
-          style={{
-            color: '#6d6d6d',
-            transition: 'all 0.25s ease',
-            fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }} 
-          onMouseOver={(e) => {
-            e.target.style.background = '#f5f5f5';
-            e.target.style.color = '#1a1a1a';
-          }} 
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = '#6d6d6d';
-          }}
-        >
-          Contact
-        </a>
+        <div className="desktop-cta-group">
         <a 
           href="tel:2765710891" 
           className="fw6 br-pill flex items-center no-underline white" 
           style={{
             background: 'linear-gradient(135deg, #d65a8c 0%, #c9a961 100%)',
-            marginLeft: 'clamp(1rem, 3vw, 2.5rem)',
             transition: 'all 0.3s ease',
             boxShadow: '0 4px 16px rgba(214, 90, 140, 0.25)',
             fontFamily: 'Quicksand, sans-serif',
@@ -255,8 +237,73 @@ const Header = memo(() => {
         >
           <FontAwesomeIcon icon={faPhone} className="mr2" /> (276) 571-0891
         </a>
+        <button
+          type="button"
+          className="fw6 br-pill flex items-center desktop-cart-btn"
+          onClick={handleOpenCart}
+          aria-label={`Open cart${cart.length ? ` with ${cart.length} items` : ''}`}
+        >
+          <FontAwesomeIcon icon={faShoppingCart} className="mr2" /> Cart
+          {cart.length > 0 && (
+            <span className="desktop-cart-badge">
+              {cart.length}
+            </span>
+          )}
+        </button>
+        </div>
       </nav>
       
+      {/* Mobile Cart Button - Only visible on mobile */}
+      <button
+        type="button"
+        className="mobile-cart-btn"
+        onClick={handleOpenCart}
+        aria-label={`Open cart${cart.length ? ` with ${cart.length} items` : ''}`}
+        style={{
+          position: 'absolute',
+          top: '1rem',
+          right: '4.25rem',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '44px',
+          height: '44px',
+          borderRadius: '50%',
+          background: cart.length > 0 
+            ? 'linear-gradient(135deg, #d65a8c 0%, #c9a961 100%)'
+            : '#e0e0e0',
+          color: 'white',
+          border: 'none',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+          cursor: 'pointer',
+          transition: 'all 0.25s ease',
+          fontSize: '1.1rem'
+        }}
+      >
+        <FontAwesomeIcon icon={faShoppingCart} />
+        {cart.length > 0 && (
+          <span style={{
+            position: 'absolute',
+            top: '-4px',
+            right: '-4px',
+            minWidth: '20px',
+            height: '20px',
+            borderRadius: '999px',
+            background: '#ff4757',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '0.7rem',
+            fontWeight: '700',
+            padding: '0 0.3rem',
+            lineHeight: '1',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+          }}>
+            {cart.length}
+          </span>
+        )}
+      </button>
+
       {/* Mobile Nav Toggle */}
       <button
         className="burger-toggle"
@@ -443,6 +490,16 @@ const Header = memo(() => {
         <FontAwesomeIcon icon={faPhone} /> (276) 571-0891
       </a>
     </nav>
+    <CartModal
+      isOpen={isCartOpen}
+      onClose={handleCloseCart}
+      cart={cart}
+      onUpdateQuantity={onUpdateQuantity}
+      onCheckout={onCheckout}
+      isCheckingOut={isCheckingOut}
+      checkoutError={checkoutError}
+      totalCents={totalCents}
+    />
     </>
   );
 });

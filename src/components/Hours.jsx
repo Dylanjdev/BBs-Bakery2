@@ -38,7 +38,7 @@ function Hours() {
   }, []);
   
   return (
-    <section id="hours" className="pv5 mw7 center" style={{padding: 'clamp(2.5rem, 10vw, 5rem) clamp(1rem, 3vw, 2rem)'}} aria-labelledby="hours-heading">
+    <section id="hours" className="pv5 center" style={{padding: 'clamp(2.5rem, 10vw, 5rem) clamp(1rem, 3vw, 2rem)', maxWidth: '100%', boxSizing: 'border-box'}} aria-labelledby="hours-heading">
       <h2 
         id="hours-heading" 
         className="f2 fw7 tc mb5" 
@@ -65,7 +65,7 @@ function Hours() {
             ? 'linear-gradient(135deg, #e8f0e8 0%, #f0fdf4 100%)' 
             : 'linear-gradient(135deg, #fce7f0 0%, #fff0f7 100%)',
           borderRadius: '25px',
-          maxWidth: '450px',
+          maxWidth: 'calc(100% - 2rem)',
           margin: '0 auto 3rem',
           border: status.isOpen ? '3px solid #6b8e6f' : '3px solid #d65a8c',
           boxShadow: status.isOpen 
@@ -75,7 +75,8 @@ function Hours() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          flexWrap: 'wrap'
+          flexWrap: 'wrap',
+          boxSizing: 'border-box'
         }}
       >
         <span 
@@ -108,6 +109,7 @@ function Hours() {
       {/* Hours Grid */}
       <div 
         className="tc hours-grid"
+        style={{maxWidth: '100%', boxSizing: 'border-box', padding: '0 1rem'}}
       >
         <div 
           className="br4 pa4" 
@@ -116,7 +118,10 @@ function Hours() {
             boxShadow: '0 8px 24px rgba(214, 90, 140, 0.1)',
             border: '2px solid #d65a8c',
             transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            padding: 'clamp(1.5rem, 4vw, 1.75rem)'
+            padding: 'clamp(1.5rem, 4vw, 1.75rem)',
+            boxSizing: 'border-box',
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word'
           }}
           onMouseOver={(e) => {
             e.currentTarget.style.transform = 'translateY(-6px)';
@@ -159,7 +164,10 @@ function Hours() {
             boxShadow: '0 8px 24px rgba(107, 142, 111, 0.1)',
             border: '2px solid #6b8e6f',
             transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            padding: 'clamp(1.5rem, 4vw, 1.75rem)'
+            padding: 'clamp(1.5rem, 4vw, 1.75rem)',
+            boxSizing: 'border-box',
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word'
           }}
           onMouseOver={(e) => {
             e.currentTarget.style.transform = 'translateY(-6px)';
@@ -203,7 +211,10 @@ function Hours() {
             border: '2px solid #c9a961',
             transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
             gridColumn: 'span auto',
-            padding: 'clamp(1.5rem, 4vw, 1.75rem)'
+            padding: 'clamp(1.5rem, 4vw, 1.75rem)',
+            boxSizing: 'border-box',
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word'
           }}
           onMouseOver={(e) => {
             e.currentTarget.style.transform = 'translateY(-6px)';
@@ -239,7 +250,7 @@ function Hours() {
           </p>
         </div>
       </div>
-      
+
       <style>{`
         @keyframes pulse {
           0%, 100% {
@@ -249,6 +260,16 @@ function Hours() {
           50% {
             opacity: 0.7;
             box-shadow: 0 0 8px rgba(107, 142, 111, 0.4);
+          }
+        }
+
+        @media (max-width: 640px) {
+          table {
+            font-size: 0.85rem !important;
+          }
+
+          td, th {
+            padding: 0.75rem !important;
           }
         }
       `}</style>
