@@ -111,7 +111,12 @@ function App() {
     setCheckoutError('');
 
     try {
-      const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+      const configuredApiUrl = (import.meta.env.VITE_API_URL || '').trim();
+      const fallbackApiUrl = import.meta.env.PROD
+        ? window.location.origin
+        : 'http://localhost:3001';
+      const apiBaseUrl = (configuredApiUrl || fallbackApiUrl).replace(/\/$/, '');
+
       const response = await fetch(`${apiBaseUrl}/create-checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
