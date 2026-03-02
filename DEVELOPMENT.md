@@ -67,6 +67,29 @@ npm run preview
 ### Environment Variables
 Copy `.env.example` to `.env.local` and fill in your values.
 
+### Export Square Variation IDs
+Run this when you need a catalog mapping for checkout:
+
+```bash
+npm run square:export-variation-ids
+```
+
+Required env vars:
+- `SQUARE_ACCESS_TOKEN` (Sandbox or Production token)
+- `SQUARE_ENVIRONMENT` (`sandbox` or `production`)
+
+Output file:
+- `square-variation-ids.csv` (includes item name, variation name, and variation ID)
+
+Build menu mapping file from the CSV:
+
+```bash
+npm run square:build-variation-map
+```
+
+This updates:
+- `src/data/squareVariationMap.js`
+
 ## Browser Support
 
 - Chrome/Edge: Latest 2 versions
