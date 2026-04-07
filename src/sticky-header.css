@@ -63,8 +63,16 @@
   display: none;
 }
 
+.mobile-admin-btn {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .mobile-cart-btn {
+    display: flex !important;
+  }
+
+  .mobile-admin-btn {
     display: flex !important;
   }
 }

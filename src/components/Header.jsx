@@ -8,7 +8,16 @@ import CartModal from './CartModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 
-const Header = memo(({ cart, onUpdateQuantity, onCheckout, isCheckingOut, checkoutError, totalCents }) => {
+const Header = memo(({
+  cart,
+  onUpdateQuantity,
+  onCheckout,
+  customerName,
+  onCustomerNameChange,
+  isCheckingOut,
+  checkoutError,
+  totalCents,
+}) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -210,6 +219,29 @@ const Header = memo(({ cart, onUpdateQuantity, onCheckout, isCheckingOut, checko
           }}
         >
           Contact
+        </a>
+        <a 
+          href="#/admin" 
+          className="fw6 br-pill no-underline" 
+          style={{
+            color: '#6d6d6d',
+            transition: 'all 0.25s ease',
+            fontFamily: 'Quicksand, sans-serif',
+            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
+            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
+            display: 'inline-block',
+            whiteSpace: 'nowrap'
+          }} 
+          onMouseOver={(e) => {
+            e.target.style.background = '#f5f5f5';
+            e.target.style.color = '#1a1a1a';
+          }} 
+          onMouseOut={(e) => {
+            e.target.style.background = 'transparent';
+            e.target.style.color = '#6d6d6d';
+          }}
+        >
+          Admin
         </a>
         <div className="desktop-cta-group">
         <a 
@@ -467,6 +499,23 @@ const Header = memo(({ cart, onUpdateQuantity, onCheckout, isCheckingOut, checko
         Contact
       </a>
       <a 
+        href="#/admin" 
+        className="no-underline" 
+        style={{
+          color: '#1a1a1a',
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid #f0f0f0',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onClick={handleClose}
+        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseOut={(e) => e.target.style.background = 'transparent'}
+      >
+        Admin
+      </a>
+      <a 
         href="tel:2765710891" 
         className="no-underline" 
         style={{
@@ -496,6 +545,8 @@ const Header = memo(({ cart, onUpdateQuantity, onCheckout, isCheckingOut, checko
       cart={cart}
       onUpdateQuantity={onUpdateQuantity}
       onCheckout={onCheckout}
+      customerName={customerName}
+      onCustomerNameChange={onCustomerNameChange}
       isCheckingOut={isCheckingOut}
       checkoutError={checkoutError}
       totalCents={totalCents}

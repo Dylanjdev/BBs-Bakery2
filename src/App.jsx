@@ -1,7 +1,10 @@
 
 import './App.css';
-import { lazy, Suspense, useState, useMemo } from 'react';
+import { lazy, Suspense, useState, useMemo, useEffect } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
+import AdminPage from './components/AdminPage';
+import { getApiBaseUrl } from './lib/apiBaseUrl';
+import { isMenuItemUnavailableToday, loadDailyUnavailableMap } from './lib/menuAvailability';
 
 // Eagerly load critical components
 import Header from './components/Header';
@@ -17,31 +20,56 @@ const FAQ = lazy(() => import('./components/FAQ'));
 const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
 
+// Temporary override: set true to disable online ordering across the site.
+const FORCE_ORDERING_CLOSED = false;
+
+// Temporary override: keep false for normal ordering schedule checks.
+const FORCE_ORDERING_OPEN = false;
+
 // Check if ordering is allowed based on current time and day
 function getOrderingStatus() {
+  if (FORCE_ORDERING_CLOSED) {
+    return {
+      isOrderingAllowed: false,
+      message: 'Online ordering is temporarily unavailable. Please call the cafe to place an order.',
+    };
+  }
+
+  if (FORCE_ORDERING_OPEN) {
+    return {
+      isOrderingAllowed: true,
+      message: '',
+    };
+  }
+
   const now = new Date();
   const day = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
   const currentTime = now.getHours() + now.getMinutes() / 60;
 
-  // Saturday opens at 8, other days at 7
-  const OPENING_TIME = day === 6 ? 8.5 : 7.5;
-  // Order cutoff time is 1:30 PM (13.5)
-  const CUTOFF_TIME = 13.5;
+  const isTuesdayToFriday = day >= 2 && day <= 5;
+  const isSaturday = day === 6;
+  const OPENING_TIME = isSaturday ? 8 : 7;
+  const CUTOFF_TIME = 16;
 
-  // Sunday (0) is closed
-  if (day === 0) {
+  if (day === 0 || day === 1) {
     return {
       isOrderingAllowed: false,
-      message: 'We are closed on Sundays. Orders reopen Monday at 7:30 AM.'
+      message: 'We are closed on Sundays and Mondays. Orders reopen Tuesday at 7:00 AM.'
+    };
+  }
+
+  if (!isTuesdayToFriday && !isSaturday) {
+    return {
+      isOrderingAllowed: false,
+      message: 'Orders are currently unavailable.'
     };
   }
 
   // Check if before opening time
   if (currentTime < OPENING_TIME) {
-    const openTime = day === 6 ? '8:30 AM' : '7:30 AM';
     return {
       isOrderingAllowed: false,
-      message: `Orders are not available yet. We open for online orders at ${openTime}.`
+      message: `Orders are not available yet. We open for online orders at ${isSaturday ? '8:00 AM' : '7:00 AM'}.`
     };
   }
 
@@ -49,7 +77,7 @@ function getOrderingStatus() {
   if (currentTime >= CUTOFF_TIME) {
     return {
       isOrderingAllowed: false,
-      message: 'Orders are closed. The daily cutoff is 1:30 PM. Please come back tomorrow!'
+      message: 'Orders are closed for the day. The daily cutoff is 4:00 PM. Please come back during business hours.'
     };
   }
 
@@ -59,18 +87,60 @@ function getOrderingStatus() {
   };
 }
 
+function getIsAdminRoute() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  return window.location.pathname === '/admin' || window.location.hash === '#/admin';
+}
+
 function App() {
+  const [isAdminRoute, setIsAdminRoute] = useState(() => getIsAdminRoute());
   const [cart, setCart] = useState([]);
+  const [customerName, setCustomerName] = useState('');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
   const orderingStatus = useMemo(() => getOrderingStatus(), []);
+
+  useEffect(() => {
+    const syncRoute = () => setIsAdminRoute(getIsAdminRoute());
+    window.addEventListener('hashchange', syncRoute);
+    window.addEventListener('popstate', syncRoute);
+
+    return () => {
+      window.removeEventListener('hashchange', syncRoute);
+      window.removeEventListener('popstate', syncRoute);
+    };
+  }, []);
 
   const totalCents = useMemo(
     () => cart.reduce((sum, item) => sum + item.amount * item.quantity, 0),
     [cart]
   );
 
+  if (isAdminRoute) {
+    return (
+      <ErrorBoundary>
+        <AdminPage />
+      </ErrorBoundary>
+    );
+  }
+
   const addToCart = (item) => {
+    const unavailableMap = loadDailyUnavailableMap();
+    const isUnavailableNow = isMenuItemUnavailableToday(item?.name, unavailableMap);
+
+    if (isUnavailableNow) {
+      setCheckoutError(`${item.name} is unavailable today.`);
+      return;
+    }
+
+    if (item?.isUnavailableToday) {
+      setCheckoutError(`${item.name} is unavailable today.`);
+      return;
+    }
+
     if (!orderingStatus.isOrderingAllowed) {
       setCheckoutError(orderingStatus.message);
       return;
@@ -107,19 +177,32 @@ function App() {
       return;
     }
 
+    if (!orderingStatus.isOrderingAllowed) {
+      setCheckoutError(orderingStatus.message);
+      return;
+    }
+
     setIsCheckingOut(true);
     setCheckoutError('');
 
     try {
-      const apiBaseUrl = (import.meta.env.VITE_API_URL || 'https://bbbackend-ntbt.onrender.com').replace(/\/$/, '');
+      const unavailableMap = loadDailyUnavailableMap();
+      const blockedItem = cart.find((item) => isMenuItemUnavailableToday(item?.name, unavailableMap));
+      if (blockedItem) {
+        throw new Error(`${blockedItem.name} is unavailable today. Please remove it from your cart.`);
+      }
+
+      const apiBaseUrl = getApiBaseUrl();
       const response = await fetch(`${apiBaseUrl}/create-checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          customerName: customerName.trim(),
           items: cart.map((item) => ({
             name: item.name,
             variationId: item.variationId || undefined,
             quantity: String(item.quantity),
+            note: item.note || undefined,
             basePriceMoney: {
               amount: item.amount,
               currency: 'USD',
@@ -148,6 +231,8 @@ function App() {
           cart={cart}
           onUpdateQuantity={updateQuantity}
           onCheckout={handleCheckout}
+          customerName={customerName}
+          onCustomerNameChange={setCustomerName}
           isCheckingOut={isCheckingOut}
           checkoutError={checkoutError}
           totalCents={totalCents}

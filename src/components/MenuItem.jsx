@@ -18,7 +18,7 @@ const MenuItem = ({ item, onAddToCart, category }) => {
 
   const getPlaceholderEmoji = (category, name) => {
     const emojiMap = {
-      'Baked Goods': ['🧁', '🥐', '🍪', '🎂', '🥖', '🍰'],
+      'Bakery Items': ['🧁', '🥐', '🍪', '🎂', '🥖', '🍰'],
       'Breakfast': ['🍳', '🌯', '🥪', '🍞', '🧈', '🥞'],
       'Loaded Energy': ['⚡', '🔋', '💪', '✨', '🚀', '💥'],
       'Specialty Coffee': ['☕', '🫖', '☕', '🧋', '🫗', '🍶'],

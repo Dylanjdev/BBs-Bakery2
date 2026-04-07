@@ -6,23 +6,31 @@ function getOpenStatus() {
   const now = new Date();
   const day = now.getDay();
   const currentTime = now.getHours() + now.getMinutes() / 60;
-  const isMondayToFriday = day >= 1 && day <= 5;
+  const isTuesdayToFriday = day >= 2 && day <= 5;
   const isSaturday = day === 6;
   const isOpen =
-    (isMondayToFriday && currentTime >= 7 && currentTime < 14) ||
-    (isSaturday && currentTime >= 8 && currentTime < 14);
+    (isTuesdayToFriday && currentTime >= 7 && currentTime < 16) ||
+    (isSaturday && currentTime >= 8 && currentTime < 16);
   let statusText = '';
   if (isOpen) {
     statusText = 'OPEN NOW';
   } else {
-    if (day === 0 || (day === 6 && currentTime >= 14)) {
-      statusText = 'CLOSED - Opens Monday 7:00 AM';
+    if (day === 0) {
+      statusText = 'CLOSED - Opens Tuesday 7:00 AM';
+    } else if (day === 1) {
+      statusText = 'CLOSED - Opens Tuesday 7:00 AM';
+    } else if (day === 6 && currentTime >= 16) {
+      statusText = 'CLOSED - Opens Tuesday 7:00 AM';
     } else if (day === 6 && currentTime < 8) {
       statusText = 'CLOSED - Opens at 8:00 AM';
-    } else if (currentTime < 7) {
+    } else if (day >= 2 && day <= 5 && currentTime < 7) {
       statusText = 'CLOSED - Opens at 7:00 AM';
-    } else {
+    } else if (day >= 2 && day <= 4 && currentTime >= 16) {
       statusText = 'CLOSED - Opens Tomorrow 7:00 AM';
+    } else if (day === 5 && currentTime >= 16) {
+      statusText = 'CLOSED - Opens Saturday 8:00 AM';
+    } else {
+      statusText = 'CLOSED';
     }
   }
   return { isOpen, statusText };
@@ -141,7 +149,7 @@ function Hours() {
               fontSize: '1rem'
             }}
           >
-            Monday - Friday
+            Tuesday - Friday
           </p>
           <p 
             className="f3 fw7" 
@@ -153,7 +161,7 @@ function Hours() {
               letterSpacing: '0.3px'
             }}
           >
-            7:00 AM – 2:00 PM
+            7:00 AM – 4:00 PM
           </p>
         </div>
         
@@ -199,7 +207,7 @@ function Hours() {
               letterSpacing: '0.3px'
             }}
           >
-            8:00 AM – 2:00 PM
+            8:00 AM – 4:00 PM
           </p>
         </div>
         
@@ -234,7 +242,7 @@ function Hours() {
               fontSize: '1rem'
             }}
           >
-            Sunday
+            Sunday & Monday
           </p>
           <p 
             className="f3 fw7" 

@@ -57,7 +57,7 @@
 }
 
 .menu-column {
-  background: var(--primary-light);
+  background: #a2ba8b;
   padding: clamp(1.5rem, 5vw, 2.8125rem);
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -81,7 +81,7 @@
 }
 
 .menu-column:hover {
-  background: var(--primary-light);
+  background: #a2ba8b;
   box-shadow: 0 12px 40px rgba(214, 90, 140, 0.15);
   transform: translateY(-3px);
 }
@@ -102,9 +102,276 @@
   position: relative;
   letter-spacing: -0.5px;
 }
-  border-bottom: 2px solid var(--accent-pink-pale);
-  position: relative;
-  letter-spacing: -0.5px;
+
+.bakery-layout {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.bakery-panel {
+  background: #a2ba8b;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.bakery-panel:hover {
+  transform: none;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.bakery-panel::before {
+  display: none;
+}
+
+.bakery-branding {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.bakery-branding__icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #111;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.bakery-branding__name {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  color: var(--text-dark);
+  font-size: clamp(1.15rem, 3vw, 2rem);
+  font-weight: 700;
+}
+
+.bakery-branding__tagline {
+  margin: 0.18rem 0 0;
+  color: var(--text-light);
+  font-size: 0.96rem;
+  font-weight: 600;
+}
+
+.bakery-divider {
+  margin: 1.3rem 0 1.2rem;
+}
+
+.bakery-heading {
+  text-align: left !important;
+  border-bottom: none !important;
+  margin: 0 0 0.35rem 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.bakery-heading::after {
+  display: none !important;
+}
+
+.bakery-note {
+  margin: 0 0 1rem 0;
+  font-family: 'Playfair Display', serif;
+  color: var(--text-dark);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.bakery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 2rem;
+}
+
+.bakery-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border-light);
+  gap: 0.9rem;
+}
+
+.bakery-item__text h4 {
+  margin: 0 0 0.25rem;
+}
+
+.bakery-item__text p {
+  margin: 0;
+  max-width: 24ch;
+}
+
+.bakery-item__actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  min-width: 120px;
+}
+
+.breakfast-panel .bakery-heading {
+  margin-bottom: 0.9rem !important;
+}
+
+.breakfast-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.breakfast-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.breakfast-item:last-child {
+  border-bottom: none;
+}
+
+.breakfast-item__text h4 {
+  margin: 0 0 0.2rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--text-dark);
+}
+
+.breakfast-item__text p {
+  margin: 0;
+  color: var(--text-light);
+  font-size: 0.95rem;
+  max-width: 46ch;
+}
+
+.breakfast-item__actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  min-width: 220px;
+}
+
+.coffee-panel .bakery-heading {
+  margin-bottom: 0 !important;
+}
+
+.coffee-header-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.5rem;
+  align-items: start;
+  margin-bottom: 1.25rem;
+}
+
+.coffee-pricing-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  min-width: 180px;
+  color: var(--text-dark);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+}
+
+.coffee-pricing-card p {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.coffee-pricing-card span {
+  font-size: 0.95rem;
+}
+
+.coffee-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 2rem;
+}
+
+.coffee-list-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.coffee-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.coffee-list-column .coffee-item:last-child {
+  border-bottom: none;
+}
+
+.coffee-item__text h4 {
+  margin: 0 0 0.2rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--text-dark);
+}
+
+.coffee-item__text p {
+  margin: 0;
+  color: var(--text-light);
+  font-size: 0.95rem;
+  max-width: 34ch;
+}
+
+.coffee-item__actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+@media (max-width: 900px) {
+  .bakery-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .coffee-header-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .coffee-pricing-card {
+    align-items: flex-start;
+    min-width: unset;
+  }
+
+  .coffee-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .breakfast-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .breakfast-item__actions {
+    min-width: unset;
+  }
+
+  .coffee-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .menu-column h3 i,
@@ -312,6 +579,14 @@
   .menu-item .price {
     font-size: 1.3rem;
     align-self: flex-end;
+  }
+
+  .bakery-branding {
+    align-items: flex-start;
+  }
+
+  .bakery-item__actions {
+    min-width: unset;
   }
 
   .menu-special {

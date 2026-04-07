@@ -67,7 +67,7 @@ const FAQ = () => (
           className="mt2"
           style={{ color: '#555', fontFamily: 'Quicksand, sans-serif', fontSize: '0.95rem' }}
         >
-          We're open Monday-Friday from 7:00 AM to 2:00 PM and Saturday from 8:00 AM to 2:00 PM. We are closed on Sundays.
+          We're open Tuesday through Friday from 7:00 AM to 4:00 PM and Saturday from 8:00 AM to 4:00 PM. We are closed on Sundays and Mondays.
         </p>
       </details>
 

@@ -19,4 +19,4 @@ export const useHoverEffect = (styles) => {
   }, [styles.normal]);
 
   return { onMouseOver: handleMouseOver, onMouseOut: handleMouseOut };
-};
+}

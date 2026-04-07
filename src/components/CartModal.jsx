@@ -11,6 +11,8 @@ const CartModal = ({
   cart, 
   onUpdateQuantity, 
   onCheckout, 
+  customerName,
+  onCustomerNameChange,
   isCheckingOut, 
   checkoutError, 
   totalCents 
@@ -77,6 +79,7 @@ const CartModal = ({
                   <div key={item.name} className="cart-item">
                     <div className="cart-item-content">
                       <div className="cart-item-name">{item.name}</div>
+                      {item.note ? <div className="cart-item-note">{item.note}</div> : null}
                       <div className="cart-item-price">
                         {item.quantity} × {formatDollars(item.amount)}
                       </div>
@@ -121,6 +124,17 @@ const CartModal = ({
                 <p className="cart-tax-note">
                   Sales tax added at checkout
                 </p>
+
+                <label className="cart-customer-field">
+                  <span>Name for pickup</span>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(event) => onCustomerNameChange(event.target.value)}
+                    placeholder="Optional"
+                    maxLength={80}
+                  />
+                </label>
 
                 <button
                   type="button"
