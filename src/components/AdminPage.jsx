@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './admin.css';
 import { getApiBaseUrl } from '../lib/apiBaseUrl';
 import {
@@ -24,9 +24,7 @@ const SECTION_OPTIONS = [
   'Smoothies',
 ];
 
-const defaultVariation = {name: 'Regular', priceAmount: ''};
-
-
+const defaultVariation = { name: 'Regular', priceAmount: '' };
 
 const toFormState = (item) => ({
   id: item?.id || null,
@@ -271,14 +269,18 @@ export default function AdminPage() {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    if (!isAuthenticated || 'menu' === adminTab) return;
+    if (!isAuthenticated || adminTab === 'menu') {
+      return undefined;
+    }
 
     fetchOrders();
-    const interval = setInterval(() => {
+    const intervalId = window.setInterval(() => {
       fetchOrders();
     }, 3000);
 
-    return () => clearInterval(interval);
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, [isAuthenticated, adminTab, token]);
 
   const handleLogin = async (event) => {
@@ -309,6 +311,7 @@ export default function AdminPage() {
     sessionStorage.removeItem(TOKEN_KEY);
     setToken('');
     setItems([]);
+    setOrders([]);
     setForm(toFormState(null));
     setError('');
   };
@@ -451,6 +454,42 @@ export default function AdminPage() {
     saveDailyUnavailableMap({});
   };
 
+  const playNotification = async (times = 5) => {
+    if (!audioRef.current) {
+      return;
+    }
+
+    for (let index = 0; index < times; index += 1) {
+      audioRef.current.currentTime = 0;
+      try {
+        await audioRef.current.play();
+      } catch {
+        // Ignore browser autoplay restrictions for admin alerts.
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 1100));
+    }
+  };
+
+  const fetchOrders = async (authToken = token) => {
+    if (!authToken) {
+      return;
+    }
+
+    try {
+      const data = await apiRequest('/admin/orders', {}, authToken);
+      const nextOrders = data?.orders || [];
+
+      if (nextOrders.length > lastOrderCount) {
+        playNotification(5);
+      }
+
+      setOrders(nextOrders);
+      setLastOrderCount(nextOrders.length);
+    } catch {
+      // Keep menu management available even if order polling fails.
+    }
+  };
+
   const updateFormField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
   };
@@ -473,39 +512,6 @@ export default function AdminPage() {
       ...current,
       variations: current.variations.filter((_, variationIndex) => variationIndex !== index),
     }));
-  };
-
-  const playNotification = async (times = 5) => {
-    if (!audioRef.current) return;
-    
-    for (let i = 0; i < times; i++) {
-      audioRef.current.currentTime = 0;
-      try {
-        await audioRef.current.play();
-      } catch (err) {
-        // Play may fail if browser doesn't allow it
-      }
-      // Wait for audio to finish (roughly 1 second per play, plus a small delay)
-      await new Promise(resolve => setTimeout(resolve, 1100));
-    }
-  };
-
-  const fetchOrders = async (authToken = token) => {
-    if (!authToken) return;
-    try {
-      const data = await apiRequest('/admin/orders', {}, authToken);
-      const newOrders = data?.orders || [];
-      
-      // Check if we have new orders and play sound
-      if (newOrders.length > lastOrderCount) {
-        playNotification(5);
-      }
-      
-      setOrders(newOrders);
-      setLastOrderCount(newOrders.length);
-    } catch (err) {
-      // Silently fail for orders fetch
-    }
   };
 
   if (!isAuthenticated) {
@@ -593,133 +599,148 @@ export default function AdminPage() {
         Daily unavailable items: {Object.keys(dailyUnavailableMap).length}
       </p>
 
-      {'menu' === adminTab ? (
+      {adminTab === 'menu' ? (
         <div className="admin-layout">
           <div className="admin-list">
-          <div className="admin-list__header">
-            <h2>
-              {menuFilter === 'unavailable'
-                ? 'Unavailable Items'
-                : menuFilter === 'all'
-                  ? 'All Square Items'
-                  : 'Current Menu Items'} ({filteredItems.length})
-            </h2>
-            <div className="admin-filter" role="tablist" aria-label="Filter items by availability">
-              <button
-                type="button"
-                className={menuFilter === 'current' ? 'admin-filter__btn active' : 'admin-filter__btn'}
-                onClick={() => setMenuFilter('current')}
-                aria-pressed={menuFilter === 'current'}
-              >
-                Current Menu Items
-              </button>
-              <button
-                type="button"
-                className={menuFilter === 'unavailable' ? 'admin-filter__btn active' : 'admin-filter__btn'}
-                onClick={() => setMenuFilter('unavailable')}
-                aria-pressed={menuFilter === 'unavailable'}
-              >
-                Unavailable ({unavailableCount})
-              </button>
-              <button
-                type="button"
-                className={menuFilter === 'all' ? 'admin-filter__btn active' : 'admin-filter__btn'}
-                onClick={() => setMenuFilter('all')}
-                aria-pressed={menuFilter === 'all'}
-              >
-                All Square Items ({items.length})
-              </button>
+            <div className="admin-list__header">
+              <h2>
+                {menuFilter === 'unavailable'
+                  ? 'Unavailable Items'
+                  : menuFilter === 'all'
+                    ? 'All Square Items'
+                    : 'Current Menu Items'} ({filteredItems.length})
+              </h2>
+              <div className="admin-filter" role="tablist" aria-label="Filter items by availability">
+                <button
+                  type="button"
+                  className={menuFilter === 'current' ? 'admin-filter__btn active' : 'admin-filter__btn'}
+                  onClick={() => setMenuFilter('current')}
+                  aria-pressed={menuFilter === 'current'}
+                >
+                  Current Menu Items
+                </button>
+                <button
+                  type="button"
+                  className={menuFilter === 'unavailable' ? 'admin-filter__btn active' : 'admin-filter__btn'}
+                  onClick={() => setMenuFilter('unavailable')}
+                  aria-pressed={menuFilter === 'unavailable'}
+                >
+                  Unavailable ({unavailableCount})
+                </button>
+                <button
+                  type="button"
+                  className={menuFilter === 'all' ? 'admin-filter__btn active' : 'admin-filter__btn'}
+                  onClick={() => setMenuFilter('all')}
+                  aria-pressed={menuFilter === 'all'}
+                >
+                  All Square Items ({items.length})
+                </button>
+              </div>
             </div>
+            {isLoading ? <p>Loading...</p> : null}
+            {!isLoading && filteredItems.length === 0 ? (
+              <p>
+                {menuFilter === 'unavailable'
+                  ? 'No unavailable items right now.'
+                  : menuFilter === 'all'
+                    ? 'No Square items found.'
+                    : 'No current menu items found.'}
+              </p>
+            ) : null}
+            {filteredItems.map((item) => (
+              <article key={item.id} className="admin-item">
+                <div>
+                  <strong>{item.name}</strong>
+                  <p>{item.description || 'No description'}</p>
+                  <p><em>Section: {item.section || 'Bakery Items'}</em></p>
+                  <p><em>Status: {item.visible === false ? 'Hidden' : 'Public'}</em></p>
+                  <p>
+                    <em>
+                      Today: {isNameUnavailableToday(item.name, dailyUnavailableMap) ? 'Unavailable' : 'Available'}
+                    </em>
+                  </p>
+                  <ul>
+                    {item.variations.map((variation) => (
+                      <li key={variation.id || variation.name}>
+                        {variation.name} — {typeof variation.priceAmount === 'number' ? `$${(variation.priceAmount / 100).toFixed(2)}` : 'N/A'}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="admin-item__actions">
+                  {item.visible === false ? (
+                    <label className="admin-item__section-label">
+                      Public section
+                      <select
+                        value={publishSections[item.id] || item.section || 'Bakery Items'}
+                        onChange={(event) =>
+                          setPublishSections((current) => ({
+                            ...current,
+                            [item.id]: event.target.value,
+                          }))
+                        }
+                        disabled={togglingItemId === item.id}
+                      >
+                        {SECTION_OPTIONS.map((section) => (
+                          <option key={`${item.id}-${section}`} value={section}>{section}</option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : null}
+                  <button type="button" onClick={() => handleEdit(item)}>Edit</button>
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => handleToggleVisibility(item)}
+                    disabled={togglingItemId === item.id}
+                  >
+                    {togglingItemId === item.id
+                      ? 'Updating...'
+                      : item.visible === false
+                        ? 'Set Public'
+                        : 'Set Hidden'}
+                  </button>
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => handleToggleDailyAvailability(item.name)}
+                  >
+                    {isNameUnavailableToday(item.name, dailyUnavailableMap)
+                      ? 'Mark Available Today'
+                      : 'Mark Unavailable Today'}
+                  </button>
+                  <button type="button" className="danger" onClick={() => handleDelete(item.id)}>Delete</button>
+                </div>
+              </article>
+            ))}
           </div>
-          {isLoading ? <p>Loading...</p> : null}
-          {!isLoading && filteredItems.length === 0 ? (
-            <p>
-              {menuFilter === 'unavailable'
-                ? 'No unavailable items right now.'
-                : menuFilter === 'all'
-                  ? 'No Square items found.'
-                  : 'No current menu items found.'}
-            </p>
-          ) : null}
-          {filteredItems.map((item) => (
-            <article key={item.id} className="admin-item">
-              <div>
-                <strong>{item.name}</strong>
-                <p>{item.description || 'No description'}</p>
-                <p><em>Section: {item.section || 'Bakery Items'}</em></p>
-                <p><em>Status: {item.visible === false ? 'Hidden' : 'Public'}</em></p>
-                <p>
-                  <em>
-                    Today: {isNameUnavailableToday(item.name, dailyUnavailableMap) ? 'Unavailable' : 'Available'}
-                  </em>
-                </p>
-                <ul>
-                  {item.variations.map((variation) => (
-                    <li key={variation.id || variation.name}>
-                      {variation.name} — {typeof variation.priceAmount === 'number' ? `$${(variation.priceAmount / 100).toFixed(2)}` : 'N/A'}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="admin-item__actions">
-                {item.visible === false ? (
-                  <label className="admin-item__section-label">
-                    Public section
-                    <select
-                      value={publishSections[item.id] || item.section || 'Bakery Items'}
-                      onChange={(event) =>
-                        setPublishSections((current) => ({
-                          ...current,
-                          [item.id]: event.target.value,
-                        }))
-                      }
-                      disabled={togglingItemId === item.id}
-                    >
-                      {SECTION_OPTIONS.map((section) => (
-                        <option key={`${item.id}-${section}`} value={section}>{section}</option>
-                      ))}
-                    </select>
-                  </label>
-                ) : null}
-                <button type="button" onClick={() => handleEdit(item)}>Edit</button>
-                <button
-                  type="button"
-                  className="secondary"
-                  onClick={() => handleToggleVisibility(item)}
-                  disabled={togglingItemId === item.id}
-                >
-                  {togglingItemId === item.id
-                    ? 'Updating...'
-                    : item.visible === false
-                      ? 'Set Public'
-                      : 'Set Hidden'}
-                </button>
-                <button
-                  type="button"
-                  className="secondary"
-                  onClick={() => handleToggleDailyAvailability(item.name)}
-                >
-                  {isNameUnavailableToday(item.name, dailyUnavailableMap)
-                    ? 'Mark Available Today'
-                    : 'Mark Unavailable Today'}
-                </button>
-                <button type="button" className="danger" onClick={() => handleDelete(item.id)}>Delete</button>
-              </div>
-            </article>
-          ))}
         </div>
-      </div>
       ) : (
         <div className="admin-layout">
           <div className="admin-list">
             <h2>Orders</h2>
-            {0 === orders.length ? (
+            {orders.length === 0 ? (
               <p className="admin-note">No orders yet</p>
             ) : (
               <div style={{ display: 'grid', gap: '1rem' }}>
                 {orders.map((order) => (
-                  <div key={order.id || order.orderId} style={{ padding: '1rem', background: '#f9f9f9', border: '1px solid #e0e0e0', borderRadius: '4px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <div
+                    key={order.id || order.orderId}
+                    style={{
+                      padding: '1rem',
+                      background: '#f9f9f9',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '4px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '0.5rem',
+                      }}
+                    >
                       <strong>Order {order.orderId ? order.orderId.slice(0, 12) : 'N/A'}...</strong>
                       <span style={{ fontSize: '0.85rem', color: '#666' }}>
                         {new Date(order.timestamp || order.createdAt).toLocaleTimeString()}
@@ -732,10 +753,10 @@ export default function AdminPage() {
                       <div style={{ margin: '0.5rem 0', paddingLeft: '1rem' }}>
                         <strong style={{ fontSize: '0.9rem' }}>Items:</strong>
                         <ul style={{ margin: '0.25rem 0', paddingLeft: '1rem', fontSize: '0.85rem' }}>
-                          {order.items.map((item, idx) => (
-                            <li key={idx}>
+                          {order.items.map((item, index) => (
+                            <li key={`${order.orderId || order.id}-${index}`}>
                               {item.quantity}x {item.name}
-                              {item.amount ? ` ($${(item.amount / 100).toFixed(2)})` : ''}
+                              {typeof item.price === 'number' ? ` ($${(item.price / 100).toFixed(2)})` : ''}
                               {item.note ? ` - ${item.note}` : ''}
                             </li>
                           ))}

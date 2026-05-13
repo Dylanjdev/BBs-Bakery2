@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPlus,
+  faBreadSlice,
+  faBurger,
+  faUtensils,
+  faBolt,
+  faGlassWater,
+  faMugHot,
+} from '@fortawesome/free-solid-svg-icons';
 import '../menu.css';
 import '../cart.css';
 import { getApiBaseUrl } from '../lib/apiBaseUrl';
@@ -8,7 +16,7 @@ import { isMenuItemUnavailableToday, loadDailyUnavailableMap } from '../lib/menu
 import { squareVariationMap } from '../data/squareVariationMap';
 
 const API_BASE_URL = getApiBaseUrl();
-const ORDERABLE_SECTION_TITLES = new Set(['Breakfast', 'Lunch']);
+const ORDERABLE_SECTION_TITLES = new Set(['Breakfast', 'Lunch', 'Pre-Orders']);
 
 const specialOfDay = [
   'Sunday – Closed',
@@ -41,6 +49,10 @@ const sections = [
       { name: 'Danish', description: 'flour + butter + cream cheese + eggs + fruit variety', fallbackAmount: 350 },
       { name: 'Pastry', description: 'flour + butter + sweet/savory filling variety', fallbackAmount: 500 },
       { name: 'Specialty Buns', description: 'flour + milk + butter + eggs + yeast + sweet/savory variety', fallbackAmount: 500 },
+      { name: 'Donuts – Glazed or Powdered', description: 'flour + sugar + yeast + butter + milk + glazed or powdered sugar', fallbackAmount: 250 },
+      { name: 'Donuts – Chocolate Glazed', description: 'flour + sugar + yeast + butter + milk + chocolate glaze', fallbackAmount: 300 },
+      { name: 'Donuts – Specialty', description: 'flour + sugar + yeast + butter + milk + specialty topping variety', fallbackAmount: 300 },
+      { name: 'Cupcakes', description: 'flour + butter + eggs + sugar + frosting variety', fallbackAmount: 350 },
     ],
   },
   {
@@ -71,11 +83,13 @@ const sections = [
     items: [
       {
         name: "BB's Signature Grilled Cheese",
+        lookupName: 'Grilled Cheese',
         description: 'cheddar + muenster on a flaky croissant',
         fallbackAmount: 500,
       },
       {
         name: "BB's Buttery BLT",
+        lookupName: 'BLT',
         description: 'crispy bacon + lettuce + tomato + mayo on a buttery croissant',
         fallbackAmount: 550,
       },
@@ -86,6 +100,7 @@ const sections = [
       },
       {
         name: "BB's Croissant Club",
+        lookupName: 'Croissant Club',
         description: 'turkey + bacon + american + lettuce + tomato + pickles + mayo on a flaky croissant',
         fallbackAmount: 700,
       },
@@ -151,6 +166,24 @@ const sections = [
         name: "Smokin' Ash",
         lookupName: "Smokin' Ash (32 oz)",
         description: 'energy + blackberry + lime + lemonade',
+        fallbackAmount: 800,
+      },
+      {
+        name: "Oatie's Moonbeam",
+        lookupName: "Oatie's Moonbeam (32 oz)",
+        description: 'energy + blue raspberry + lavender + almond + vanilla + sweet cream',
+        fallbackAmount: 800,
+      },
+      {
+        name: "Rip 'n' Dragon",
+        lookupName: "Rip 'n' Dragon (32 oz)",
+        description: 'energy + dragon fruit + pomegranate + passion fruit + lemonade',
+        fallbackAmount: 800,
+      },
+      {
+        name: 'Sherbert Spark',
+        lookupName: 'Sherbert Spark (32 oz)',
+        description: 'energy + raspberry + orange + lime + cream',
         fallbackAmount: 800,
       },
     ],
@@ -288,6 +321,56 @@ const sections = [
           { label: 'Large', amount: 600, variationId: 'W7ZHSZ623DO2MOAWLV4BG6EN' },
         ],
       },
+      {
+        name: 'Toasted Float',
+        description: 'diet Dr Pepper base + vanilla salt + white chocolate + marshmallow + cherry cold foam',
+        fallbackAmount: 400,
+        sizeOptions: [
+          { label: 'Small', amount: 400, variationId: '3GGVCBOKAP2OYDA3U7ZZ4VW6' },
+          { label: 'Medium', amount: 500, variationId: 'GJMCXRXSWLH3KAST5F4NXPNJ' },
+          { label: 'Large', amount: 600, variationId: 'W7ZHSZ623DO2MOAWLV4BG6EN' },
+        ],
+      },
+      {
+        name: "Ace's Butterbeer",
+        description: 'Dr Pepper base + caramel + butter pecan + maple cold foam',
+        fallbackAmount: 400,
+        sizeOptions: [
+          { label: 'Small', amount: 400, variationId: '3GGVCBOKAP2OYDA3U7ZZ4VW6' },
+          { label: 'Medium', amount: 500, variationId: 'GJMCXRXSWLH3KAST5F4NXPNJ' },
+          { label: 'Large', amount: 600, variationId: 'W7ZHSZ623DO2MOAWLV4BG6EN' },
+        ],
+      },
+      {
+        name: 'Frosted Lime',
+        description: 'Sprite base + lime + white chocolate + sweet cream',
+        fallbackAmount: 400,
+        sizeOptions: [
+          { label: 'Small', amount: 400, variationId: '3GGVCBOKAP2OYDA3U7ZZ4VW6' },
+          { label: 'Medium', amount: 500, variationId: 'GJMCXRXSWLH3KAST5F4NXPNJ' },
+          { label: 'Large', amount: 600, variationId: 'W7ZHSZ623DO2MOAWLV4BG6EN' },
+        ],
+      },
+      {
+        name: 'Peachy Cream',
+        description: 'Dr Pepper base + peach vanilla + sweet cream',
+        fallbackAmount: 400,
+        sizeOptions: [
+          { label: 'Small', amount: 400, variationId: '3GGVCBOKAP2OYDA3U7ZZ4VW6' },
+          { label: 'Medium', amount: 500, variationId: 'GJMCXRXSWLH3KAST5F4NXPNJ' },
+          { label: 'Large', amount: 600, variationId: 'W7ZHSZ623DO2MOAWLV4BG6EN' },
+        ],
+      },
+      {
+        name: 'Cherry Dream',
+        description: 'Diet Coke base + cherry + vanilla + sweet cream',
+        fallbackAmount: 400,
+        sizeOptions: [
+          { label: 'Small', amount: 400, variationId: '3GGVCBOKAP2OYDA3U7ZZ4VW6' },
+          { label: 'Medium', amount: 500, variationId: 'GJMCXRXSWLH3KAST5F4NXPNJ' },
+          { label: 'Large', amount: 600, variationId: 'W7ZHSZ623DO2MOAWLV4BG6EN' },
+        ],
+      },
     ],
   },
   {
@@ -367,6 +450,30 @@ const sections = [
       },
     ],
   },
+  {
+    title: 'Pre-Orders',
+    preOrder: true,
+    note: 'Ongoing weekly pre-orders • Order by Saturday 6:00 PM for Tuesday pickup',
+    items: [
+      {
+        name: 'White Sandwich Bread',
+        lookupName: 'White Bread',
+        description: 'freshly baked white sandwich bread loaf',
+        fallbackAmount: 600,
+      },
+      {
+        name: 'Cinnamon Raisin Bread',
+        description: 'freshly baked cinnamon raisin bread loaf',
+        fallbackAmount: 700,
+      },
+      {
+        name: 'Cheddar Jalapeño Bread',
+        lookupName: 'Cheddar Jalopeno bread',
+        description: 'freshly baked cheddar jalapeño bread loaf',
+        fallbackAmount: 700,
+      },
+    ],
+  },
 ];
 
 const normalize = (value) =>
@@ -374,6 +481,23 @@ const normalize = (value) =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
+
+const isWithinPreOrderWindow = (date = new Date()) => {
+  const day = date.getDay();
+  const minutes = (date.getHours() * 60) + date.getMinutes();
+  const saturdayCutoffMinutes = 18 * 60;
+
+  // Weekly pre-orders run Tuesday through Saturday at 5:59 PM.
+  if (day === 0 || day === 1) {
+    return false;
+  }
+
+  if (day === 6) {
+    return minutes < saturdayCutoffMinutes;
+  }
+
+  return true;
+};
 
 const formatPriceLabel = (amount, currency = 'USD') => {
   if (!Number.isFinite(amount)) {
@@ -429,6 +553,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
   const [error, setError] = useState('');
   const [selectedProteins, setSelectedProteins] = useState({});
   const [dailyUnavailableMap, setDailyUnavailableMap] = useState(() => loadDailyUnavailableMap());
+  const [isPreOrderWindowOpen, setIsPreOrderWindowOpen] = useState(() => isWithinPreOrderWindow());
 
   useEffect(() => {
     const handleStorage = (event) => {
@@ -474,9 +599,20 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const syncWindowState = () => {
+      setIsPreOrderWindowOpen(isWithinPreOrderWindow());
+    };
+
+    const intervalId = window.setInterval(syncWindowState, 60_000);
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
   const enrichedSections = useMemo(
     () => {
-      const lockedCuratedSections = new Set(['Bakery Items', 'Breakfast', 'Lunch', 'Loaded Energy', 'Specialty Coffee', 'Classic Espresso', 'Iced Latte', 'Hot Latte', 'Frappes', 'Dirty Sodas', 'Smoothies']);
+      const lockedCuratedSections = new Set(['Bakery Items', 'Breakfast', 'Lunch', 'Loaded Energy', 'Specialty Coffee', 'Classic Espresso', 'Iced Latte', 'Hot Latte', 'Frappes', 'Dirty Sodas', 'Smoothies', 'Pre-Orders']);
       const curatedNames = new Set(
         sections.flatMap((section) =>
           section.items.flatMap((item) => [
@@ -547,6 +683,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
               return {
                 ...item,
                 amount,
+                isPreOrder: section.preOrder === true,
                 variationId: live?.variationId || fallbackVariationId,
                 isOnlineOrderable: ORDERABLE_SECTION_TITLES.has(section.title),
                 visible: keepCuratedVisible ? true : live?.visible !== false,
@@ -570,6 +707,10 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       return;
     }
 
+    if (item?.isPreOrder && !isPreOrderWindowOpen) {
+      return;
+    }
+
     if (item.isUnavailableToday) {
       return;
     }
@@ -581,6 +722,11 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
     const selectedProtein = item.proteinOptions?.length
       ? selectedProteins[itemKey] || item.proteinOptions[0]
       : null;
+    const resolvedVariationId = selectedSizeOption?.variationId || item.variationId;
+
+    if (!resolvedVariationId) {
+      return;
+    }
 
     onAddToCart({
       name: selectedProtein
@@ -590,7 +736,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
           : item.name,
       amount: selectedSizeOption?.amount ?? item.amount,
       label: selectedSizeOption ? formatPriceLabel(selectedSizeOption.amount) : item.label,
-      variationId: selectedSizeOption?.variationId || item.variationId,
+      variationId: resolvedVariationId,
       note: selectedProtein ? `Protein: ${selectedProtein}` : '',
       isUnavailableToday: item.isUnavailableToday,
     });
@@ -657,23 +803,19 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       {enrichedSections.map((section) => {
         const simpleSheetSectionConfig = {
           'Classic Espresso': {
-            iconClassName: 'fa-solid fa-mug-hot',
-            ariaLabel: 'Classic espresso icon',
+            icon: faMugHot,
             listAriaLabel: 'Classic espresso items',
           },
           'Iced Latte': {
-            iconClassName: 'fa-solid fa-glass-water',
-            ariaLabel: 'Iced latte icon',
+            icon: faGlassWater,
             listAriaLabel: 'Iced latte items',
           },
           'Hot Latte': {
-            iconClassName: 'fa-solid fa-mug-hot',
-            ariaLabel: 'Hot latte icon',
+            icon: faMugHot,
             listAriaLabel: 'Hot latte items',
           },
           Frappes: {
-            iconClassName: 'fa-solid fa-glass-water',
-            ariaLabel: 'Frappes icon',
+            icon: faGlassWater,
             listAriaLabel: 'Frappes items',
           },
         };
@@ -685,6 +827,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
         const isDirtySodasSection = section.title === 'Dirty Sodas';
         const isSmoothiesSection = section.title === 'Smoothies';
         const isSpecialtyCoffeeSection = section.title === 'Specialty Coffee';
+        const isPreOrdersSection = section.title === 'Pre-Orders';
         const simpleSheetSection = simpleSheetSectionConfig[section.title];
 
         if (isBakerySection) {
@@ -692,7 +835,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             <div className="menu-content bakery-layout" key={section.title}>
               <div className="menu-column bakery-panel">
                 <div className="bakery-branding">
-                  <i className="fa-solid fa-bread-slice bakery-branding__icon" aria-label="Bakery icon" />
+                  <FontAwesomeIcon icon={faBreadSlice} className="bakery-branding__icon" aria-hidden="true" />
                   <div>
                     <p className="bakery-branding__name">BB&apos;s Bakery & Cafe</p>
                     <p className="bakery-branding__tagline">Bringing the best bites to your day</p>
@@ -727,7 +870,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                           onClick={() => handleAddToCart(item)}
                           aria-label={`Add ${item.name} to cart`}
-                          disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                          disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                         >
                           <FontAwesomeIcon icon={faPlus} />
                         </button>
@@ -745,7 +888,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             <div className="menu-content bakery-layout" key={section.title}>
               <div className="menu-column bakery-panel breakfast-panel">
                 <div className="bakery-branding">
-                  <i className="fa-solid fa-burger bakery-branding__icon" aria-label="Breakfast icon" />
+                  <FontAwesomeIcon icon={faBurger} className="bakery-branding__icon" aria-hidden="true" />
                   <div>
                     <p className="bakery-branding__name">BB&apos;s Bakery & Cafe</p>
                     <p className="bakery-branding__tagline">Bringing the best bites to your day</p>
@@ -774,7 +917,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                             value={selectedProteins[item.lookupName || item.name] || item.proteinOptions[0]}
                             onChange={(event) => handleProteinChange(item, event.target.value)}
                             aria-label={`Choose protein for ${item.name}`}
-                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                           >
                             {item.proteinOptions.map((protein) => (
                               <option key={`${item.name}-${protein}`} value={protein}>
@@ -794,7 +937,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                           onClick={() => handleAddToCart(item)}
                           aria-label={`Add ${item.name} to cart`}
-                          disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                          disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                         >
                           <FontAwesomeIcon icon={faPlus} />
                         </button>
@@ -812,7 +955,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             <div className="menu-content bakery-layout" key={section.title}>
               <div className="menu-column bakery-panel breakfast-panel">
                 <div className="bakery-branding">
-                  <i className="fa-solid fa-utensils bakery-branding__icon" aria-label="Lunch icon" />
+                  <FontAwesomeIcon icon={faUtensils} className="bakery-branding__icon" aria-hidden="true" />
                   <div>
                     <p className="bakery-branding__name">BB&apos;s Bakery & Cafe</p>
                     <p className="bakery-branding__tagline">Bringing the best bites to your day</p>
@@ -846,7 +989,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                           onClick={() => handleAddToCart(item)}
                           aria-label={`Add ${item.name} to cart`}
-                          disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                          disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                         >
                           <FontAwesomeIcon icon={faPlus} />
                         </button>
@@ -864,7 +1007,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             <div className="menu-content bakery-layout" key={section.title}>
               <div className="menu-column bakery-panel breakfast-panel">
                 <div className="bakery-branding">
-                  <i className={`${simpleSheetSection.iconClassName} bakery-branding__icon`} aria-label={simpleSheetSection.ariaLabel} />
+                  <FontAwesomeIcon icon={simpleSheetSection.icon} className="bakery-branding__icon" aria-hidden="true" />
                   <div>
                     <p className="bakery-branding__name">BB&apos;s Bakery & Cafe</p>
                     <p className="bakery-branding__tagline">Bringing the best bites to your day</p>
@@ -898,7 +1041,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                           onClick={() => handleAddToCart(item)}
                           aria-label={`Add ${item.name} to cart`}
-                          disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                          disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                         >
                           <FontAwesomeIcon icon={faPlus} />
                         </button>
@@ -920,7 +1063,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             <div className="menu-content bakery-layout" key={section.title}>
               <div className="menu-column bakery-panel coffee-panel">
                 <div className="bakery-branding">
-                  <i className="fa-solid fa-bolt bakery-branding__icon" aria-label="Loaded energy icon" />
+                  <FontAwesomeIcon icon={faBolt} className="bakery-branding__icon" aria-hidden="true" />
                   <div>
                     <p className="bakery-branding__name">BB&apos;s Bakery & Cafe</p>
                     <p className="bakery-branding__tagline">Bringing the best bites to your day</p>
@@ -959,7 +1102,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                             onClick={() => handleAddToCart(item)}
                             aria-label={`Add ${item.name} to cart`}
-                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                           >
                             <FontAwesomeIcon icon={faPlus} />
                           </button>
@@ -990,7 +1133,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                             onClick={() => handleAddToCart(item)}
                             aria-label={`Add ${item.name} to cart`}
-                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                           >
                             <FontAwesomeIcon icon={faPlus} />
                           </button>
@@ -1013,7 +1156,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             <div className="menu-content bakery-layout" key={section.title}>
               <div className="menu-column bakery-panel coffee-panel">
                 <div className="bakery-branding">
-                  <i className="fa-solid fa-glass-water bakery-branding__icon" aria-label="Dirty sodas icon" />
+                  <FontAwesomeIcon icon={faGlassWater} className="bakery-branding__icon" aria-hidden="true" />
                   <div>
                     <p className="bakery-branding__name">BB&apos;s Bakery & Cafe</p>
                     <p className="bakery-branding__tagline">Bringing the best bites to your day</p>
@@ -1030,7 +1173,6 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                     ))}
                   </div>
                 </div>
-
                 <div className="coffee-grid" role="list" aria-label="Dirty soda items">
                   <div className="coffee-list-column">
                     {leftColumnItems.map((item, itemIndex) => {
@@ -1058,7 +1200,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                               onClick={() => handleAddToCart(item)}
                               aria-label={`Add ${item.name} to cart`}
-                              disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                              disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                             >
                               <FontAwesomeIcon icon={faPlus} />
                             </button>
@@ -1094,7 +1236,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                               onClick={() => handleAddToCart(item)}
                               aria-label={`Add ${item.name} to cart`}
-                              disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                              disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                             >
                               <FontAwesomeIcon icon={faPlus} />
                             </button>
@@ -1118,7 +1260,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             <div className="menu-content bakery-layout" key={section.title}>
               <div className="menu-column bakery-panel coffee-panel">
                 <div className="bakery-branding">
-                  <i className="fa-solid fa-glass-water bakery-branding__icon" aria-label="Smoothies icon" />
+                  <FontAwesomeIcon icon={faGlassWater} className="bakery-branding__icon" aria-hidden="true" />
                   <div>
                     <p className="bakery-branding__name">BB&apos;s Bakery & Cafe</p>
                     <p className="bakery-branding__tagline">Bringing the best bites to your day</p>
@@ -1163,7 +1305,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                               onClick={() => handleAddToCart(item)}
                               aria-label={`Add ${item.name} to cart`}
-                              disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                              disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                             >
                               <FontAwesomeIcon icon={faPlus} />
                             </button>
@@ -1199,7 +1341,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                               onClick={() => handleAddToCart(item)}
                               aria-label={`Add ${item.name} to cart`}
-                              disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                              disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                             >
                               <FontAwesomeIcon icon={faPlus} />
                             </button>
@@ -1223,7 +1365,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             <div className="menu-content bakery-layout" key={section.title}>
               <div className="menu-column bakery-panel coffee-panel">
                 <div className="bakery-branding">
-                  <i className="fa-solid fa-mug-hot bakery-branding__icon" aria-label="Coffee icon" />
+                  <FontAwesomeIcon icon={faMugHot} className="bakery-branding__icon" aria-hidden="true" />
                   <div>
                     <p className="bakery-branding__name">BB&apos;s Bakery & Cafe</p>
                     <p className="bakery-branding__tagline">Bringing the best bites to your day</p>
@@ -1265,7 +1407,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                             onClick={() => handleAddToCart(item)}
                             aria-label={`Add ${item.name} to cart`}
-                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                           >
                             <FontAwesomeIcon icon={faPlus} />
                           </button>
@@ -1296,7 +1438,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                             onClick={() => handleAddToCart(item)}
                             aria-label={`Add ${item.name} to cart`}
-                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                           >
                             <FontAwesomeIcon icon={faPlus} />
                           </button>
@@ -1304,6 +1446,88 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (isPreOrdersSection) {
+          return (
+            <div className="menu-content bakery-layout" key={section.title}>
+              <div className="menu-column bakery-panel breakfast-panel">
+                <div className="bakery-branding">
+                  <FontAwesomeIcon icon={faBreadSlice} className="bakery-branding__icon" aria-hidden="true" />
+                  <div>
+                    <p className="bakery-branding__name">BB&apos;s Bakery & Cafe</p>
+                    <p className="bakery-branding__tagline">Bringing the best bites to your day</p>
+                  </div>
+                </div>
+
+                <div className="menu-divider bakery-divider" />
+
+                <h3 className="bakery-heading">{section.title}</h3>
+
+                <div
+                  style={{
+                    background: isPreOrderWindowOpen
+                      ? 'linear-gradient(135deg, #e6f9ef 0%, #f0fff6 100%)'
+                      : 'linear-gradient(135deg, #fff4e6 0%, #fff9f0 100%)',
+                    border: isPreOrderWindowOpen ? '2px solid #3aab6e' : '2px solid #d4a84b',
+                    borderRadius: '10px',
+                    padding: '0.85rem 1rem',
+                    marginBottom: '1.25rem',
+                    textAlign: 'center',
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      fontWeight: 700,
+                      fontSize: '0.95rem',
+                      color: isPreOrderWindowOpen ? '#1e7a49' : '#a0700a',
+                      fontFamily: 'Playfair Display, serif',
+                    }}
+                  >
+                    {isPreOrderWindowOpen
+                      ? '✅ Pre-order window is open'
+                      : '⏳ Pre-orders open Tuesday and close Saturday at 6:00 PM'}
+                  </p>
+                  <p style={{ margin: '0.4rem 0 0', fontSize: '0.88rem', color: '#555' }}>
+                    We accept bread pre-orders every week. Order by <strong>Saturday at 6:00 PM</strong> for <strong>Tuesday pickup</strong>.
+                  </p>
+                </div>
+
+                <div className="breakfast-list" role="list" aria-label="Pre-order bread items">
+                  {section.items.map((item, itemIndex) => (
+                    <div
+                      className="breakfast-item"
+                      role="listitem"
+                      key={`${section.title}-${item.name}-${itemIndex}`}
+                    >
+                      <div className="breakfast-item__text">
+                        <h4>{item.name}</h4>
+                        <p>{item.description}</p>
+                      </div>
+                      <div className="breakfast-item__actions">
+                        {!isPreOrderWindowOpen ? (
+                          <span className="menu-unavailable-chip" aria-label="Pre-order window closed">
+                            Pre-order window closed
+                          </span>
+                        ) : null}
+                        <span className="price">{item.label}</span>
+                        <button
+                          className="add-to-cart-btn"
+                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          onClick={() => handleAddToCart(item)}
+                          aria-label={`Add ${item.name} to cart`}
+                          disabled={!orderingStatus?.isOrderingAllowed || !isPreOrderWindowOpen || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
+                        >
+                          <FontAwesomeIcon icon={faPlus} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -1342,7 +1566,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                         value={selectedProteins[item.lookupName || item.name] || item.proteinOptions[0]}
                         onChange={(event) => handleProteinChange(item, event.target.value)}
                         aria-label={`Choose protein for ${item.name}`}
-                        disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                        disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                       >
                         {item.proteinOptions.map((protein) => (
                           <option key={`${item.name}-${protein}`} value={protein}>
@@ -1362,7 +1586,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
                       onClick={() => handleAddToCart(item)}
                       aria-label={`Add ${item.name} to cart`}
-                      disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable}
+                      disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
                     >
                       <FontAwesomeIcon icon={faPlus} />
                     </button>

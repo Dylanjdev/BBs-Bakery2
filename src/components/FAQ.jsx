@@ -125,7 +125,7 @@ const FAQ = () => (
           className="mt2"
           style={{ color: '#555', fontFamily: 'Quicksand, sans-serif', fontSize: '0.95rem' }}
         >
-          Yes! Call us at (276) 571-0891 to place your order.
+          Yes! Call us at (276) 537-0189 to place your order.
         </p>
       </details>
 

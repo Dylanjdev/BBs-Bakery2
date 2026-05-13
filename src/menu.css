@@ -153,7 +153,7 @@
 
 .bakery-branding__tagline {
   margin: 0.18rem 0 0;
-  color: var(--text-light);
+  color: var(--text-dark);
   font-size: 0.96rem;
   font-weight: 600;
 }
@@ -246,7 +246,7 @@
 
 .breakfast-item__text p {
   margin: 0;
-  color: var(--text-light);
+  color: var(--text-dark);
   font-size: 0.95rem;
   max-width: 46ch;
 }
@@ -326,7 +326,7 @@
 
 .coffee-item__text p {
   margin: 0;
-  color: var(--text-light);
+  color: var(--text-dark);
   font-size: 0.95rem;
   max-width: 34ch;
 }

@@ -77,7 +77,7 @@ const Contact = () => (
           <FontAwesomeIcon icon={faPhone} className="mr2" style={{fontSize: '1.2rem'}} /> Phone
         </p>
         <a 
-          href="tel:2765710891" 
+          href="tel:2765370189" 
           itemProp="telephone" 
           className="link no-underline" 
           style={{color: '#d65a8c', fontWeight: '700', fontFamily: 'Quicksand, sans-serif', fontSize: '0.95rem', transition: 'all 0.2s'}}
@@ -88,7 +88,7 @@ const Contact = () => (
             e.target.style.opacity = '1';
           }}
         >
-          (276) 571-0891
+          (276) 537-0189
         </a>
       </div>
       

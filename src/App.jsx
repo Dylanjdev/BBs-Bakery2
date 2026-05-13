@@ -16,6 +16,7 @@ const Reviews = lazy(() => import('./components/Reviews'));
 const Menu = lazy(() => import('./components/Menu'));
 const Hours = lazy(() => import('./components/Hours'));
 const OrderingGuide = lazy(() => import('./components/OrderingGuide'));
+const CustomCakeForm = lazy(() => import('./components/CustomCakeForm'));
 const FAQ = lazy(() => import('./components/FAQ'));
 const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
@@ -48,13 +49,13 @@ function getOrderingStatus() {
 
   const isTuesdayToFriday = day >= 2 && day <= 5;
   const isSaturday = day === 6;
-  const OPENING_TIME = isSaturday ? 8 : 7;
+  const OPENING_TIME = isSaturday ? 10 : 8;
   const CUTOFF_TIME = 16;
 
   if (day === 0 || day === 1) {
     return {
       isOrderingAllowed: false,
-      message: 'We are closed on Sundays and Mondays. Orders reopen Tuesday at 7:00 AM.'
+      message: 'We are closed on Sundays and Mondays. Orders reopen Tuesday at 8:00 AM.'
     };
   }
 
@@ -69,7 +70,7 @@ function getOrderingStatus() {
   if (currentTime < OPENING_TIME) {
     return {
       isOrderingAllowed: false,
-      message: `Orders are not available yet. We open for online orders at ${isSaturday ? '8:00 AM' : '7:00 AM'}.`
+      message: `Orders are not available yet. We open for online orders at ${isSaturday ? '10:00 AM' : '8:00 AM'}.`
     };
   }
 
@@ -182,6 +183,14 @@ function App() {
       return;
     }
 
+    const missingVariationItem = cart.find(
+      (item) => typeof item?.variationId !== 'string' || !item.variationId.trim()
+    );
+    if (missingVariationItem) {
+      setCheckoutError(`${missingVariationItem.name} is not currently available for online checkout. Please remove it and try again.`);
+      return;
+    }
+
     setIsCheckingOut(true);
     setCheckoutError('');
 
@@ -246,6 +255,7 @@ function App() {
               <Hours />
               <Menu onAddToCart={addToCart} cart={cart} orderingStatus={orderingStatus} />
               <OrderingGuide />
+              <CustomCakeForm />
               <FAQ />
               <Contact />
             </div>

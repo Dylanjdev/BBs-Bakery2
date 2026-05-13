@@ -71,8 +71,9 @@ const Hero = () => (
               transition: 'transform 0.4s ease',
               filter: 'brightness(1.05) contrast(1.08)'
             }} 
+            loading="eager"
             fetchPriority="high"
-            decoding="async"
+            decoding="sync"
             onMouseOver={(e) => {
               e.currentTarget.style.transform = 'scale(1.03)';
             }}
@@ -178,7 +179,7 @@ const Hero = () => (
           </a>
           
           <a 
-            href="tel:2765710891" 
+            href="tel:2765370189" 
             className="fw6 pv3 ph5 br-pill dib no-underline white" 
             aria-label="Call BB's Bakery" 
             style={{

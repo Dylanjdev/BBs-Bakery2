@@ -81,7 +81,7 @@ const Header = memo(({
             border: '2px solid #f0f0f0',
             objectFit: 'cover'
           }} 
-          fetchPriority="high"
+          fetchPriority="auto"
           decoding="async"
         />
         <span 
@@ -197,6 +197,29 @@ const Header = memo(({
         >
           FAQ
         </a>
+        <a
+          href="#custom-cakes"
+          className="fw6 br-pill no-underline"
+          style={{
+            color: '#6d6d6d',
+            transition: 'all 0.25s ease',
+            fontFamily: 'Quicksand, sans-serif',
+            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
+            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
+            display: 'inline-block',
+            whiteSpace: 'nowrap'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.background = '#f5f5f5';
+            e.target.style.color = '#1a1a1a';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.background = 'transparent';
+            e.target.style.color = '#6d6d6d';
+          }}
+        >
+          Custom Cakes
+        </a>
         <a 
           href="#contact" 
           className="fw6 br-pill no-underline" 
@@ -245,7 +268,7 @@ const Header = memo(({
         </a>
         <div className="desktop-cta-group">
         <a 
-          href="tel:2765710891" 
+          href="tel:2765370189" 
           className="fw6 br-pill flex items-center no-underline white" 
           style={{
             background: 'linear-gradient(135deg, #d65a8c 0%, #c9a961 100%)',
@@ -267,7 +290,7 @@ const Header = memo(({
             e.target.style.boxShadow = '0 4px 16px rgba(214, 90, 140, 0.25)';
           }}
         >
-          <FontAwesomeIcon icon={faPhone} className="mr2" /> (276) 571-0891
+          <FontAwesomeIcon icon={faPhone} className="mr2" /> (276) 537-0189
         </a>
         <button
           type="button"
@@ -498,6 +521,23 @@ const Header = memo(({
       >
         Contact
       </a>
+      <a
+        href="#custom-cakes"
+        className="no-underline"
+        style={{
+          color: '#1a1a1a',
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid #f0f0f0',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onClick={handleClose}
+        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseOut={(e) => e.target.style.background = 'transparent'}
+      >
+        Custom Cakes
+      </a>
       <a 
         href="#/admin" 
         className="no-underline" 
@@ -516,7 +556,7 @@ const Header = memo(({
         Admin
       </a>
       <a 
-        href="tel:2765710891" 
+        href="tel:2765370189" 
         className="no-underline" 
         style={{
           color: '#ffffff',
@@ -536,7 +576,7 @@ const Header = memo(({
         onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
         onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
       >
-        <FontAwesomeIcon icon={faPhone} /> (276) 571-0891
+        <FontAwesomeIcon icon={faPhone} /> (276) 537-0189
       </a>
     </nav>
     <CartModal
