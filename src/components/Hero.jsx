@@ -129,7 +129,7 @@ const Hero = () => (
             margin: '0 0 1.5rem 0'
           }}
         >
-          Fresh-baked goodness made with love every morning
+          Fresh-baked goodness made with love every morning for Pennington Gap, Lee County, and Southwest Virginia
         </p>
         
         <p 
@@ -143,7 +143,7 @@ const Hero = () => (
           }}
         >
           <FontAwesomeIcon icon={faLocationDot} style={{color: '#d65a8c', fontSize: '1.1rem', flexShrink: 0}} /> 
-          Pennington Gap, Virginia
+          Pennington Gap, Virginia. Serving Lee County and Southwest Virginia.
         </p>
         
         {/* CTA Buttons */}

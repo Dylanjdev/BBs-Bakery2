@@ -50,6 +50,9 @@ const Contact = () => (
         <span itemProp="address" itemScope itemType="https://schema.org/PostalAddress" style={{color: '#6d6d6d', fontSize: '0.95rem', fontFamily: 'Quicksand, sans-serif', lineHeight: '1.6'}}>
           <span itemProp="streetAddress">103 Main St</span>, <span itemProp="addressLocality">Pennington Gap</span>, <span itemProp="addressRegion">VA</span> <span itemProp="postalCode">24277</span>
         </span>
+        <p style={{color: '#8d8d8d', fontSize: '0.9rem', fontFamily: 'Quicksand, sans-serif', lineHeight: '1.5', margin: '0.75rem 0 0'}}>
+          Serving Lee County, Southwest Virginia, and nearby communities.
+        </p>
       </div>
       
       <div 
