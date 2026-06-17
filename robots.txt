@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 Disallow: /node_modules/
-Sitemap: https://bbsbakery.com/sitemap.xml
+Sitemap: https://bbs-bakery.com/sitemap.xml
