@@ -1,6 +1,6 @@
 
 import './App.css';
-import { lazy, Suspense, useState, useMemo, useEffect } from 'react';
+import { lazy, Suspense, useState, useMemo, useEffect, useRef } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
 import AdminPage from './components/AdminPage';
 import { getApiBaseUrl } from './lib/apiBaseUrl';
@@ -15,14 +15,16 @@ const About = lazy(() => import('./components/About'));
 const Reviews = lazy(() => import('./components/Reviews'));
 const Menu = lazy(() => import('./components/Menu'));
 const Hours = lazy(() => import('./components/Hours'));
+const HomeHighlights = lazy(() => import('./components/HomeHighlights'));
 const OrderingGuide = lazy(() => import('./components/OrderingGuide'));
 const CustomCakeForm = lazy(() => import('./components/CustomCakeForm'));
+const Catering = lazy(() => import('./components/Catering'));
 const FAQ = lazy(() => import('./components/FAQ'));
 const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
 
 // Temporary override: set true to disable online ordering across the site.
-const FORCE_ORDERING_CLOSED = false;
+const FORCE_ORDERING_CLOSED = true;
 
 // Temporary override: keep false for normal ordering schedule checks.
 const FORCE_ORDERING_OPEN = false;
@@ -93,11 +95,86 @@ function getIsAdminRoute() {
     return false;
   }
 
-  return window.location.pathname === '/admin' || window.location.hash === '#/admin';
+  return getCurrentPath() === '/admin';
 }
+
+function getCurrentPath() {
+  if (typeof window === 'undefined') {
+    return '/';
+  }
+
+  if (window.location.hash.startsWith('#/')) {
+    return normalizePath(window.location.hash.slice(1));
+  }
+
+  return normalizePath(window.location.pathname || '/');
+}
+
+function normalizePath(path) {
+  if (path.length > 1 && path.endsWith('/')) {
+    return path.slice(0, -1);
+  }
+
+  return path;
+}
+
+const routeMetadata = {
+  '/': {
+    title: "BB's Bakery & Cafe - Pennington Gap, Lee County & Southwest Virginia",
+    description: "Fresh-baked goodness made with love daily in Pennington Gap, VA. Browse our menu, hours, reviews, and ordering information.",
+    urlPath: '/',
+  },
+  '/about': {
+    title: "About BB's Bakery & Cafe | Pennington Gap VA bakery",
+    description: "Learn about BB's Bakery & Cafe, our fresh daily baked goods, community roots, and our commitment to local quality.",
+    urlPath: '/about',
+  },
+  '/menu': {
+    title: "Menu | BB's Bakery & Cafe",
+    description: "See our bakery and cafe menu including pastries, breads, coffees, and daily specials available for pickup in Pennington Gap.",
+    urlPath: '/menu',
+  },
+  '/reviews': {
+    title: "Reviews | BB's Bakery & Cafe",
+    description: "Read what customers say about BB's Bakery & Cafe — fresh pastries, great coffee, and friendly service in Southwest Virginia.",
+    urlPath: '/reviews',
+  },
+  '/hours': {
+    title: "Hours | BB's Bakery & Cafe",
+    description: "Find BB's Bakery & Cafe opening hours, ordering windows, and holiday schedule for Pennington Gap, Virginia.",
+    urlPath: '/hours',
+  },
+  '/ordering-guide': {
+    title: "Ordering Guide | BB's Bakery & Cafe",
+    description: "Get step-by-step instructions for placing an online order at BB's Bakery & Cafe, including menu add-ons and pickup details.",
+    urlPath: '/ordering-guide',
+  },
+  '/custom-cakes': {
+    title: "Custom Cakes | BB's Bakery & Cafe",
+    description: "Order a custom cake from BB's Bakery & Cafe with fresh designs, local ingredients, and pickup in Pennington Gap.",
+    urlPath: '/custom-cakes',
+  },
+  '/catering': {
+    title: "Catering in Pennington Gap, VA | BB's Bakery & Cafe",
+    description: "Plan fresh bakery, breakfast, lunch, office, party, and dessert catering from BB's Bakery & Cafe in Pennington Gap, VA. Request a custom quote.",
+    urlPath: '/catering',
+  },
+  '/faq': {
+    title: "FAQ | BB's Bakery & Cafe",
+    description: "Find answers to common questions about orders, pickup, payments, and menu availability at BB's Bakery & Cafe.",
+    urlPath: '/faq',
+  },
+  '/contact': {
+    title: "Contact | BB's Bakery & Cafe",
+    description: "Contact BB's Bakery & Cafe for orders, questions, and special requests in Pennington Gap, VA.",
+    urlPath: '/contact',
+  },
+};
 
 function App() {
   const [isAdminRoute, setIsAdminRoute] = useState(() => getIsAdminRoute());
+  const [currentPath, setCurrentPath] = useState(() => getCurrentPath());
+  const hasMounted = useRef(false);
   const [cart, setCart] = useState([]);
   const [customerName, setCustomerName] = useState('');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -105,7 +182,10 @@ function App() {
   const orderingStatus = useMemo(() => getOrderingStatus(), []);
 
   useEffect(() => {
-    const syncRoute = () => setIsAdminRoute(getIsAdminRoute());
+    const syncRoute = () => {
+      setCurrentPath(getCurrentPath());
+      setIsAdminRoute(getIsAdminRoute());
+    };
     window.addEventListener('hashchange', syncRoute);
     window.addEventListener('popstate', syncRoute);
 
@@ -114,6 +194,42 @@ function App() {
       window.removeEventListener('popstate', syncRoute);
     };
   }, []);
+
+  useEffect(() => {
+    const meta = routeMetadata[currentPath] || routeMetadata['/'];
+    document.title = meta.title;
+
+    const setMetaContent = (selector, value) => {
+      const element = document.querySelector(selector);
+      if (element) {
+        element.setAttribute('content', value);
+      }
+    };
+
+    const url = `${window.location.origin}${meta.urlPath}`;
+    setMetaContent('meta[name="description"]', meta.description);
+    setMetaContent('meta[property="og:title"]', meta.title);
+    setMetaContent('meta[property="og:description"]', meta.description);
+    setMetaContent('meta[property="og:url"]', url);
+    setMetaContent('meta[name="twitter:title"]', meta.title);
+    setMetaContent('meta[name="twitter:description"]', meta.description);
+
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) {
+      canonical.setAttribute('href', url);
+    }
+  }, [currentPath]);
+
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    });
+  }, [currentPath]);
 
   const totalCents = useMemo(
     () => cart.reduce((sum, item) => sum + item.amount * item.quantity, 0),
@@ -233,6 +349,44 @@ function App() {
     }
   };
 
+  const renderPage = () => {
+    switch (currentPath) {
+      case '/':
+        return (
+          <>
+            <Hero />
+            <HomeHighlights />
+            <Hours />
+          </>
+        );
+      case '/about':
+        return <About />;
+      case '/reviews':
+        return <Reviews />;
+      case '/hours':
+        return <Hours />;
+      case '/menu':
+        return (
+          <>
+            <Menu onAddToCart={addToCart} cart={cart} orderingStatus={orderingStatus} />
+            <OrderingGuide />
+          </>
+        );
+      case '/ordering-guide':
+        return <OrderingGuide />;
+      case '/custom-cakes':
+        return <CustomCakeForm />;
+      case '/catering':
+        return <Catering />;
+      case '/faq':
+        return <FAQ />;
+      case '/contact':
+        return <Contact />;
+      default:
+        return <Hero />;
+    }
+  };
+
   return (
     <ErrorBoundary>
       <div className="App">
@@ -247,17 +401,9 @@ function App() {
           totalCents={totalCents}
         />
         <main className="main-content-wrapper" id="main-content">
-          <Hero />
           <Suspense fallback={<div style={{minHeight: '100vh', background: 'linear-gradient(135deg, var(--bg-very-light) 0%, var(--bg-light) 100%)'}} />}>
-            <div className="section-wrapper">
-              <About />
-              <Reviews />
-              <Hours />
-              <Menu onAddToCart={addToCart} cart={cart} orderingStatus={orderingStatus} />
-              <OrderingGuide />
-              <CustomCakeForm />
-              <FAQ />
-              <Contact />
+            <div className={`section-wrapper${currentPath === '/' ? ' section-wrapper-home' : ' section-wrapper-page'}`}>
+              {renderPage()}
             </div>
           </Suspense>
         </main>

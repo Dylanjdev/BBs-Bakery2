@@ -1,199 +1,198 @@
 // Hero.jsx - BB's Bakery & Cafe
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faClock, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
+
+const handleInternalClick = (event, path) => {
+  if (
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.shiftKey
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  window.history.pushState({}, '', path);
+  window.dispatchEvent(new PopStateEvent('popstate'));
+};
 
 const Hero = () => (
   <section 
-    className="relative" 
+    className="hero-shell relative" 
     aria-label="Welcome banner"
     style={{
-      background: 'linear-gradient(135deg, rgba(252, 231, 240, 0.3) 0%, rgba(232, 240, 232, 0.2) 100%)',
-      paddingTop: 'clamp(1.5rem, 8vw, 4rem)',
-      paddingBottom: 'clamp(1.5rem, 8vw, 4rem)',
-      borderRadius: '32px',
-      margin: 'clamp(1rem, 4vw, 2rem) auto',
-      maxWidth: '1400px'
+      position: 'relative',
+      isolation: 'isolate',
+      overflow: 'hidden',
+      width: '100%',
+      maxWidth: '1400px',
+      minHeight: 'auto',
+      margin: 'clamp(0.75rem, 3vw, 1.5rem) auto 0',
+      borderRadius: 'clamp(18px, 4vw, 34px)',
+      background: 'linear-gradient(135deg, rgba(252, 231, 240, 0.62) 0%, rgba(255, 255, 255, 0.96) 44%, rgba(232, 240, 232, 0.65) 100%)',
+      boxShadow: '0 24px 70px rgba(42, 42, 42, 0.16)'
     }}
   >
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'minmax(300px, 1fr) minmax(300px, 1fr)',
-      gap: 'clamp(1.5rem, 4vw, 3rem)',
-      alignItems: 'center',
-      padding: 'clamp(1rem, 4vw, 2.5rem)',
-      maxWidth: '100%'
-    }} className="hero-grid">
-      {/* Hero Image */}
-      <div 
-        className="br4 overflow-hidden relative order-2-ns" 
+    <div
+      className="hero-content"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 0.86fr) minmax(320px, 1.14fr)',
+        alignItems: 'center',
+        gap: 'clamp(1.5rem, 5vw, 4rem)',
+        padding: 'clamp(1.5rem, 5vw, 4rem)',
+      }}
+    >
+      <div
+        className="hero-copy"
         style={{
-          boxShadow: '0 20px 60px rgba(214, 90, 140, 0.25)',
-          borderRadius: '28px',
-          border: 'none',
-          transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          position: 'relative',
-          height: 'clamp(300px, 35vw, 450px)',
-          minHeight: '300px',
-          order: 2,
-          width: '100%'
-        }}
-        onMouseOver={(e) => {
-          e.currentTarget.style.boxShadow = '0 30px 80px rgba(214, 90, 140, 0.4)';
-          e.currentTarget.style.transform = 'translateY(-8px)';
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.boxShadow = '0 20px 60px rgba(214, 90, 140, 0.25)';
-          e.currentTarget.style.transform = 'translateY(0)';
+          maxWidth: '760px',
+          paddingBottom: 'clamp(0.5rem, 2vw, 1rem)'
         }}
       >
-        <div 
+        <div
+          className="hero-kicker"
           style={{
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-            overflow: 'hidden',
-            background: '#f9f9f9'
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.55rem',
+            marginBottom: '1rem',
+            padding: '0.52rem 0.82rem',
+            borderRadius: '999px',
+            color: '#8f2d58',
+            background: '#fff',
+            border: '1px solid rgba(214, 90, 140, 0.18)',
+            boxShadow: '0 8px 20px rgba(214, 90, 140, 0.1)',
+            fontFamily: 'Quicksand, sans-serif',
+            fontWeight: 800,
+            fontSize: 'clamp(0.8rem, 2vw, 0.95rem)',
+            lineHeight: 1.2
           }}
         >
-          <img 
-            src="/assets/images/CoverPhoto.webp" 
-            alt="Fresh baked pastries and breads at BB's Bakery & Cafe in Pennington Gap, Virginia" 
-            width="1200" 
-            height="600" 
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center center',
-              transition: 'transform 0.4s ease',
-              filter: 'brightness(1.05) contrast(1.08)'
-            }} 
-            loading="eager"
-            fetchPriority="high"
-            decoding="sync"
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'scale(1.03)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-            }}
-          />
-          {/* Overlay gradient for depth */}
-          <div 
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'linear-gradient(135deg, rgba(214, 90, 140, 0.1) 0%, rgba(107, 142, 111, 0.05) 100%)',
-              pointerEvents: 'none'
-            }}
-          />
+          <FontAwesomeIcon icon={faClock} />
+          BB&apos;s Bakery & Cafe in Pennington Gap
         </div>
-      </div>
 
-      {/* Hero Content */}
-      <div style={{order: 1}}>
         <h1 
-          className="f1 f-headline-l fw7 mb3 mt0 lh-title" 
+          className="hero-title f1 f-headline-l fw7 mb3 mt0 lh-title" 
           style={{
             fontFamily: 'Playfair Display, serif',
             color: '#1a1a1a',
-            letterSpacing: '-1.5px',
-            fontSize: 'clamp(2rem, 10vw, 5rem)',
-            background: 'linear-gradient(135deg, #d65a8c 0%, #6b8e6f 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
+            letterSpacing: '0',
+            fontSize: 'clamp(2.9rem, 7vw, 6rem)',
+            lineHeight: 1,
             textAlign: 'left',
-            margin: '0 0 1rem 0'
+            margin: '0 0 1.15rem 0',
+            overflowWrap: 'break-word',
+            maxWidth: '940px',
           }}
         >
-          BB's Bakery & Cafe in Pennington Gap, VA
+          Bakery mornings worth leaving early for.
         </h1>
         
         <p 
-          className="fw5 mb3" 
+          className="hero-subtitle fw6 mb3" 
           style={{
-            color: '#6d6d6d',
+            color: '#5f5f5f',
             fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.95rem, 4vw, 1.15rem)',
-            letterSpacing: '0.5px',
-            fontWeight: '500',
-            lineHeight: '1.8',
+            fontSize: 'clamp(1.05rem, 2.7vw, 1.35rem)',
+            letterSpacing: '0',
+            lineHeight: '1.65',
             textAlign: 'left',
-            margin: '0 0 1.5rem 0'
+            margin: '0 0 1.4rem 0',
+            maxWidth: '620px',
           }}
         >
-          Fresh-baked goodness made with love every morning for Pennington Gap, Lee County, and Southwest Virginia
+          BB&apos;s Bakery & Cafe serves warm pastries, coffee, breakfast, lunch, viral dot cakes, and custom sweets made right here in Lee County.
         </p>
         
         <p 
-          className="fw5 mb5 flex items-center"
+          className="hero-location fw6 flex items-center"
           style={{
-            color: '#8d8d8d',
-            fontSize: '1rem',
-            gap: '0.5rem',
+            color: '#747474',
+            fontSize: 'clamp(0.9rem, 2.2vw, 1rem)',
+            gap: '0.55rem',
             textAlign: 'left',
-            alignItems: 'center'
+            alignItems: 'center',
+            margin: '0 0 2rem 0',
+            fontFamily: 'Quicksand, sans-serif'
           }}
         >
-          <FontAwesomeIcon icon={faLocationDot} style={{color: '#d65a8c', fontSize: '1.1rem', flexShrink: 0}} /> 
+          <FontAwesomeIcon icon={faLocationDot} style={{color: '#d65a8c', fontSize: '1rem', flexShrink: 0}} /> 
           Pennington Gap, Virginia. Serving Lee County and Southwest Virginia.
         </p>
         
-        {/* CTA Buttons */}
         <div 
-          className="flex flex-wrap items-center" 
-          style={{gap: 'clamp(0.5rem, 2vw, 1rem)', justifyContent: 'flex-start'}}
+          className="hero-actions flex flex-wrap items-center" 
+          style={{gap: '0.85rem', justifyContent: 'flex-start'}}
         >
           <a 
-            href="#menu" 
-            className="fw6 pv3 ph5 br-pill dib no-underline" 
+            href="/menu" 
+            className="hero-action-primary fw7 pv3 ph5 br-pill dib no-underline" 
+            onClick={(event) => handleInternalClick(event, '/menu')}
             style={{
               transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              fontSize: 'clamp(0.85rem, 3vw, 1rem)',
-              padding: 'clamp(0.6rem, 3vw, 0.75rem) clamp(1rem, 4vw, 1.25rem)',
+              fontSize: 'clamp(0.95rem, 2.5vw, 1.05rem)',
+              padding: '0.9rem 1.35rem',
               background: 'linear-gradient(135deg, #d65a8c 0%, #c9a961 100%)',
-              color: 'white',
+              color: '#fff',
               border: 'none',
-              boxShadow: '0 6px 24px rgba(214, 90, 140, 0.25)',
-              letterSpacing: '0.3px',
-              fontWeight: '600',
-              whiteSpace: 'nowrap'
+              boxShadow: '0 10px 30px rgba(214, 90, 140, 0.24)',
+              letterSpacing: '0',
+              whiteSpace: 'nowrap',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.55rem'
             }}
             onMouseOver={(e) => {
               e.target.style.transform = 'translateY(-3px)';
-              e.target.style.boxShadow = '0 10px 36px rgba(214, 90, 140, 0.35)';
+              e.target.style.boxShadow = '0 14px 38px rgba(214, 90, 140, 0.32)';
             }}
             onMouseOut={(e) => {
               e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 6px 24px rgba(214, 90, 140, 0.25)';
+              e.target.style.boxShadow = '0 10px 30px rgba(214, 90, 140, 0.24)';
             }}
           >
             View Menu
+            <FontAwesomeIcon icon={faArrowRight} />
+          </a>
+
+          <a
+            href="/custom-cakes"
+            className="hero-action-secondary fw7 pv3 ph5 br-pill dib no-underline"
+            onClick={(event) => handleInternalClick(event, '/custom-cakes')}
+            style={{
+              transition: 'all 0.35s ease',
+              fontSize: 'clamp(0.95rem, 2.5vw, 1.05rem)',
+              padding: '0.9rem 1.25rem',
+              background: '#fff',
+              color: '#8f2d58',
+              border: '1px solid rgba(214, 90, 140, 0.24)',
+              boxShadow: '0 8px 22px rgba(214, 90, 140, 0.1)',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            Custom Cakes
           </a>
           
           <a 
             href="tel:2765370189" 
-            className="fw6 pv3 ph5 br-pill dib no-underline white" 
+            className="hero-phone fw7 pv3 ph5 br-pill dib no-underline white" 
             aria-label="Call BB's Bakery" 
             style={{
               transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              fontSize: 'clamp(0.85rem, 3vw, 1rem)',
-              padding: 'clamp(0.6rem, 3vw, 0.75rem) clamp(1rem, 4vw, 1.25rem)',
+              fontSize: 'clamp(0.95rem, 2.5vw, 1.05rem)',
+              padding: '0.9rem 1.25rem',
               background: 'linear-gradient(135deg, #6b8e6f 0%, #a7d5ab 100%)',
               border: 'none',
-              boxShadow: '0 6px 24px rgba(107, 142, 111, 0.25)',
+              boxShadow: '0 10px 30px rgba(107, 142, 111, 0.22)',
               color: 'white',
-              letterSpacing: '0.3px',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.4rem',
+              gap: '0.5rem',
               whiteSpace: 'nowrap'
             }}
             onMouseOver={(e) => {
@@ -206,19 +205,107 @@ const Hero = () => (
             }}
           >
             <FontAwesomeIcon icon={faPhone} /> 
-            Order Now
+            Call Now
           </a>
-          
+        </div>
+      </div>
+
+      <div
+        className="hero-image-panel"
+        style={{
+          position: 'relative',
+          minHeight: 'clamp(360px, 44vw, 560px)',
+          borderRadius: 'clamp(18px, 4vw, 30px)',
+          overflow: 'hidden',
+          boxShadow: '0 22px 54px rgba(42, 42, 42, 0.18)',
+          border: '1px solid rgba(255, 255, 255, 0.7)',
+          background: '#f8f1f5'
+        }}
+      >
+        <img
+          src="/assets/images/CoverPhoto.webp"
+          alt="Fresh baked pastries and breads at BB's Bakery & Cafe in Pennington Gap, Virginia"
+          width="1200"
+          height="600"
+          loading="eager"
+          fetchPriority="high"
+          decoding="sync"
+          style={{
+            width: '100%',
+            height: '100%',
+            minHeight: 'inherit',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            display: 'block',
+            filter: 'saturate(1.05) contrast(1.04)'
+          }}
+        />
+        <div
+          className="hero-image-badge"
+          style={{
+            position: 'absolute',
+            left: 'clamp(1rem, 3vw, 1.5rem)',
+            bottom: 'clamp(1rem, 3vw, 1.5rem)',
+            maxWidth: 'min(300px, calc(100% - 2rem))',
+            padding: '0.9rem 1rem',
+            borderRadius: '16px',
+            color: '#fff',
+            background: 'rgba(26, 22, 18, 0.72)',
+            backdropFilter: 'blur(14px)',
+            fontFamily: 'Quicksand, sans-serif',
+            boxShadow: '0 12px 30px rgba(0,0,0,0.24)'
+          }}
+        >
+          <strong style={{ display: 'block', fontSize: '0.98rem', marginBottom: '0.18rem' }}>
+            Fresh-baked every morning
+          </strong>
+          <span style={{ display: 'block', fontSize: '0.86rem', lineHeight: 1.45, opacity: 0.9 }}>
+            Pastries, coffee, breakfast, lunch, and sweets made for Pennington Gap.
+          </span>
         </div>
       </div>
     </div>
+
     <style>{`
-      .hero-grid {
-        grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr) !important;
-      }
-      @media (max-width: 900px) {
-        .hero-grid {
+      @media (max-width: 980px) {
+        .hero-content {
           grid-template-columns: 1fr !important;
+          align-items: center !important;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .hero-shell {
+          min-height: auto !important;
+        }
+
+        .hero-content {
+          padding: 1.35rem !important;
+          gap: 1.2rem !important;
+        }
+
+        .hero-title {
+          font-size: clamp(2.65rem, 12vw, 3.35rem) !important;
+          line-height: 1 !important;
+        }
+
+        .hero-subtitle {
+          font-size: 1rem !important;
+          line-height: 1.55 !important;
+        }
+
+        .hero-actions {
+          align-items: stretch !important;
+        }
+
+        .hero-actions a {
+          justify-content: center !important;
+          flex: 1 1 100% !important;
+        }
+
+        .hero-image-panel {
+          min-height: 280px !important;
+          border-radius: 18px !important;
         }
       }
     `}</style>

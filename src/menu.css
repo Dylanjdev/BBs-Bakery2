@@ -589,6 +589,42 @@
     min-width: unset;
   }
 
+  .bakery-item,
+  .breakfast-item,
+  .coffee-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+
+  .bakery-item__text p,
+  .breakfast-item__text p,
+  .coffee-item__text p {
+    max-width: none;
+  }
+
+  .bakery-item__actions,
+  .breakfast-item__actions,
+  .coffee-item__actions,
+  .menu-item-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .bakery-item__actions .price,
+  .breakfast-item__actions .price,
+  .coffee-item__actions .price {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .protein-select {
+    flex: 1 1 150px;
+    min-width: 0;
+  }
+
   .menu-special {
     padding: 20px;
     margin-bottom: 25px;
@@ -607,7 +643,7 @@
 
 @media (max-width: 480px) {
   .menu-section {
-    padding: 40px 20px;
+    padding: 32px 0;
   }
 
   .menu-header h2 {
@@ -619,7 +655,8 @@
   }
 
   .menu-column {
-    padding: 25px 15px;
+    padding: 24px 16px;
+    border-radius: 14px;
   }
 
   .menu-column h3 {
@@ -648,5 +685,29 @@
 
   .menu-special ul {
     font-size: 0.95rem;
+  }
+
+  .bakery-branding {
+    gap: 0.65rem;
+  }
+
+  .bakery-branding__icon {
+    width: 46px;
+    height: 46px;
+    font-size: 1.45rem;
+  }
+
+  .menu-unavailable-chip {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .menu-item:hover {
+    padding: 15px 10px;
+    margin: 0;
+  }
+
+  .menu-item:last-child:hover {
+    padding: 15px 10px;
   }
 }

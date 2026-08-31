@@ -64,6 +64,33 @@ npm run build
 npm run preview
 ```
 
+### Production Caching
+
+The current deploy script publishes `dist/` to GitHub Pages:
+
+```bash
+npm run deploy
+```
+
+GitHub Pages sends static files with `Cache-Control: max-age=600`, so Lighthouse reports a 10 minute cache TTL for `/assets/...` files. This cannot be changed from React, Vite, `index.html`, or a file committed to this repo while GitHub Pages is the HTTP server.
+
+To resolve the Lighthouse "Use efficient cache lifetimes" warning, put the site behind a CDN or static host that lets you set response headers. For Cloudflare, add a Cache Rule for:
+
+```text
+Hostname equals bbs-bakery.com
+URI Path starts with /assets/
+```
+
+Recommended settings:
+
+```text
+Browser Cache TTL: 1 year
+Edge Cache TTL: 1 year
+Cache eligibility: Eligible for cache
+```
+
+The Vite-generated JavaScript and CSS filenames are content-hashed, so long immutable caching is safe for those files. Images in `public/assets/images/` keep stable filenames, so purge the CDN cache after replacing an image or move frequently changed images into `src/assets/` and import them so Vite emits hashed filenames.
+
 ### Environment Variables
 Copy `.env.example` to `.env.local` and fill in your values.
 

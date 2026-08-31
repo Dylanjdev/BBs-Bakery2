@@ -12,6 +12,12 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+const params = new URLSearchParams(window.location.search);
+const redirectPath = params.get('redirect');
+if (redirectPath) {
+  window.history.replaceState({}, '', redirectPath);
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />

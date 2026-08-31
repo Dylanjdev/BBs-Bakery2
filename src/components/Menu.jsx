@@ -34,24 +34,35 @@ const sections = [
     special: true,
     note: '*selection varies daily*',
     items: [
-      { name: 'Muffins', description: 'flour + butter + eggs + sugar + fruit variety', fallbackAmount: 400 },
-      { name: 'Brownies', description: 'flour + cocoa powder + eggs + sugar + milk', fallbackAmount: 350 },
-      { name: 'Scones', description: 'flour + butter + eggs + buttermilk + fruit variety/savory', fallbackAmount: 400 },
+      { name: 'Muffins', description: 'flour + butter + eggs + sugar + fruit variety', fallbackAmount: 350 },
+      { name: 'Brownies', description: 'flour + cocoa powder + eggs + sugar + milk', fallbackAmount: 300 },
+      { name: 'Scones', description: 'flour + butter + eggs + buttermilk + fruit variety/savory', fallbackAmount: 350 },
       { name: 'Cinnamon Rolls', description: 'flour + butter + milk + eggs + yeast + cinnamon + sugar + cream cheese', fallbackAmount: 500 },
       {
         name: 'Croissants',
         description: 'flour + milk + butter + salt + yeast',
-        fallbackAmount: 400,
-        suffix: '/$5.00',
+        fallbackAmount: 300,
+        priceOptions: [
+          { lookupName: 'Croissant (Regular)', fallbackAmount: 300 },
+          { lookupName: 'Croissant (specialty)', fallbackAmount: 500 },
+        ],
       },
-      { name: 'Mini loaf', description: 'flour + butter + eggs + sugar + fruit variety', fallbackAmount: 400 },
+      { name: 'Mini loaf', description: 'flour + butter + eggs + sugar + fruit variety', fallbackAmount: 500 },
       { name: 'Mini Bundts', description: 'flour + sugar + milk + eggs + variety', fallbackAmount: 500 },
-      { name: 'Danish', description: 'flour + butter + cream cheese + eggs + fruit variety', fallbackAmount: 350 },
-      { name: 'Pastry', description: 'flour + butter + sweet/savory filling variety', fallbackAmount: 500 },
+      { name: 'Danish', description: 'flour + butter + cream cheese + eggs + fruit variety', fallbackAmount: 400 },
+      { name: 'Pastry', description: 'flour + butter + sweet/savory filling variety', fallbackAmount: 400 },
       { name: 'Specialty Buns', description: 'flour + milk + butter + eggs + yeast + sweet/savory variety', fallbackAmount: 500 },
-      { name: 'Donuts – Glazed or Powdered', description: 'flour + sugar + yeast + butter + milk + glazed or powdered sugar', fallbackAmount: 250 },
-      { name: 'Donuts – Chocolate Glazed', description: 'flour + sugar + yeast + butter + milk + chocolate glaze', fallbackAmount: 300 },
-      { name: 'Donuts – Specialty', description: 'flour + sugar + yeast + butter + milk + specialty topping variety', fallbackAmount: 300 },
+      { name: 'Donuts – Glazed or Powdered', priceLookupName: 'Donut (glazed)', description: 'flour + sugar + yeast + butter + milk + glazed or powdered sugar', fallbackAmount: 200 },
+      { name: 'Donuts – Chocolate Glazed', priceLookupName: 'Donut (chocolate glazed)', description: 'flour + sugar + yeast + butter + milk + chocolate glaze', fallbackAmount: 250 },
+      {
+        name: 'Donuts – Specialty',
+        description: 'flour + sugar + yeast + butter + milk + specialty topping variety',
+        fallbackAmount: 200,
+        priceOptions: [
+          { lookupName: 'Donut (blueberry glaze)', fallbackAmount: 200 },
+          { lookupName: 'Donut (cookie butter)', fallbackAmount: 250 },
+        ],
+      },
       { name: 'Cupcakes', description: 'flour + butter + eggs + sugar + frosting variety', fallbackAmount: 350 },
     ],
   },
@@ -61,19 +72,19 @@ const sections = [
       {
         name: 'Breakfast Biscuit',
         description: 'choice of protein + cheese + two eggs',
-        fallbackAmount: 550,
+        fallbackAmount: 500,
         proteinOptions: ['Bacon', 'Sausage', 'Ham'],
       },
       {
         name: 'Breakfast Sandwich',
         description: 'choice of protein + cheese + two eggs + choice of bagel or croissant',
-        fallbackAmount: 700,
+        fallbackAmount: 650,
         proteinOptions: ['Bacon', 'Sausage', 'Ham'],
       },
       {
         name: 'Breakfast Wrap',
         description: 'choice of protein + cheese + three eggs',
-        fallbackAmount: 800,
+        fallbackAmount: 700,
         proteinOptions: ['Bacon', 'Sausage', 'Ham'],
       },
     ],
@@ -119,6 +130,7 @@ const sections = [
   {
     title: 'Loaded Energy',
     note: '32 oz • $8.00',
+    priceLookupName: 'Loaded Energy (Large)',
     items: [
       {
         name: 'Tater Colada',
@@ -191,6 +203,12 @@ const sections = [
   {
     title: 'Specialty Coffee',
     note: 'Pricing & Sizes',
+    priceLookupName: 'Iced Latte (medium)',
+    pricingOptions: [
+      { label: '12 oz', lookupName: 'Iced Latte (small)', fallbackAmount: 550 },
+      { label: '20 oz', lookupName: 'Iced Latte (medium)', fallbackAmount: 650 },
+      { label: '32 oz', lookupName: 'Iced Latte (large)', fallbackAmount: 750 },
+    ],
     items: [
       { name: 'Tiramisu', lookupName: 'Tiramisu (20 oz)', description: 'mocha + espresso + cream cheese mixture + cold foam + chocolate drizzle', fallbackAmount: 650 },
       { name: 'Cookies & Cream', lookupName: 'Cookies & Cream (20 oz)', description: 'white chocolate vanilla + espresso + oreo cream mixture + chocolate drizzle', fallbackAmount: 650 },
@@ -210,7 +228,7 @@ const sections = [
     items: [
       { name: 'Americano', description: 'espresso + hot water', fallbackAmount: 400 },
       { name: 'Cappuccino', description: 'espresso + steamed milk + foam', fallbackAmount: 450 },
-      { name: 'Cortado', description: 'espresso + equal parts steamed milk', fallbackAmount: 450 },
+      { name: 'Cortado', description: 'espresso + equal parts steamed milk', fallbackAmount: 350 },
     ],
   },
   {
@@ -224,8 +242,8 @@ const sections = [
   {
     title: 'Hot Latte',
     items: [
-      { name: 'Hot Latte (Medium)', lookupName: 'Hot Latte (12 oz)', description: 'espresso + steamed milk', fallbackAmount: 500 },
-      { name: 'Hot Latte (Large)', lookupName: 'Hot Latte (20 oz)', description: 'espresso + steamed milk', fallbackAmount: 600 },
+      { name: 'Hot Latte (Medium)', lookupName: 'Hot Latte (12 oz)', priceLookupName: 'Hot Latte (Regular)', description: 'espresso + steamed milk', fallbackAmount: 500 },
+      { name: 'Hot Latte (Large)', lookupName: 'Hot Latte (20 oz)', priceLookupName: 'Hot Latte (Large)', description: 'espresso + steamed milk', fallbackAmount: 600 },
     ],
   },
   {
@@ -239,7 +257,7 @@ const sections = [
   {
     title: 'Dirty Sodas',
     note: 'Pricing & Sizes',
-    pricingLines: ['Small - $4', 'Medium - $5', 'Large - $6'],
+    dynamicSizePricing: true,
     items: [
       {
         name: 'Berries & Cream',
@@ -376,7 +394,7 @@ const sections = [
   {
     title: 'Smoothies',
     note: 'Pricing & Sizes',
-    pricingLines: ['small $6', 'medium $7', 'large $8'],
+    dynamicSizePricing: true,
     items: [
       {
         name: 'Strawberry Fields',
@@ -482,6 +500,8 @@ const normalize = (value) =>
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
 
+const toSingularKey = (value) => normalize(value).replace(/\b(\w+?)s\b/g, '$1');
+
 const isWithinPreOrderWindow = (date = new Date()) => {
   const day = date.getDay();
   const minutes = (date.getHours() * 60) + date.getMinutes();
@@ -519,6 +539,24 @@ const toDisplayName = (itemName, variationName) => {
   return `${itemName} (${variationName})`;
 };
 
+const getPreferredVariationRank = (variationName) => {
+  const variationKey = normalize(variationName);
+
+  if (variationKey === 'regular') {
+    return 0;
+  }
+
+  if (variationKey === 'single') {
+    return 1;
+  }
+
+  if (variationKey === 'default') {
+    return 2;
+  }
+
+  return 10;
+};
+
 const buildSquareLookup = (squareItems = []) => {
   const lookup = new Map();
 
@@ -532,19 +570,66 @@ const buildSquareLookup = (squareItems = []) => {
       }
 
       const displayName = toDisplayName(itemName, variation.name || 'Regular');
+      const variationLookupName = `${itemName} (${variation.name || 'Regular'})`;
       const data = {
         variationId: variation.id || null,
         amount: variation.priceAmount,
         currency: variation.currency || 'USD',
         visible: item?.visible !== false,
+        rank: getPreferredVariationRank(variation.name),
       };
 
       lookup.set(normalize(displayName), data);
-      lookup.set(normalize(itemName), data);
+      lookup.set(toSingularKey(displayName), data);
+      lookup.set(normalize(variationLookupName), data);
+      lookup.set(toSingularKey(variationLookupName), data);
+
+      if (data.variationId) {
+        lookup.set(`variation:${data.variationId}`, data);
+      }
+
+      [normalize(itemName), toSingularKey(itemName)].forEach((itemKey) => {
+        const existing = lookup.get(itemKey);
+        if (!existing || data.rank < existing.rank) {
+          lookup.set(itemKey, data);
+        }
+      });
     });
   });
 
   return lookup;
+};
+
+const findSquarePrice = (squareLookup, lookupName, variationId) => {
+  const nameMatch = lookupName
+    ? squareLookup.get(normalize(lookupName)) || squareLookup.get(toSingularKey(lookupName))
+    : null;
+
+  return nameMatch || (variationId ? squareLookup.get(`variation:${variationId}`) : null);
+};
+
+const resolvePriceOption = (option, squareLookup) => {
+  const fallbackVariationId =
+    option.variationId
+    || squareVariationMap[option.lookupName]
+    || null;
+  const live = findSquarePrice(squareLookup, option.lookupName, fallbackVariationId);
+
+  return {
+    ...option,
+    amount: live?.amount ?? option.fallbackAmount,
+    currency: live?.currency || option.currency || 'USD',
+    variationId: live?.variationId || fallbackVariationId,
+  };
+};
+
+const formatPriceRange = (priceOptions = []) => {
+  const labels = priceOptions
+    .filter((option) => Number.isFinite(option.amount))
+    .map((option) => formatPriceLabel(option.amount, option.currency));
+  const uniqueLabels = [...new Set(labels)];
+
+  return uniqueLabels.join('–');
 };
 
 const Menu = ({ onAddToCart, orderingStatus }) => {
@@ -665,38 +750,64 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       });
 
       return sections
-        .map((section) => ({
-          ...section,
-          items: [
+        .map((section) => {
+          const resolvedItems = [
             ...section.items
               .map((item) => {
-              const keepCuratedVisible = lockedCuratedSections.has(section.title);
-              const lookupKey = normalize(item.lookupName || item.name);
-              const live = squareLookup.get(lookupKey);
-              const amount = live?.amount ?? item.fallbackAmount;
-              const currency = live?.currency || 'USD';
-              const fallbackVariationId =
-                squareVariationMap[item.lookupName || item.name]
-                || squareVariationMap[item.name]
-                || null;
+                const keepCuratedVisible = lockedCuratedSections.has(section.title);
+                const priceLookupName = item.priceLookupName || section.priceLookupName || item.lookupName || item.name;
+                const fallbackVariationId =
+                  squareVariationMap[priceLookupName]
+                  || squareVariationMap[item.lookupName || item.name]
+                  || squareVariationMap[item.name]
+                  || null;
+                const live = findSquarePrice(squareLookup, priceLookupName, fallbackVariationId);
+                const priceOptions = item.priceOptions?.map((option) =>
+                  resolvePriceOption(option, squareLookup)) || [];
+                const sizeOptions = item.sizeOptions?.map((option) =>
+                  resolvePriceOption(option, squareLookup));
+                const amount = live?.amount ?? priceOptions[0]?.amount ?? item.fallbackAmount;
+                const currency = live?.currency || priceOptions[0]?.currency || 'USD';
+                const priceRangeLabel = formatPriceRange(priceOptions);
 
-              return {
-                ...item,
-                amount,
-                isPreOrder: section.preOrder === true,
-                variationId: live?.variationId || fallbackVariationId,
-                isOnlineOrderable: ORDERABLE_SECTION_TITLES.has(section.title),
-                visible: keepCuratedVisible ? true : live?.visible !== false,
-                isUnavailableToday:
-                  isMenuItemUnavailableToday(item.lookupName, dailyUnavailableMap)
-                  || isMenuItemUnavailableToday(item.name, dailyUnavailableMap),
-                label: `${formatPriceLabel(amount, currency)}${item.suffix || ''}`,
-              };
-            })
-            .filter((item) => item.visible),
+                return {
+                  ...item,
+                  amount,
+                  priceOptions,
+                  sizeOptions,
+                  isPreOrder: section.preOrder === true,
+                  variationId: live?.variationId || priceOptions[0]?.variationId || fallbackVariationId,
+                  isOnlineOrderable: ORDERABLE_SECTION_TITLES.has(section.title),
+                  visible: keepCuratedVisible ? true : live?.visible !== false,
+                  isUnavailableToday:
+                    isMenuItemUnavailableToday(item.lookupName, dailyUnavailableMap)
+                    || isMenuItemUnavailableToday(item.name, dailyUnavailableMap),
+                  label: priceRangeLabel || formatPriceLabel(amount, currency),
+                };
+              })
+              .filter((item) => item.visible),
             ...(extrasBySection.get(section.title) || []),
-          ],
-        }))
+          ];
+          const sizePricingOptions = section.dynamicSizePricing
+            ? resolvedItems.find((item) => item.sizeOptions?.length)?.sizeOptions || []
+            : [];
+          const sectionPricingOptions = section.pricingOptions?.map((option) =>
+            resolvePriceOption(option, squareLookup)) || [];
+          const pricingOptions = sizePricingOptions.length
+            ? sizePricingOptions
+            : sectionPricingOptions;
+          const pricingLines = pricingOptions.map((option) =>
+            `${option.label} - ${formatPriceLabel(option.amount, option.currency)}`);
+
+          return {
+            ...section,
+            items: resolvedItems,
+            note: section.title === 'Loaded Energy' && resolvedItems[0]
+              ? `32 oz • ${formatPriceLabel(resolvedItems[0].amount)}`
+              : section.note,
+            pricingLines: pricingLines.length ? pricingLines : section.pricingLines,
+          };
+        })
         .filter((section) => section.items.length > 0);
     },
     [squareLookup, squareItems, dailyUnavailableMap],
@@ -1378,9 +1489,9 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                   <h3 className="bakery-heading">{section.title}</h3>
                   <div className="coffee-pricing-card" aria-label="Specialty coffee pricing and sizes">
                     <p>{section.note}</p>
-                    <span>12 oz- $5.50</span>
-                    <span>20 oz- $6.50</span>
-                    <span>32 oz- $7.50</span>
+                    {section.pricingLines?.map((line) => (
+                      <span key={line}>{line}</span>
+                    ))}
                   </div>
                 </div>
 

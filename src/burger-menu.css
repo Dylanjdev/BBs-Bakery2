@@ -3,7 +3,7 @@
   transform: scale(1.18) rotate(6deg);
   outline: none;
 }
-@media (max-width: 900px) {
+@media (max-width: 1180px) {
   nav.dn.db-ns.flex.items-center {
     display: none !important;
   }
@@ -72,7 +72,7 @@
 
 
 
-@media (max-width: 900px) {
+@media (max-width: 1180px) {
   .burger-toggle {
     display: flex;
   }
@@ -127,4 +127,16 @@
   opacity: 1;
   visibility: visible;
   transform: scaleY(1);
+}
+
+@media (max-width: 520px) {
+  .mobile-nav-overlay {
+    padding: 0.75rem;
+    padding-top: 70px;
+  }
+
+  .mobile-nav-overlay a {
+    font-size: 0.95rem !important;
+    padding: 0.72rem 0.85rem !important;
+  }
 }

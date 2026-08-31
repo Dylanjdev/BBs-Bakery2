@@ -124,22 +124,22 @@ const parseCsv = (content) => {
 };
 
 const extractMenuNames = (menuSource) => {
-  const match = menuSource.match(/const\s+onlineOrderPrices\s*=\s*\{([\s\S]*?)\n\};/);
+  const match = menuSource.match(/const\s+sections\s*=\s*\[([\s\S]*?)\n\];/);
   if (!match) {
     return [];
   }
 
-  const objectBody = match[1];
-  const keyRegex = /^\s*(['"])(.*?)\1\s*:\s*\{\s*amount\s*:/gm;
-  const names = [];
-  let keyMatch = keyRegex.exec(objectBody);
+  const sectionsSource = match[1];
+  const fieldRegex = /\b(?:name|lookupName|priceLookupName)\s*:\s*(['"])(.*?)\1/g;
+  const names = new Set();
+  let fieldMatch = fieldRegex.exec(sectionsSource);
 
-  while (keyMatch) {
-    names.push(keyMatch[2]);
-    keyMatch = keyRegex.exec(objectBody);
+  while (fieldMatch) {
+    names.add(fieldMatch[2]);
+    fieldMatch = fieldRegex.exec(sectionsSource);
   }
 
-  return names;
+  return [...names];
 };
 
 const buildMap = (menuNames, csvRows) => {
@@ -170,6 +170,27 @@ const buildMap = (menuNames, csvRows) => {
     const menuKeyNoParens = normalize(removeParenthetical(menuName));
     const menuKeySingular = toSingular(menuName);
     const menuOunces = getMenuOunces(menuName);
+
+    const exactVariationMatch = rowsWithKeys.find((entry) =>
+      entry.combinedKey === menuKey
+    );
+
+    if (exactVariationMatch) {
+      mapped[menuName] = exactVariationMatch.variationId || null;
+      continue;
+    }
+
+    const exactItemMatches = rowsWithKeys.filter((entry) =>
+      entry.itemKey === menuKey
+    );
+
+    if (exactItemMatches.length > 0) {
+      const [bestMatch] = [...exactItemMatches].sort((a, b) =>
+        preferredVariationRank(a.variationName) - preferredVariationRank(b.variationName)
+      );
+      mapped[menuName] = bestMatch.variationId || null;
+      continue;
+    }
 
     const directMatches = rowsWithKeys.filter((entry) =>
       [
@@ -240,7 +261,7 @@ const main = async () => {
 
   const menuNames = extractMenuNames(menuSource);
   if (!menuNames.length) {
-    throw new Error('Could not find onlineOrderPrices keys in src/components/Menu.jsx');
+    throw new Error('Could not find menu item names in src/components/Menu.jsx');
   }
 
   const csvRows = parseCsv(csvSource);

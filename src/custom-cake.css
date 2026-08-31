@@ -1,50 +1,284 @@
 .custom-cake-section {
   width: 100%;
-  padding: clamp(2.5rem, 8vw, 5rem) 0;
+  padding: clamp(2rem, 7vw, 4rem) clamp(1rem, 4vw, 2rem);
 }
 
 .custom-cake-shell {
-  max-width: 980px;
+  width: 100%;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: clamp(1.2rem, 4vw, 2rem);
-  border-radius: 28px;
-  border: 2px solid var(--accent-pink-light);
-  background:
-    radial-gradient(circle at 8% 10%, rgba(201, 169, 97, 0.22), transparent 38%),
-    radial-gradient(circle at 95% 90%, rgba(107, 142, 111, 0.15), transparent 42%),
-    linear-gradient(145deg, #fffdf9 0%, #fff7fa 100%);
-  box-shadow: 0 20px 45px rgba(214, 90, 140, 0.12);
+}
+
+.custom-cake-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+  margin-bottom: clamp(2.25rem, 6vw, 4rem);
 }
 
 .custom-cake-intro {
-  margin-bottom: 1.35rem;
+  min-width: 0;
 }
 
 .custom-cake-kicker {
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  margin: 0 0 0.75rem;
+  color: var(--accent-pink);
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
   text-transform: uppercase;
-  color: var(--accent-green);
-  margin: 0 0 0.4rem;
 }
 
 .custom-cake-intro h2 {
-  margin: 0;
+  margin: 0 0 1.1rem;
+  color: var(--text-dark);
   font-family: 'Playfair Display', serif;
-  font-size: clamp(1.9rem, 4.8vw, 3rem);
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent-gold) 52%, var(--accent-green) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: clamp(2.35rem, 7vw, 4.65rem);
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 .custom-cake-intro p {
-  margin: 0.7rem 0 0;
-  max-width: 68ch;
+  margin: 0;
+  max-width: 64ch;
   color: var(--text-light);
+  font-family: 'Quicksand', sans-serif;
+  font-size: clamp(1rem, 2.5vw, 1.14rem);
+  font-weight: 600;
+  line-height: 1.78;
+}
+
+.custom-cake-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1.6rem;
+}
+
+.custom-cake-actions a,
+.custom-cake-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 50px;
+  border-radius: 999px;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.custom-cake-primary-link,
+.custom-cake-submit {
+  border: none;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent-gold) 100%);
+  box-shadow: 0 14px 30px rgba(214, 90, 140, 0.22);
+}
+
+.custom-cake-primary-link,
+.custom-cake-secondary-link {
+  padding: 0.85rem 1.2rem;
+}
+
+.custom-cake-secondary-link {
+  color: #2e5e3f;
+  background: #fff;
+  border: 1px solid rgba(107, 142, 111, 0.28);
+  box-shadow: 0 12px 26px rgba(42, 42, 42, 0.07);
+}
+
+.custom-cake-photo-stack {
+  position: relative;
+  min-height: clamp(420px, 48vw, 560px);
+}
+
+.custom-cake-photo-stack figure {
+  margin: 0;
+  overflow: hidden;
+  background: #fff7fb;
+  box-shadow: 0 18px 44px rgba(42, 42, 42, 0.12);
+}
+
+.custom-cake-feature-photo {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+}
+
+.custom-cake-small-photo {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  width: 28%;
+  height: 24%;
+  border: 6px solid #fff;
+  border-radius: 18px;
+}
+
+.custom-cake-photo-stack img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.custom-cake-feature-photo figcaption {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  padding: 1rem;
+  border-radius: 16px;
+  color: #fff;
+  background: rgba(34, 28, 25, 0.82);
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.custom-cake-process {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: clamp(2rem, 6vw, 3.5rem);
+}
+
+.custom-cake-process article,
+.custom-cake-notes,
+.custom-cake-form-panel {
+  border: 1px solid rgba(214, 90, 140, 0.18);
+  background: #fff;
+  box-shadow: 0 14px 32px rgba(42, 42, 42, 0.08);
+}
+
+.custom-cake-process article {
+  display: grid;
+  align-content: start;
+  gap: 0.7rem;
+  min-height: 210px;
+  padding: clamp(1.2rem, 3vw, 1.5rem);
+  border-radius: 18px;
+}
+
+.custom-cake-process span,
+.custom-cake-date-card svg {
+  color: var(--accent-pink);
+}
+
+.custom-cake-process article > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(214, 90, 140, 0.1);
+  font-size: 1.2rem;
+}
+
+.custom-cake-process h3,
+.custom-cake-notes h3,
+.custom-cake-form-heading h3 {
+  margin: 0;
+  color: var(--text-dark);
+  font-family: 'Playfair Display', serif;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.custom-cake-process h3 {
+  font-size: 1.45rem;
+}
+
+.custom-cake-process p,
+.custom-cake-form-heading p,
+.custom-cake-notes p {
+  margin: 0;
+  color: var(--text-light);
+  font-family: 'Quicksand', sans-serif;
+  line-height: 1.6;
+}
+
+.custom-cake-request-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.42fr) minmax(0, 1fr);
+  gap: clamp(1rem, 4vw, 2rem);
+  align-items: start;
+}
+
+.custom-cake-notes,
+.custom-cake-form-panel {
+  border-radius: 22px;
+}
+
+.custom-cake-notes {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.25rem, 3vw, 1.65rem);
+  background: linear-gradient(135deg, #fce7f0 0%, #ffffff 100%);
+  position: sticky;
+  top: 110px;
+}
+
+.custom-cake-notes h3,
+.custom-cake-form-heading h3 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+.custom-cake-notes div:not(.custom-cake-date-card) {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.custom-cake-notes p {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.custom-cake-notes p svg {
+  flex: 0 0 auto;
+  margin-top: 0.25rem;
+  color: var(--accent-green);
+}
+
+.custom-cake-date-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid rgba(214, 90, 140, 0.2);
+}
+
+.custom-cake-date-card span {
+  color: var(--text-light);
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.custom-cake-date-card strong {
+  color: var(--text-dark);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+}
+
+.custom-cake-form-panel {
+  padding: clamp(1.2rem, 4vw, 2rem);
+}
+
+.custom-cake-form-heading {
+  margin-bottom: 1.25rem;
+}
+
+.custom-cake-form-heading h3 {
+  margin-bottom: 0.55rem;
 }
 
 .custom-cake-form {
@@ -61,28 +295,29 @@
 .custom-cake-form label {
   display: grid;
   gap: 0.38rem;
-  font-size: 0.96rem;
-  font-weight: 600;
   color: var(--text-dark);
+  font-size: 0.96rem;
+  font-weight: 700;
 }
 
 .custom-cake-form input,
 .custom-cake-form textarea,
 .custom-cake-form select {
   width: 100%;
+  min-width: 0;
   border: 1px solid #e4d8de;
   border-radius: 12px;
-  font-size: 0.98rem;
-  font-family: inherit;
   color: var(--text-dark);
-  background: rgba(255, 255, 255, 0.92);
-  padding: 0.72rem 0.85rem;
+  background: rgba(255, 255, 255, 0.94);
+  font-family: inherit;
+  font-size: 0.98rem;
+  padding: 0.75rem 0.85rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .custom-cake-form textarea {
+  min-height: 136px;
   resize: vertical;
-  min-height: 130px;
 }
 
 .custom-cake-form input:focus,
@@ -90,8 +325,8 @@
 .custom-cake-form select:focus {
   outline: none;
   border-color: var(--accent-pink);
-  box-shadow: 0 0 0 3px rgba(214, 90, 140, 0.15);
   background: #fff;
+  box-shadow: 0 0 0 3px rgba(214, 90, 140, 0.15);
 }
 
 .custom-cake-upload-control {
@@ -102,12 +337,12 @@
 }
 
 .custom-cake-file-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  border: 0;
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
   clip: rect(0 0 0 0);
   overflow: hidden;
 }
@@ -116,16 +351,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 44px;
   border: 1px solid rgba(214, 90, 140, 0.35);
-  background: linear-gradient(140deg, rgba(252, 231, 240, 0.85) 0%, rgba(255, 255, 255, 0.98) 100%);
-  color: #8f2d58;
   border-radius: 999px;
-  padding: 0.58rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  color: #8f2d58;
+  background: linear-gradient(140deg, rgba(252, 231, 240, 0.85) 0%, rgba(255, 255, 255, 0.98) 100%);
   box-shadow: 0 6px 14px rgba(214, 90, 140, 0.12);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding: 0.58rem 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .custom-cake-upload-button:hover {
@@ -139,22 +375,24 @@
   outline-offset: 3px;
 }
 
+.custom-cake-upload-help,
+.custom-cake-inline-help {
+  color: var(--text-light);
+  font-weight: 600;
+}
+
 .custom-cake-upload-help {
   font-size: 0.85rem;
-  color: var(--text-light);
-  font-weight: 500;
 }
 
 .custom-cake-inline-help {
   font-size: 0.8rem;
-  color: var(--text-light);
-  font-weight: 500;
 }
 
 .custom-cake-files {
   margin: 0;
-  font-size: 0.88rem;
   color: var(--accent-green);
+  font-size: 0.88rem;
 }
 
 .custom-cake-status {
@@ -162,7 +400,7 @@
   border-radius: 12px;
   padding: 0.75rem 0.9rem;
   font-size: 0.92rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .custom-cake-status.success {
@@ -180,15 +418,9 @@
 .custom-cake-submit {
   justify-self: start;
   border: none;
-  border-radius: 999px;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  padding: 0.88rem 1.4rem;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent-gold) 100%);
-  box-shadow: 0 10px 24px rgba(214, 90, 140, 0.22);
+  font-size: 1rem;
+  padding: 0.88rem 1.4rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
@@ -203,20 +435,61 @@
 }
 
 .custom-cake-honeypot {
-  position: absolute;
+  position: absolute !important;
   left: -9999px;
-  width: 1px;
-  height: 1px;
+  width: 1px !important;
+  height: 1px !important;
   opacity: 0;
   pointer-events: none;
 }
 
+@media (max-width: 980px) {
+  .custom-cake-hero,
+  .custom-cake-request-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-cake-notes {
+    position: static;
+  }
+}
+
 @media (max-width: 780px) {
+  .custom-cake-process,
   .custom-cake-grid {
     grid-template-columns: 1fr;
   }
 
+  .custom-cake-photo-stack {
+    min-height: 430px;
+  }
+
   .custom-cake-submit {
     justify-self: stretch;
+  }
+}
+
+@media (max-width: 560px) {
+  .custom-cake-actions a {
+    width: 100%;
+  }
+
+  .custom-cake-form input,
+  .custom-cake-form textarea,
+  .custom-cake-form select {
+    font-size: 0.94rem;
+    padding-inline: 0.72rem;
+  }
+
+  .custom-cake-photo-stack {
+    min-height: 360px;
+  }
+
+  .custom-cake-feature-photo {
+    inset: 0;
+  }
+
+  .custom-cake-small-photo {
+    display: none;
   }
 }

@@ -45,6 +45,23 @@ const Header = memo(({
   const handleClose = () => setMenuOpen(false);
   const handleOpenCart = () => setIsCartOpen(true);
   const handleCloseCart = () => setIsCartOpen(false);
+  const handleInternalNavigate = (event, path) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.shiftKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    window.history.pushState({}, '', path);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    handleClose();
+  };
   
   return (
     <>
@@ -69,7 +86,13 @@ const Header = memo(({
         zIndex: 10010
       }}
     >
-      <div className="logo flex items-center" style={{gap: '1rem', flexShrink: 0, minWidth: '0'}}>
+      <a
+        href="/"
+        className="logo flex items-center no-underline"
+        style={{gap: '1rem', flexShrink: 0, minWidth: '0'}}
+        onClick={(e) => handleInternalNavigate(e, '/')}
+        aria-label="BB's Bakery home"
+      >
         <img 
           src="/assets/images/logo.webp" 
           alt="BB's Bakery & Cafe - Fresh Baked Goods in Pennington Gap, Virginia" 
@@ -95,7 +118,7 @@ const Header = memo(({
         >
           BB's Bakery
         </span>
-      </div>
+      </a>
       
       {/* Desktop Nav - hidden when burger menu is open */}
       <nav 
@@ -105,8 +128,32 @@ const Header = memo(({
         aria-label="Main navigation"
       >
         {/* ...existing code for links... */}
+        <a
+          href="/"
+          className="fw6 br-pill no-underline"
+          style={{
+            color: '#6d6d6d',
+            transition: 'all 0.25s ease',
+            fontFamily: 'Quicksand, sans-serif',
+            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
+            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
+            display: 'inline-block',
+            whiteSpace: 'nowrap'
+          }}
+          onClick={(e) => handleInternalNavigate(e, '/')}
+          onMouseOver={(e) => {
+            e.target.style.background = '#f5f5f5';
+            e.target.style.color = '#1a1a1a';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.background = 'transparent';
+            e.target.style.color = '#6d6d6d';
+          }}
+        >
+          Home
+        </a>
         <a 
-          href="#about" 
+          href="/about" 
           className="fw6 br-pill no-underline" 
           style={{
             color: '#6d6d6d',
@@ -117,6 +164,7 @@ const Header = memo(({
             display: 'inline-block',
             whiteSpace: 'nowrap'
           }} 
+          onClick={(e) => handleInternalNavigate(e, '/about')}
           onMouseOver={(e) => {
             e.target.style.background = '#f5f5f5';
             e.target.style.color = '#1a1a1a';
@@ -129,7 +177,7 @@ const Header = memo(({
           About
         </a>
         <a 
-          href="#menu" 
+          href="/menu" 
           className="fw6 br-pill no-underline" 
           style={{
             color: '#6d6d6d',
@@ -140,6 +188,7 @@ const Header = memo(({
             display: 'inline-block',
             whiteSpace: 'nowrap'
           }} 
+          onClick={(e) => handleInternalNavigate(e, '/menu')}
           onMouseOver={(e) => {
             e.target.style.background = '#f5f5f5';
             e.target.style.color = '#1a1a1a';
@@ -152,7 +201,7 @@ const Header = memo(({
           Menu
         </a>
         <a 
-          href="#hours" 
+          href="/reviews" 
           className="fw6 br-pill no-underline" 
           style={{
             color: '#6d6d6d',
@@ -163,6 +212,7 @@ const Header = memo(({
             display: 'inline-block',
             whiteSpace: 'nowrap'
           }} 
+          onClick={(e) => handleInternalNavigate(e, '/reviews')}
           onMouseOver={(e) => {
             e.target.style.background = '#f5f5f5';
             e.target.style.color = '#1a1a1a';
@@ -174,8 +224,32 @@ const Header = memo(({
         >
           Reviews
         </a>
+        <a
+          href="/catering"
+          className="fw6 br-pill no-underline"
+          style={{
+            color: '#6d6d6d',
+            transition: 'all 0.25s ease',
+            fontFamily: 'Quicksand, sans-serif',
+            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
+            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
+            display: 'inline-block',
+            whiteSpace: 'nowrap'
+          }}
+          onClick={(e) => handleInternalNavigate(e, '/catering')}
+          onMouseOver={(e) => {
+            e.target.style.background = '#f5f5f5';
+            e.target.style.color = '#1a1a1a';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.background = 'transparent';
+            e.target.style.color = '#6d6d6d';
+          }}
+        >
+          Catering
+        </a>
         <a 
-          href="#faq" 
+          href="/faq" 
           className="fw6 br-pill no-underline" 
           style={{
             color: '#6d6d6d',
@@ -186,6 +260,7 @@ const Header = memo(({
             display: 'inline-block',
             whiteSpace: 'nowrap'
           }} 
+          onClick={(e) => handleInternalNavigate(e, '/faq')}
           onMouseOver={(e) => {
             e.target.style.background = '#f5f5f5';
             e.target.style.color = '#1a1a1a';
@@ -198,7 +273,7 @@ const Header = memo(({
           FAQ
         </a>
         <a
-          href="#custom-cakes"
+          href="/custom-cakes"
           className="fw6 br-pill no-underline"
           style={{
             color: '#6d6d6d',
@@ -209,6 +284,7 @@ const Header = memo(({
             display: 'inline-block',
             whiteSpace: 'nowrap'
           }}
+          onClick={(e) => handleInternalNavigate(e, '/custom-cakes')}
           onMouseOver={(e) => {
             e.target.style.background = '#f5f5f5';
             e.target.style.color = '#1a1a1a';
@@ -221,7 +297,7 @@ const Header = memo(({
           Custom Cakes
         </a>
         <a 
-          href="#contact" 
+          href="/contact" 
           className="fw6 br-pill no-underline" 
           style={{
             color: '#6d6d6d',
@@ -232,6 +308,7 @@ const Header = memo(({
             display: 'inline-block',
             whiteSpace: 'nowrap'
           }} 
+          onClick={(e) => handleInternalNavigate(e, '/contact')}
           onMouseOver={(e) => {
             e.target.style.background = '#f5f5f5';
             e.target.style.color = '#1a1a1a';
@@ -244,7 +321,7 @@ const Header = memo(({
           Contact
         </a>
         <a 
-          href="#/admin" 
+          href="/admin" 
           className="fw6 br-pill no-underline" 
           style={{
             color: '#6d6d6d',
@@ -255,6 +332,7 @@ const Header = memo(({
             display: 'inline-block',
             whiteSpace: 'nowrap'
           }} 
+          onClick={(e) => handleInternalNavigate(e, '/admin')}
           onMouseOver={(e) => {
             e.target.style.background = '#f5f5f5';
             e.target.style.color = '#1a1a1a';
@@ -419,110 +497,8 @@ const Header = memo(({
           ×
         </button>
       </div>
-      <a 
-        href="#about" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={handleClose}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        About
-      </a>
-      <a 
-        href="#menu" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={handleClose}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        Menu
-      </a>
-      <a 
-        href="#hours" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={handleClose}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        Hours
-      </a>
-      <a 
-        href="#reviews" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={handleClose}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        Reviews
-      </a>
-      <a 
-        href="#faq" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={handleClose}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        FAQ
-      </a>
-      <a 
-        href="#contact" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={handleClose}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        Contact
-      </a>
       <a
-        href="#custom-cakes"
+        href="/"
         className="no-underline"
         style={{
           color: '#1a1a1a',
@@ -532,14 +508,14 @@ const Header = memo(({
           fontWeight: '500',
           transition: 'background 0.2s'
         }}
-        onClick={handleClose}
+        onClick={(e) => handleInternalNavigate(e, '/')}
         onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
         onMouseOut={(e) => e.target.style.background = 'transparent'}
       >
-        Custom Cakes
+        Home
       </a>
       <a 
-        href="#/admin" 
+        href="/about" 
         className="no-underline" 
         style={{
           color: '#1a1a1a',
@@ -549,7 +525,126 @@ const Header = memo(({
           fontWeight: '500',
           transition: 'background 0.2s'
         }}
-        onClick={handleClose}
+        onClick={(e) => handleInternalNavigate(e, '/about')}
+        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseOut={(e) => e.target.style.background = 'transparent'}
+      >
+        About
+      </a>
+      <a 
+        href="/menu" 
+        className="no-underline" 
+        style={{
+          color: '#1a1a1a',
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid #f0f0f0',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onClick={(e) => handleInternalNavigate(e, '/menu')}
+        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseOut={(e) => e.target.style.background = 'transparent'}
+      >
+        Menu
+      </a>
+      <a 
+        href="/reviews" 
+        className="no-underline" 
+        style={{
+          color: '#1a1a1a',
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid #f0f0f0',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onClick={(e) => handleInternalNavigate(e, '/reviews')}
+        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseOut={(e) => e.target.style.background = 'transparent'}
+      >
+        Reviews
+      </a>
+      <a
+        href="/catering"
+        className="no-underline"
+        style={{
+          color: '#1a1a1a',
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid #f0f0f0',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onClick={(e) => handleInternalNavigate(e, '/catering')}
+        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseOut={(e) => e.target.style.background = 'transparent'}
+      >
+        Catering
+      </a>
+      <a 
+        href="/faq" 
+        className="no-underline" 
+        style={{
+          color: '#1a1a1a',
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid #f0f0f0',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onClick={(e) => handleInternalNavigate(e, '/faq')}
+        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseOut={(e) => e.target.style.background = 'transparent'}
+      >
+        FAQ
+      </a>
+      <a 
+        href="/contact" 
+        className="no-underline" 
+        style={{
+          color: '#1a1a1a',
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid #f0f0f0',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onClick={(e) => handleInternalNavigate(e, '/contact')}
+        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseOut={(e) => e.target.style.background = 'transparent'}
+      >
+        Contact
+      </a>
+      <a
+        href="/custom-cakes"
+        className="no-underline"
+        style={{
+          color: '#1a1a1a',
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid #f0f0f0',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onClick={(e) => handleInternalNavigate(e, '/custom-cakes')}
+        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseOut={(e) => e.target.style.background = 'transparent'}
+      >
+        Custom Cakes
+      </a>
+      <a 
+        href="/admin" 
+        className="no-underline" 
+        style={{
+          color: '#1a1a1a',
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid #f0f0f0',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onClick={(e) => handleInternalNavigate(e, '/admin')}
         onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
         onMouseOut={(e) => e.target.style.background = 'transparent'}
       >
@@ -597,4 +692,3 @@ const Header = memo(({
 
 Header.displayName = 'Header';
 export default Header;
-

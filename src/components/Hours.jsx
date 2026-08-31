@@ -1,6 +1,18 @@
 // Hours.jsx - BB's Bakery & Cafe
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClock, faLocationDot, faMugHot, faShoppingBag } from '@fortawesome/free-solid-svg-icons';
 import '../hours-fix.css';
+
+const weeklyHours = [
+  { day: 'Sunday', hours: 'Closed', isClosed: true },
+  { day: 'Monday', hours: 'Closed', isClosed: true },
+  { day: 'Tuesday', hours: '7:00 AM - 4:00 PM' },
+  { day: 'Wednesday', hours: '7:00 AM - 4:00 PM' },
+  { day: 'Thursday', hours: '7:00 AM - 4:00 PM' },
+  { day: 'Friday', hours: '7:00 AM - 4:00 PM' },
+  { day: 'Saturday', hours: '8:00 AM - 4:00 PM' },
+];
 
 function getOpenStatus() {
   const now = new Date();
@@ -11,273 +23,293 @@ function getOpenStatus() {
   const isOpen =
     (isTuesdayToFriday && currentTime >= 7 && currentTime < 16) ||
     (isSaturday && currentTime >= 8 && currentTime < 16);
+
   let statusText = '';
+  let detailText = '';
+
   if (isOpen) {
-    statusText = 'OPEN NOW';
+    statusText = 'Open Now';
+    detailText = 'Stop in before 4:00 PM for fresh bakery and cafe favorites.';
+  } else if (day === 0 || day === 1 || (day === 6 && currentTime >= 16)) {
+    statusText = 'Closed Today';
+    detailText = 'We open again Tuesday at 7:00 AM.';
+  } else if (day === 6 && currentTime < 8) {
+    statusText = 'Closed Now';
+    detailText = 'We open today at 8:00 AM.';
+  } else if (day >= 2 && day <= 5 && currentTime < 7) {
+    statusText = 'Closed Now';
+    detailText = 'We open today at 7:00 AM.';
+  } else if (day >= 2 && day <= 4 && currentTime >= 16) {
+    statusText = 'Closed Now';
+    detailText = 'We open tomorrow at 7:00 AM.';
+  } else if (day === 5 && currentTime >= 16) {
+    statusText = 'Closed Now';
+    detailText = 'We open Saturday at 8:00 AM.';
   } else {
-    if (day === 0) {
-      statusText = 'CLOSED - Opens Tuesday 7:00 AM';
-    } else if (day === 1) {
-      statusText = 'CLOSED - Opens Tuesday 7:00 AM';
-    } else if (day === 6 && currentTime >= 16) {
-      statusText = 'CLOSED - Opens Tuesday 7:00 AM';
-    } else if (day === 6 && currentTime < 8) {
-      statusText = 'CLOSED - Opens at 8:00 AM';
-    } else if (day >= 2 && day <= 5 && currentTime < 7) {
-      statusText = 'CLOSED - Opens at 7:00 AM';
-    } else if (day >= 2 && day <= 4 && currentTime >= 16) {
-      statusText = 'CLOSED - Opens Tomorrow 7:00 AM';
-    } else if (day === 5 && currentTime >= 16) {
-      statusText = 'CLOSED - Opens Saturday 8:00 AM';
-    } else {
-      statusText = 'CLOSED';
-    }
+    statusText = 'Closed Now';
+    detailText = 'Check the weekly schedule below for our next open day.';
   }
-  return { isOpen, statusText };
+
+  return { isOpen, statusText, detailText, currentDay: day };
 }
 
 function Hours() {
   const [status, setStatus] = useState(getOpenStatus());
+
   useEffect(() => {
     const interval = setInterval(() => {
       setStatus(getOpenStatus());
     }, 60000);
     return () => clearInterval(interval);
   }, []);
-  
+
   return (
-    <section id="hours" className="pv5 center" style={{padding: 'clamp(2.5rem, 10vw, 5rem) clamp(1rem, 3vw, 2rem)', maxWidth: '100%', boxSizing: 'border-box'}} aria-labelledby="hours-heading">
-      <h2 
-        id="hours-heading" 
-        className="f2 fw7 tc mb5" 
+    <section
+      id="hours"
+      className="hours-section"
+      style={{
+        width: '100%',
+        maxWidth: '1180px',
+        margin: '0 auto',
+        padding: 'clamp(2rem, 7vw, 4rem) clamp(1rem, 4vw, 2rem)',
+      }}
+      aria-labelledby="hours-heading"
+    >
+      <div
+        className="hours-layout"
         style={{
-          fontFamily: 'Playfair Display, serif',
-          background: 'linear-gradient(135deg, #d65a8c 0%, #6b8e6f 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          letterSpacing: '-0.8px',
-          fontSize: 'clamp(2rem, 6vw, 2.5rem)',
-          marginBottom: '2rem'
+          display: 'grid',
+          gridTemplateColumns: 'minmax(280px, 0.85fr) minmax(0, 1.15fr)',
+          gap: 'clamp(1.25rem, 4vw, 2.5rem)',
+          alignItems: 'stretch',
         }}
       >
-        ⏰ Hours of Operation
-      </h2>
-      
-      {/* Status Badge */}
-      <div 
-        className="tc mb5 flex items-center justify-center" 
-        style={{
-          padding: 'clamp(1rem, 3vw, 1.5rem)',
-          background: status.isOpen 
-            ? 'linear-gradient(135deg, #e8f0e8 0%, #f0fdf4 100%)' 
-            : 'linear-gradient(135deg, #fce7f0 0%, #fff0f7 100%)',
-          borderRadius: '25px',
-          maxWidth: 'calc(100% - 2rem)',
-          margin: '0 auto 3rem',
-          border: status.isOpen ? '3px solid #6b8e6f' : '3px solid #d65a8c',
-          boxShadow: status.isOpen 
-            ? '0 8px 30px rgba(107, 142, 111, 0.2)' 
-            : '0 8px 30px rgba(214, 90, 140, 0.2)',
-          transition: 'all 0.35s ease',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          boxSizing: 'border-box'
-        }}
-      >
-        <span 
+        <div
           style={{
-            width: '14px',
-            height: '14px',
-            borderRadius: '50%',
-            background: status.isOpen ? '#6b8e6f' : '#d65a8c',
-            marginRight: '1rem',
-            boxShadow: status.isOpen 
-              ? '0 0 12px rgba(107, 142, 111, 0.6)' 
-              : '0 0 12px rgba(214, 90, 140, 0.6)',
-            animation: status.isOpen ? 'pulse 2s ease-in-out infinite' : 'none'
-          }}
-        ></span>
-        <span 
-          style={{
-            fontWeight: '800',
-            fontSize: 'clamp(1rem, 3vw, 1.25rem)',
-            color: status.isOpen ? '#2e5e3f' : '#a64c78',
-            fontFamily: 'Playfair Display, serif',
-            letterSpacing: '0.5px',
-            whiteSpace: 'nowrap'
+            display: 'grid',
+            alignContent: 'space-between',
+            gap: '1rem',
+            padding: 'clamp(1.4rem, 4vw, 2rem)',
+            borderRadius: '22px',
+            background: status.isOpen
+              ? 'linear-gradient(135deg, #e8f0e8 0%, #ffffff 100%)'
+              : 'linear-gradient(135deg, #fce7f0 0%, #ffffff 100%)',
+            border: status.isOpen ? '1px solid rgba(107, 142, 111, 0.28)' : '1px solid rgba(214, 90, 140, 0.26)',
+            boxShadow: '0 18px 44px rgba(42, 42, 42, 0.09)',
           }}
         >
-          {status.statusText}
-        </span>
-      </div>
-      
-      {/* Hours Grid */}
-      <div 
-        className="tc hours-grid"
-        style={{maxWidth: '100%', boxSizing: 'border-box', padding: '0 1rem'}}
-      >
-        <div 
-          className="br4 pa4" 
-          style={{
-            background: 'linear-gradient(135deg, #fce7f0 0%, rgba(255, 255, 255, 0.8) 100%)',
-            boxShadow: '0 8px 24px rgba(214, 90, 140, 0.1)',
-            border: '2px solid #d65a8c',
-            transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            padding: 'clamp(1.5rem, 4vw, 1.75rem)',
-            boxSizing: 'border-box',
-            wordWrap: 'break-word',
-            overflowWrap: 'break-word'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = 'translateY(-6px)';
-            e.currentTarget.style.boxShadow = '0 14px 40px rgba(214, 90, 140, 0.2)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 8px 24px rgba(214, 90, 140, 0.1)';
-          }}
-        >
-          <p 
-            className="f5 fw7 mb3" 
+          <div>
+            <p
+              style={{
+                margin: '0 0 0.75rem',
+                color: '#d65a8c',
+                fontFamily: 'Quicksand, sans-serif',
+                fontSize: '0.88rem',
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Hours of Operation
+            </p>
+
+            <h2
+              id="hours-heading"
+              style={{
+                margin: '0 0 1rem',
+                color: '#1a1a1a',
+                fontFamily: 'Playfair Display, serif',
+                fontSize: 'clamp(2.15rem, 6vw, 3.4rem)',
+                lineHeight: 1,
+                letterSpacing: '0',
+              }}
+            >
+              Plan your bakery run.
+            </h2>
+
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.7rem',
+                margin: '0.45rem 0 0.9rem',
+                padding: '0.75rem 0.95rem',
+                borderRadius: '999px',
+                background: '#fff',
+                border: status.isOpen ? '1px solid rgba(107, 142, 111, 0.32)' : '1px solid rgba(214, 90, 140, 0.3)',
+                boxShadow: '0 8px 20px rgba(42, 42, 42, 0.06)',
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  background: status.isOpen ? '#6b8e6f' : '#d65a8c',
+                  boxShadow: status.isOpen ? '0 0 0 6px rgba(107, 142, 111, 0.12)' : '0 0 0 6px rgba(214, 90, 140, 0.12)',
+                }}
+              />
+              <strong
+                style={{
+                  color: status.isOpen ? '#2e5e3f' : '#a64c78',
+                  fontFamily: 'Quicksand, sans-serif',
+                  fontSize: '1rem',
+                }}
+              >
+                {status.statusText}
+              </strong>
+            </div>
+
+            <p
+              style={{
+                margin: 0,
+                color: '#5f5f5f',
+                fontFamily: 'Quicksand, sans-serif',
+                fontSize: '1rem',
+                lineHeight: 1.65,
+                fontWeight: 600,
+              }}
+            >
+              {status.detailText}
+            </p>
+          </div>
+
+          <div
             style={{
-              color: '#d65a8c',
-              fontFamily: 'Playfair Display, serif',
-              margin: '0 0 1rem 0',
-              fontSize: '1rem'
+              display: 'grid',
+              gap: '0.85rem',
+              marginTop: '1rem',
             }}
           >
-            Tuesday - Friday
-          </p>
-          <p 
-            className="f3 fw7" 
-            style={{
-              color: '#1a1a1a',
-              fontFamily: 'Playfair Display, serif',
-              margin: '0',
-              fontSize: 'clamp(1.1rem, 4vw, 1.3rem)',
-              letterSpacing: '0.3px'
-            }}
-          >
-            7:00 AM – 4:00 PM
-          </p>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+              <FontAwesomeIcon icon={faMugHot} style={{ color: '#d65a8c', marginTop: '0.25rem' }} />
+              <p style={{ margin: 0, color: '#6d6d6d', fontFamily: 'Quicksand, sans-serif', lineHeight: 1.55 }}>
+                Cafe opens at 7:00 AM Tuesday-Friday and 8:00 AM Saturday.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+              <FontAwesomeIcon icon={faShoppingBag} style={{ color: '#6b8e6f', marginTop: '0.25rem' }} />
+              <p style={{ margin: 0, color: '#6d6d6d', fontFamily: 'Quicksand, sans-serif', lineHeight: 1.55 }}>
+                Online ordering starts at 8:00 AM Tuesday-Friday and 10:00 AM Saturday.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+              <FontAwesomeIcon icon={faLocationDot} style={{ color: '#c9a961', marginTop: '0.25rem' }} />
+              <p style={{ margin: 0, color: '#6d6d6d', fontFamily: 'Quicksand, sans-serif', lineHeight: 1.55 }}>
+                Visit us at 103 Main St, Pennington Gap, VA 24277.
+              </p>
+            </div>
+          </div>
         </div>
-        
-        <div 
-          className="br4" 
+
+        <div
+          className="weekly-hours-card"
           style={{
-            background: 'linear-gradient(135deg, #e8f0e8 0%, rgba(255, 255, 255, 0.8) 100%)',
-            boxShadow: '0 8px 24px rgba(107, 142, 111, 0.1)',
-            border: '2px solid #6b8e6f',
-            transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            padding: 'clamp(1.5rem, 4vw, 1.75rem)',
-            boxSizing: 'border-box',
-            wordWrap: 'break-word',
-            overflowWrap: 'break-word'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = 'translateY(-6px)';
-            e.currentTarget.style.boxShadow = '0 14px 40px rgba(107, 142, 111, 0.2)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 8px 24px rgba(107, 142, 111, 0.1)';
+            padding: 'clamp(1rem, 3vw, 1.35rem)',
+            borderRadius: '22px',
+            background: '#fff',
+            border: '1px solid rgba(107, 142, 111, 0.18)',
+            boxShadow: '0 18px 44px rgba(42, 42, 42, 0.08)',
           }}
         >
-          <p 
-            className="f5 fw7 mb3" 
+          <div
             style={{
-              color: '#6b8e6f',
-              fontFamily: 'Playfair Display, serif',
-              margin: '0 0 1rem 0',
-              fontSize: '1rem'
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1rem',
+              marginBottom: '0.85rem',
             }}
           >
-            Saturday
-          </p>
-          <p 
-            className="f3 fw7" 
-            style={{
-              color: '#1a1a1a',
-              fontFamily: 'Playfair Display, serif',
-              margin: '0',
-              fontSize: 'clamp(1.1rem, 4vw, 1.3rem)',
-              letterSpacing: '0.3px'
-            }}
-          >
-            8:00 AM – 4:00 PM
-          </p>
-        </div>
-        
-        <div 
-          className="br4" 
-          style={{
-            background: 'linear-gradient(135deg, #fef3e8 0%, rgba(255, 255, 255, 0.8) 100%)',
-            boxShadow: '0 8px 24px rgba(201, 169, 97, 0.1)',
-            border: '2px solid #c9a961',
-            transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            gridColumn: 'span auto',
-            padding: 'clamp(1.5rem, 4vw, 1.75rem)',
-            boxSizing: 'border-box',
-            wordWrap: 'break-word',
-            overflowWrap: 'break-word'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = 'translateY(-6px)';
-            e.currentTarget.style.boxShadow = '0 14px 40px rgba(201, 169, 97, 0.2)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 8px 24px rgba(201, 169, 97, 0.1)';
-          }}
-        >
-          <p 
-            className="f5 fw7 mb3" 
-            style={{
-              color: '#c9a961',
-              fontFamily: 'Playfair Display, serif',
-              margin: '0 0 1rem 0',
-              fontSize: '1rem'
-            }}
-          >
-            Sunday & Monday
-          </p>
-          <p 
-            className="f3 fw7" 
-            style={{
-              color: '#1a1a1a',
-              fontFamily: 'Playfair Display, serif',
-              margin: '0',
-              fontSize: 'clamp(1.1rem, 4vw, 1.3rem)',
-              letterSpacing: '0.3px'
-            }}
-          >
-            Closed 😴
-          </p>
+            <h3
+              style={{
+                margin: 0,
+                color: '#1a1a1a',
+                fontFamily: 'Playfair Display, serif',
+                fontSize: 'clamp(1.45rem, 4vw, 2rem)',
+              }}
+            >
+              Weekly Schedule
+            </h3>
+            <FontAwesomeIcon icon={faClock} style={{ color: '#d65a8c' }} />
+          </div>
+
+          <div style={{ display: 'grid', gap: '0.55rem' }}>
+            {weeklyHours.map((item, index) => {
+              const isToday = status.currentDay === index;
+              return (
+                <div
+                  key={item.day}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'minmax(0, 0.8fr) minmax(0, 1fr)',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    padding: '0.9rem 1rem',
+                    borderRadius: '14px',
+                    background: isToday ? 'linear-gradient(135deg, #fce7f0 0%, #e8f0e8 100%)' : '#fafaf8',
+                    border: isToday ? '1px solid rgba(214, 90, 140, 0.32)' : '1px solid rgba(42, 42, 42, 0.06)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', minWidth: 0 }}>
+                    {isToday ? (
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: status.isOpen ? '#6b8e6f' : '#d65a8c',
+                          flexShrink: 0,
+                        }}
+                      />
+                    ) : null}
+                    <strong
+                      style={{
+                        color: '#2a2a2a',
+                        fontFamily: 'Quicksand, sans-serif',
+                        fontSize: '0.98rem',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {item.day}
+                    </strong>
+                  </div>
+
+                  <span
+                    style={{
+                      color: item.isClosed ? '#9a5d74' : '#4f4f4f',
+                      fontFamily: 'Quicksand, sans-serif',
+                      fontSize: '0.98rem',
+                      fontWeight: 800,
+                      textAlign: 'right',
+                    }}
+                  >
+                    {item.hours}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
       <style>{`
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-            box-shadow: 0 0 12px rgba(107, 142, 111, 0.6);
-          }
-          50% {
-            opacity: 0.7;
-            box-shadow: 0 0 8px rgba(107, 142, 111, 0.4);
+        @media (max-width: 900px) {
+          .hours-layout {
+            grid-template-columns: 1fr !important;
           }
         }
 
-        @media (max-width: 640px) {
-          table {
-            font-size: 0.85rem !important;
+        @media (max-width: 560px) {
+          .weekly-hours-card > div:last-child > div {
+            grid-template-columns: 1fr !important;
+            gap: 0.35rem !important;
           }
 
-          td, th {
-            padding: 0.75rem !important;
+          .weekly-hours-card span {
+            text-align: left !important;
           }
         }
       `}</style>
