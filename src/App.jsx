@@ -4,7 +4,6 @@ import { lazy, Suspense, useState, useMemo, useEffect, useRef } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
 import AdminPage from './components/AdminPage';
 import { getApiBaseUrl } from './lib/apiBaseUrl';
-import { isMenuItemUnavailableToday, loadDailyUnavailableMap } from './lib/menuAvailability';
 
 // Eagerly load critical components
 import Header from './components/Header';
@@ -23,28 +22,8 @@ const FAQ = lazy(() => import('./components/FAQ'));
 const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
 
-// Temporary override: set true to disable online ordering across the site.
-const FORCE_ORDERING_CLOSED = true;
-
-// Temporary override: keep false for normal ordering schedule checks.
-const FORCE_ORDERING_OPEN = false;
-
 // Check if ordering is allowed based on current time and day
 function getOrderingStatus() {
-  if (FORCE_ORDERING_CLOSED) {
-    return {
-      isOrderingAllowed: false,
-      message: 'Online ordering is temporarily unavailable. Please call the cafe to place an order.',
-    };
-  }
-
-  if (FORCE_ORDERING_OPEN) {
-    return {
-      isOrderingAllowed: true,
-      message: '',
-    };
-  }
-
   const now = new Date();
   const day = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
   const currentTime = now.getHours() + now.getMinutes() / 60;
@@ -169,6 +148,11 @@ const routeMetadata = {
     description: "Contact BB's Bakery & Cafe for orders, questions, and special requests in Pennington Gap, VA.",
     urlPath: '/contact',
   },
+  '/admin': {
+    title: "Admin | BB's Bakery & Cafe",
+    description: "Manage BB's Bakery & Cafe online ordering and menu availability.",
+    urlPath: '/admin',
+  },
 };
 
 function App() {
@@ -179,7 +163,62 @@ function App() {
   const [customerName, setCustomerName] = useState('');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
-  const orderingStatus = useMemo(() => getOrderingStatus(), []);
+  const [globalOrderingControl, setGlobalOrderingControl] = useState({
+    enabled: false,
+    hasLoaded: false,
+  });
+  const orderingStatus = useMemo(() => {
+    if (!globalOrderingControl.enabled) {
+      return {
+        isOrderingAllowed: false,
+        isGloballyEnabled: false,
+        message: globalOrderingControl.hasLoaded
+          ? 'Online ordering is temporarily unavailable. Please call the cafe to place an order.'
+          : 'Checking online ordering availability...',
+      };
+    }
+
+    return {
+      ...getOrderingStatus(),
+      isGloballyEnabled: true,
+    };
+  }, [globalOrderingControl]);
+
+  useEffect(() => {
+    let isCurrent = true;
+    let timeoutId;
+
+    const syncOrderingControl = async () => {
+      try {
+        const response = await fetch(`${getApiBaseUrl()}/ordering-status`, { cache: 'no-store' });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data?.error || 'Failed to load ordering status');
+        }
+
+        if (isCurrent) {
+          setGlobalOrderingControl({ enabled: data?.enabled === true, hasLoaded: true });
+        }
+      } catch {
+        if (isCurrent) {
+          setGlobalOrderingControl((current) => (
+            current.hasLoaded ? current : { enabled: false, hasLoaded: true }
+          ));
+        }
+      } finally {
+        if (isCurrent) {
+          timeoutId = window.setTimeout(syncOrderingControl, 5_000);
+        }
+      }
+    };
+
+    void syncOrderingControl();
+
+    return () => {
+      isCurrent = false;
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   useEffect(() => {
     const syncRoute = () => {
@@ -245,16 +284,8 @@ function App() {
   }
 
   const addToCart = (item) => {
-    const unavailableMap = loadDailyUnavailableMap();
-    const isUnavailableNow = isMenuItemUnavailableToday(item?.name, unavailableMap);
-
-    if (isUnavailableNow) {
-      setCheckoutError(`${item.name} is unavailable today.`);
-      return;
-    }
-
     if (item?.isUnavailableToday) {
-      setCheckoutError(`${item.name} is unavailable today.`);
+      setCheckoutError(`${item.name} is unavailable for online ordering.`);
       return;
     }
 
@@ -311,12 +342,6 @@ function App() {
     setCheckoutError('');
 
     try {
-      const unavailableMap = loadDailyUnavailableMap();
-      const blockedItem = cart.find((item) => isMenuItemUnavailableToday(item?.name, unavailableMap));
-      if (blockedItem) {
-        throw new Error(`${blockedItem.name} is unavailable today. Please remove it from your cart.`);
-      }
-
       const apiBaseUrl = getApiBaseUrl();
       const response = await fetch(`${apiBaseUrl}/create-checkout`, {
         method: 'POST',

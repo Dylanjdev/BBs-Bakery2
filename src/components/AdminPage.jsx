@@ -1,17 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './admin.css';
 import { getApiBaseUrl } from '../lib/apiBaseUrl';
-import {
-  isNameUnavailableToday,
-  loadDailyUnavailableMap,
-  normalizeMenuName,
-  saveDailyUnavailableMap,
-} from '../lib/menuAvailability';
 
 const API_BASE_URL = getApiBaseUrl();
 const TOKEN_KEY = 'bb_admin_token';
+const ORDER_POLL_INTERVAL_MS = 3000;
 const SECTION_OPTIONS = [
-  'Bakery Items',
+  'Baked Goods',
   'Breakfast',
   'Lunch',
   'Loaded Energy',
@@ -20,18 +15,54 @@ const SECTION_OPTIONS = [
   'Iced Latte',
   'Hot Latte',
   'Frappes',
-  'Dirty Sodas',
-  'Smoothies',
+  '💥 Dirty Sodas & Lemonades',
+  '🍓 Smoothies',
 ];
 
 const defaultVariation = { name: 'Regular', priceAmount: '' };
+
+const getOrderKey = (order) => order?.orderId || order?.id || '';
+
+const getOrderDate = (order) => new Date(order?.timestamp || order?.createdAt || order?.paidAt);
+
+const isOrderFromToday = (order, now = new Date()) => {
+  const orderDate = getOrderDate(order);
+  return !Number.isNaN(orderDate.getTime())
+    && orderDate.getFullYear() === now.getFullYear()
+    && orderDate.getMonth() === now.getMonth()
+    && orderDate.getDate() === now.getDate();
+};
+
+const getOrderItemPrice = (item) => {
+  const amount = item?.price ?? item?.amount ?? item?.basePriceMoney?.amount;
+  return typeof amount === 'number' ? amount : null;
+};
+
+const formatMoney = (amount) =>
+  typeof amount === 'number'
+    ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount / 100)
+    : 'Pending';
+
+const formatOrderTime = (value) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return 'Time unavailable';
+  }
+
+  return date.toLocaleString([], {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+};
 
 const toFormState = (item) => ({
   id: item?.id || null,
   name: item?.name || '',
   description: item?.description || '',
   categoryId: item?.categoryId || '',
-  section: item?.section || 'Bakery Items',
+  section: item?.section || 'Baked Goods',
   visibility: item?.visible === false ? 'hidden' : 'public',
   variations:
     Array.isArray(item?.variations) && item.variations.length
@@ -76,7 +107,10 @@ async function apiRequest(path, options = {}, token = null) {
       ...options,
       headers,
     });
-  } catch {
+  } catch (requestError) {
+    if (requestError?.name === 'AbortError') {
+      throw requestError;
+    }
     throw new Error(`Could not connect to API at ${API_BASE_URL}`);
   }
 
@@ -143,15 +177,18 @@ function ItemForm({ form, onChange, onVariationChange, onAddVariation, onRemoveV
       </label>
 
       <label>
-        Visibility
+        Online menu availability
         <select
           value={form.visibility}
           onChange={(event) => onChange('visibility', event.target.value)}
           required
         >
-          <option value="public">Public</option>
-          <option value="hidden">Hidden</option>
+          <option value="public">Available</option>
+          <option value="hidden">Unavailable</option>
         </select>
+        <small className="admin-field-help">
+          Unavailable items are removed from the customer menu and rejected at checkout.
+        </small>
       </label>
 
       <div className="admin-variations">
@@ -198,29 +235,39 @@ function ItemForm({ form, onChange, onVariationChange, onAddVariation, onRemoveV
 
 export default function AdminPage() {
   const [menuFilter, setMenuFilter] = useState('current');
+  const [menuSearch, setMenuSearch] = useState('');
   const [token, setToken] = useState(() => sessionStorage.getItem(TOKEN_KEY) || '');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [items, setItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(() => Boolean(sessionStorage.getItem(TOKEN_KEY)));
   const [error, setError] = useState('');
   const [form, setForm] = useState(toFormState(null));
   const [isSaving, setIsSaving] = useState(false);
   const [togglingItemId, setTogglingItemId] = useState('');
   const [publishSections, setPublishSections] = useState({});
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [dailyUnavailableMap, setDailyUnavailableMap] = useState(() => loadDailyUnavailableMap());
+  const [globalOrderingEnabled, setGlobalOrderingEnabled] = useState(null);
+  const [isGlobalOrderingLoading, setIsGlobalOrderingLoading] = useState(() => Boolean(sessionStorage.getItem(TOKEN_KEY)));
+  const [orderingControlError, setOrderingControlError] = useState('');
   const [adminTab, setAdminTab] = useState('menu');
   const [orders, setOrders] = useState([]);
-  const [lastOrderCount, setLastOrderCount] = useState(0);
+  const [ordersError, setOrdersError] = useState('');
+  const [isOrdersLoading, setIsOrdersLoading] = useState(false);
+  const [updatingOrderId, setUpdatingOrderId] = useState('');
+  const [ordersUpdatedAt, setOrdersUpdatedAt] = useState(null);
   const audioRef = useRef(null);
+  const knownOrderIdsRef = useRef(null);
+  const missingOrderPollsRef = useRef(new Map());
+  const suppressedOrderIdsRef = useRef(new Set());
+  const ordersRequestInFlightRef = useRef(false);
 
-  const isAuthenticated = useMemo(() => Boolean(token), [token]);
+  const isAuthenticated = Boolean(token);
   const sectionCategoryMap = useMemo(() => {
     const map = {};
 
     items.forEach((item) => {
-      const section = item?.section || 'Bakery Items';
+      const section = item?.section || 'Baked Goods';
       const categoryId = item?.categoryId || '';
       if (!map[section] && categoryId) {
         map[section] = categoryId;
@@ -230,26 +277,39 @@ export default function AdminPage() {
     return map;
   }, [items]);
 
-  const unavailableCount = useMemo(
-    () => items.filter((item) => isNameUnavailableToday(item?.name, dailyUnavailableMap)).length,
-    [items, dailyUnavailableMap],
-  );
+  const unavailableCount = useMemo(() => items.filter((item) => item?.visible === false).length, [items]);
+  const availableCount = items.length - unavailableCount;
 
   const filteredItems = useMemo(() => {
-    if (menuFilter === 'all') {
-      return items;
+    const availabilityMatches = menuFilter === 'all'
+      ? items
+      : items.filter((item) => (
+          menuFilter === 'unavailable' ? item?.visible === false : item?.visible !== false
+        ));
+    const query = menuSearch.trim().toLowerCase();
+
+    if (!query) {
+      return availabilityMatches;
     }
 
-    if (menuFilter === 'unavailable') {
-      return items.filter((item) => isNameUnavailableToday(item?.name, dailyUnavailableMap));
-    }
+    return availabilityMatches.filter((item) => {
+      const searchableText = [
+        item?.name,
+        item?.description,
+        item?.section,
+        ...(Array.isArray(item?.variations)
+          ? item.variations.map((variation) => variation?.name)
+          : []),
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
 
-    return items.filter(
-      (item) => item?.visible !== false && !isNameUnavailableToday(item?.name, dailyUnavailableMap),
-    );
-  }, [items, menuFilter, dailyUnavailableMap]);
+      return searchableText.includes(query);
+    });
+  }, [items, menuFilter, menuSearch]);
 
-  const refreshItems = async (authToken = token) => {
+  const refreshItems = useCallback(async (authToken = token) => {
     setIsLoading(true);
     setError('');
     try {
@@ -260,28 +320,173 @@ export default function AdminPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      refreshItems();
+  const refreshGlobalOrderingStatus = useCallback(async () => {
+    setIsGlobalOrderingLoading(true);
+    setOrderingControlError('');
+    try {
+      const data = await apiRequest('/ordering-status');
+      setGlobalOrderingEnabled(data?.enabled === true);
+    } catch (requestError) {
+      setOrderingControlError(requestError.message || 'Failed to load online ordering status');
+    } finally {
+      setIsGlobalOrderingLoading(false);
     }
-  }, [isAuthenticated]);
+  }, []);
+
+  const playNotification = useCallback(async (times = 3) => {
+    if (!audioRef.current) {
+      return;
+    }
+
+    for (let index = 0; index < times; index += 1) {
+      audioRef.current.currentTime = 0;
+      try {
+        await audioRef.current.play();
+      } catch {
+        // Browsers can block audio until the admin has interacted with the page.
+        return;
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 1100));
+    }
+  }, []);
+
+  const refreshOrders = useCallback(async (authToken = token, options = {}) => {
+    if (!authToken || ordersRequestInFlightRef.current) {
+      return;
+    }
+
+    ordersRequestInFlightRef.current = true;
+    try {
+      const data = await apiRequest('/admin/orders', { signal: options.signal }, authToken);
+      const receivedOrders = (Array.isArray(data?.orders) ? data.orders : [])
+        .filter((order) => isOrderFromToday(order))
+        .filter((order) => !suppressedOrderIdsRef.current.has(getOrderKey(order)));
+      const receivedOrderIds = new Set(receivedOrders.map(getOrderKey).filter(Boolean));
+      const knownOrderIds = knownOrderIdsRef.current;
+      const hasNewOrder =
+        options.notify !== false
+        && knownOrderIds instanceof Set
+        && [...receivedOrderIds].some((orderId) => !knownOrderIds.has(orderId));
+
+      const stableOrderIds = new Set(receivedOrderIds);
+      if (knownOrderIds instanceof Set) {
+        knownOrderIds.forEach((orderId) => {
+          if (receivedOrderIds.has(orderId) || suppressedOrderIdsRef.current.has(orderId)) {
+            missingOrderPollsRef.current.delete(orderId);
+            return;
+          }
+
+          const missingPolls = (missingOrderPollsRef.current.get(orderId) || 0) + 1;
+          if (missingPolls < 2) {
+            missingOrderPollsRef.current.set(orderId, missingPolls);
+            stableOrderIds.add(orderId);
+          } else {
+            missingOrderPollsRef.current.delete(orderId);
+          }
+        });
+      }
+      receivedOrderIds.forEach((orderId) => missingOrderPollsRef.current.delete(orderId));
+
+      knownOrderIdsRef.current = stableOrderIds;
+      setOrders((currentOrders) => {
+        const receivedById = new Map(receivedOrders.map((order) => [getOrderKey(order), order]));
+        const retainedOrders = currentOrders.filter((order) => {
+          const orderId = getOrderKey(order);
+          return stableOrderIds.has(orderId) && !receivedById.has(orderId);
+        });
+
+        return [...receivedOrders, ...retainedOrders].sort(
+          (firstOrder, secondOrder) => getOrderDate(secondOrder) - getOrderDate(firstOrder),
+        );
+      });
+      setOrdersError('');
+      setOrdersUpdatedAt(new Date());
+
+      if (hasNewOrder) {
+        void playNotification();
+      }
+    } catch (requestError) {
+      if (requestError?.name !== 'AbortError') {
+        setOrdersError(requestError.message || 'Failed to load orders');
+      }
+    } finally {
+      ordersRequestInFlightRef.current = false;
+      setIsOrdersLoading(false);
+    }
+  }, [playNotification, token]);
 
   useEffect(() => {
-    if (!isAuthenticated || adminTab === 'menu') {
+    if (!token) {
       return undefined;
     }
 
-    fetchOrders();
-    const intervalId = window.setInterval(() => {
-      fetchOrders();
-    }, 3000);
+    let isCurrent = true;
+
+    apiRequest('/admin/items', {}, token)
+      .then((data) => {
+        if (isCurrent) {
+          setItems(data?.items || []);
+          setError('');
+        }
+      })
+      .catch((requestError) => {
+        if (isCurrent) {
+          setError(requestError.message || 'Failed to load items');
+        }
+      })
+      .finally(() => {
+        if (isCurrent) {
+          setIsLoading(false);
+        }
+      });
+
+    apiRequest('/ordering-status')
+      .then((data) => {
+        if (isCurrent) {
+          setGlobalOrderingEnabled(data?.enabled === true);
+          setOrderingControlError('');
+        }
+      })
+      .catch((requestError) => {
+        if (isCurrent) {
+          setOrderingControlError(requestError.message || 'Failed to load online ordering status');
+        }
+      })
+      .finally(() => {
+        if (isCurrent) {
+          setIsGlobalOrderingLoading(false);
+        }
+      });
 
     return () => {
-      window.clearInterval(intervalId);
+      isCurrent = false;
     };
-  }, [isAuthenticated, adminTab, token]);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token || adminTab !== 'orders') {
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    let timeoutId;
+
+    const pollOrders = async () => {
+      await refreshOrders(token, { signal: controller.signal });
+      if (!controller.signal.aborted) {
+        timeoutId = window.setTimeout(pollOrders, ORDER_POLL_INTERVAL_MS);
+      }
+    };
+
+    void pollOrders();
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timeoutId);
+    };
+  }, [adminTab, refreshOrders, token]);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -298,9 +503,9 @@ export default function AdminPage() {
         throw new Error('Token not returned');
       }
 
+      setIsLoading(true);
       setToken(nextToken);
       sessionStorage.setItem(TOKEN_KEY, nextToken);
-      await refreshItems(nextToken);
       setPassword('');
     } catch (requestError) {
       setError(requestError.message || 'Login failed');
@@ -312,8 +517,45 @@ export default function AdminPage() {
     setToken('');
     setItems([]);
     setOrders([]);
+    setOrdersError('');
+    setOrdersUpdatedAt(null);
+    setGlobalOrderingEnabled(null);
+    setOrderingControlError('');
+    setIsGlobalOrderingLoading(false);
+    knownOrderIdsRef.current = null;
+    missingOrderPollsRef.current.clear();
+    suppressedOrderIdsRef.current.clear();
     setForm(toFormState(null));
     setError('');
+  };
+
+  const handleToggleGlobalOrdering = async () => {
+    if (globalOrderingEnabled === null || isGlobalOrderingLoading) {
+      return;
+    }
+
+    const nextEnabled = !globalOrderingEnabled;
+    if (!nextEnabled && !window.confirm('Turn off online ordering for every customer?')) {
+      return;
+    }
+
+    setIsGlobalOrderingLoading(true);
+    setOrderingControlError('');
+    try {
+      const data = await apiRequest(
+        '/admin/ordering-status',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ enabled: nextEnabled }),
+        },
+        token,
+      );
+      setGlobalOrderingEnabled(data?.enabled === true);
+    } catch (requestError) {
+      setOrderingControlError(requestError.message || 'Failed to update online ordering status');
+    } finally {
+      setIsGlobalOrderingLoading(false);
+    }
   };
 
   const handleEdit = (item) => {
@@ -347,46 +589,35 @@ export default function AdminPage() {
     setError('');
     setTogglingItemId(item.id);
     try {
-      if (item.visible === false) {
-        const selectedSection = publishSections[item.id] || item.section || 'Bakery Items';
-        const payload = {
-          name: item.name || '',
-          description: item.description || '',
-          categoryId: item.categoryId || sectionCategoryMap[selectedSection] || null,
-          section: selectedSection,
-          visible: true,
-          variations: Array.isArray(item.variations)
-            ? item.variations
-                .map((variation) => ({
-                  name: variation?.name || 'Regular',
-                  priceAmount: Math.round(Number(variation?.priceAmount || 0)),
-                  currency: variation?.currency || 'USD',
-                }))
-                .filter((variation) => Number.isFinite(variation.priceAmount) && variation.priceAmount > 0)
-            : [],
-        };
+      const selectedSection = publishSections[item.id] || item.section || 'Baked Goods';
+      const payload = {
+        name: item.name || '',
+        description: item.description || '',
+        categoryId: item.categoryId || sectionCategoryMap[selectedSection] || null,
+        section: selectedSection,
+        visible: item.visible === false,
+        variations: Array.isArray(item.variations)
+          ? item.variations
+              .map((variation) => ({
+                name: variation?.name || 'Regular',
+                priceAmount: Math.round(Number(variation?.priceAmount || 0)),
+                currency: variation?.currency || 'USD',
+              }))
+              .filter((variation) => Number.isFinite(variation.priceAmount) && variation.priceAmount > 0)
+          : [],
+      };
 
-        await apiRequest(
-          `/admin/items/${item.id}`,
-          {
-            method: 'PATCH',
-            body: JSON.stringify(payload),
-          },
-          token,
-        );
-      } else {
-        await apiRequest(
-          `/admin/items/${item.id}/visibility`,
-          {
-            method: 'PATCH',
-            body: JSON.stringify({ visible: false }),
-          },
-          token,
-        );
-      }
+      await apiRequest(
+        `/admin/items/${item.id}`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        },
+        token,
+      );
       await refreshItems();
     } catch (requestError) {
-      setError(requestError.message || 'Visibility update failed');
+      setError(requestError.message || 'Availability update failed');
     } finally {
       setTogglingItemId('');
     }
@@ -427,66 +658,38 @@ export default function AdminPage() {
     }
   };
 
-  const handleToggleDailyAvailability = (itemName) => {
-    const key = normalizeMenuName(itemName);
-    if (!key) {
+  const handleOrderAction = async (order, action) => {
+    const orderId = order?.orderId;
+    if (!orderId) {
+      setOrdersError('This order is missing its Square order ID.');
       return;
     }
 
-    setDailyUnavailableMap((current) => {
-      const next = { ...current };
-      if (next[key]) {
-        delete next[key];
-      } else {
-        next[key] = true;
-      }
-      saveDailyUnavailableMap(next);
-      return next;
-    });
-  };
-
-  const handleClearDailyUnavailable = () => {
-    if (!window.confirm('Mark all items as available for today?')) {
+    if (action === 'dismiss' && !window.confirm('Dismiss this order from the active orders list?')) {
       return;
     }
 
-    setDailyUnavailableMap({});
-    saveDailyUnavailableMap({});
-  };
-
-  const playNotification = async (times = 5) => {
-    if (!audioRef.current) {
-      return;
-    }
-
-    for (let index = 0; index < times; index += 1) {
-      audioRef.current.currentTime = 0;
-      try {
-        await audioRef.current.play();
-      } catch {
-        // Ignore browser autoplay restrictions for admin alerts.
-      }
-      await new Promise((resolve) => window.setTimeout(resolve, 1100));
-    }
-  };
-
-  const fetchOrders = async (authToken = token) => {
-    if (!authToken) {
-      return;
-    }
-
+    setUpdatingOrderId(orderId);
+    setOrdersError('');
+    suppressedOrderIdsRef.current.add(orderId);
     try {
-      const data = await apiRequest('/admin/orders', {}, authToken);
-      const nextOrders = data?.orders || [];
+      const path = action === 'complete'
+        ? `/admin/orders/${orderId}/complete`
+        : `/admin/orders/${orderId}`;
+      const method = action === 'complete' ? 'PATCH' : 'DELETE';
 
-      if (nextOrders.length > lastOrderCount) {
-        playNotification(5);
-      }
-
-      setOrders(nextOrders);
-      setLastOrderCount(nextOrders.length);
-    } catch {
-      // Keep menu management available even if order polling fails.
+      await apiRequest(path, { method }, token);
+      setOrders((current) => current.filter((currentOrder) => getOrderKey(currentOrder) !== getOrderKey(order)));
+      knownOrderIdsRef.current?.delete(orderId);
+      missingOrderPollsRef.current.delete(orderId);
+    } catch (requestError) {
+      suppressedOrderIdsRef.current.delete(orderId);
+      setOrdersError(
+        requestError.message
+          || (action === 'complete' ? 'Failed to complete order' : 'Failed to dismiss order'),
+      );
+    } finally {
+      setUpdatingOrderId('');
     }
   };
 
@@ -548,9 +751,9 @@ export default function AdminPage() {
 
   return (
     <div className="admin-page">
-      <audio ref={audioRef} src="/notification.mp3" />
+      <audio ref={audioRef} src="/notification.mp3" preload="auto" />
       <div className="admin-header">
-        <h1>Menu Admin</h1>
+        <h1>BB&apos;s Admin</h1>
         <div className="admin-header__actions">
           <button
             type="button"
@@ -562,53 +765,99 @@ export default function AdminPage() {
           <button
             type="button"
             className={adminTab === 'orders' ? '' : 'secondary'}
-            onClick={() => setAdminTab('orders')}
+            onClick={() => {
+              setAdminTab('orders');
+              if (!ordersUpdatedAt) {
+                setIsOrdersLoading(true);
+              }
+            }}
           >
             Orders {orders.length > 0 ? `(${orders.length})` : ''}
           </button>
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
-            <button
-              type="button"
-              className="secondary"
-              onClick={handleClearDailyUnavailable}
-              disabled={Object.keys(dailyUnavailableMap).length === 0}
-            >
-              Reset Daily Availability
-            </button>
-            <button type="button" className="secondary" onClick={() => refreshItems()} disabled={isLoading}>
-              {isLoading ? 'Refreshing...' : 'Refresh'}
-            </button>
+          <div className="admin-toolbar">
             <button
               type="button"
               className="secondary"
               onClick={() => {
-                setForm(toFormState(null));
-                setIsFormOpen(true);
-                setError('');
+                if (adminTab === 'menu') {
+                  void Promise.all([refreshItems(), refreshGlobalOrderingStatus()]);
+                } else {
+                  setIsOrdersLoading(true);
+                  void refreshOrders(token, { notify: false });
+                }
               }}
+              disabled={adminTab === 'menu' ? isLoading : isOrdersLoading}
             >
-              New Item
+              {isLoading || isOrdersLoading ? 'Refreshing...' : 'Refresh'}
             </button>
+            {adminTab === 'menu' ? (
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => {
+                  setForm(toFormState(null));
+                  setIsFormOpen(true);
+                  setError('');
+                }}
+              >
+                New Item
+              </button>
+            ) : null}
             <button type="button" className="danger" onClick={handleLogout}>Log Out</button>
           </div>
         </div>
       </div>
 
       {error ? <p className="admin-error">{error}</p> : null}
-      <p className="admin-note">
-        Daily unavailable items: {Object.keys(dailyUnavailableMap).length}
-      </p>
+      <section className={`admin-global-ordering ${globalOrderingEnabled ? 'on' : 'off'}`}>
+        <div>
+          <p className="admin-global-ordering__eyebrow">Site-wide control</p>
+          <h2>
+            {globalOrderingEnabled === null
+              ? 'Loading online ordering status...'
+              : `Online ordering is ${globalOrderingEnabled ? 'On' : 'Off'}`}
+          </h2>
+          <p>
+            {globalOrderingEnabled === null
+              ? 'Checking the shared customer ordering control.'
+              : globalOrderingEnabled
+              ? 'Customers can order enabled items during normal ordering hours.'
+              : 'Add buttons are hidden and checkout is blocked for every customer.'}
+          </p>
+        </div>
+        <button
+          type="button"
+          className={`admin-global-ordering__toggle ${globalOrderingEnabled ? 'on' : 'off'}`}
+          onClick={handleToggleGlobalOrdering}
+          disabled={globalOrderingEnabled === null || isGlobalOrderingLoading}
+          role="switch"
+          aria-checked={globalOrderingEnabled === true}
+        >
+          <span className="admin-global-ordering__track" aria-hidden="true">
+            <span className="admin-global-ordering__thumb" />
+          </span>
+          <span>
+            {isGlobalOrderingLoading
+              ? 'Updating...'
+              : `Turn ordering ${globalOrderingEnabled ? 'Off' : 'On'}`}
+          </span>
+        </button>
+      </section>
+      {orderingControlError ? <p className="admin-error">{orderingControlError}</p> : null}
 
       {adminTab === 'menu' ? (
         <div className="admin-layout">
           <div className="admin-list">
+            <p className="admin-note">
+              Online ordering is on for {availableCount} items and off for {unavailableCount}. Customers can still see off items, but cannot add them to an order.
+            </p>
             <div className="admin-list__header">
               <h2>
                 {menuFilter === 'unavailable'
-                  ? 'Unavailable Items'
+                  ? 'Online Ordering Off'
                   : menuFilter === 'all'
                     ? 'All Square Items'
-                    : 'Current Menu Items'} ({filteredItems.length})
+                    : 'Online Ordering On'} ({filteredItems.length})
               </h2>
               <div className="admin-filter" role="tablist" aria-label="Filter items by availability">
                 <button
@@ -617,7 +866,7 @@ export default function AdminPage() {
                   onClick={() => setMenuFilter('current')}
                   aria-pressed={menuFilter === 'current'}
                 >
-                  Current Menu Items
+                  On ({availableCount})
                 </button>
                 <button
                   type="button"
@@ -625,7 +874,7 @@ export default function AdminPage() {
                   onClick={() => setMenuFilter('unavailable')}
                   aria-pressed={menuFilter === 'unavailable'}
                 >
-                  Unavailable ({unavailableCount})
+                  Off ({unavailableCount})
                 </button>
                 <button
                   type="button"
@@ -637,14 +886,33 @@ export default function AdminPage() {
                 </button>
               </div>
             </div>
+            <label className="admin-search">
+              <span>Search menu items</span>
+              <div className="admin-search__field">
+                <input
+                  type="search"
+                  value={menuSearch}
+                  onChange={(event) => setMenuSearch(event.target.value)}
+                  placeholder="Search by item, section, or variation..."
+                  autoComplete="off"
+                />
+                {menuSearch ? (
+                  <button type="button" className="secondary" onClick={() => setMenuSearch('')}>
+                    Clear
+                  </button>
+                ) : null}
+              </div>
+            </label>
             {isLoading ? <p>Loading...</p> : null}
             {!isLoading && filteredItems.length === 0 ? (
               <p>
-                {menuFilter === 'unavailable'
-                  ? 'No unavailable items right now.'
+                {menuSearch.trim()
+                  ? `No items match “${menuSearch.trim()}” in this filter.`
+                  : menuFilter === 'unavailable'
+                  ? 'Online ordering is not switched off for any items.'
                   : menuFilter === 'all'
                     ? 'No Square items found.'
-                    : 'No current menu items found.'}
+                    : 'Online ordering is not switched on for any items.'}
               </p>
             ) : null}
             {filteredItems.map((item) => (
@@ -652,12 +920,11 @@ export default function AdminPage() {
                 <div>
                   <strong>{item.name}</strong>
                   <p>{item.description || 'No description'}</p>
-                  <p><em>Section: {item.section || 'Bakery Items'}</em></p>
-                  <p><em>Status: {item.visible === false ? 'Hidden' : 'Public'}</em></p>
+                  <p><em>Section: {item.section || 'Baked Goods'}</em></p>
                   <p>
-                    <em>
-                      Today: {isNameUnavailableToday(item.name, dailyUnavailableMap) ? 'Unavailable' : 'Available'}
-                    </em>
+                    <span className={item.visible === false ? 'admin-status unavailable' : 'admin-status available'}>
+                      Online ordering: {item.visible === false ? 'Off' : 'On'}
+                    </span>
                   </p>
                   <ul>
                     {item.variations.map((variation) => (
@@ -670,9 +937,9 @@ export default function AdminPage() {
                 <div className="admin-item__actions">
                   {item.visible === false ? (
                     <label className="admin-item__section-label">
-                      Public section
+                      Menu section
                       <select
-                        value={publishSections[item.id] || item.section || 'Bakery Items'}
+                        value={publishSections[item.id] || item.section || 'Baked Goods'}
                         onChange={(event) =>
                           setPublishSections((current) => ({
                             ...current,
@@ -690,24 +957,21 @@ export default function AdminPage() {
                   <button type="button" onClick={() => handleEdit(item)}>Edit</button>
                   <button
                     type="button"
-                    className="secondary"
+                    className={`admin-ordering-toggle ${item.visible === false ? 'off' : 'on'}`}
                     onClick={() => handleToggleVisibility(item)}
                     disabled={togglingItemId === item.id}
+                    role="switch"
+                    aria-checked={item.visible !== false}
+                    aria-label={`Turn online ordering ${item.visible === false ? 'on' : 'off'} for ${item.name}`}
                   >
-                    {togglingItemId === item.id
-                      ? 'Updating...'
-                      : item.visible === false
-                        ? 'Set Public'
-                        : 'Set Hidden'}
-                  </button>
-                  <button
-                    type="button"
-                    className="secondary"
-                    onClick={() => handleToggleDailyAvailability(item.name)}
-                  >
-                    {isNameUnavailableToday(item.name, dailyUnavailableMap)
-                      ? 'Mark Available Today'
-                      : 'Mark Unavailable Today'}
+                    <span className="admin-ordering-toggle__track" aria-hidden="true">
+                      <span className="admin-ordering-toggle__thumb" />
+                    </span>
+                    <span>
+                      {togglingItemId === item.id
+                        ? 'Updating...'
+                        : `Online ordering ${item.visible === false ? 'Off' : 'On'}`}
+                    </span>
                   </button>
                   <button type="button" className="danger" onClick={() => handleDelete(item.id)}>Delete</button>
                 </div>
@@ -717,59 +981,75 @@ export default function AdminPage() {
         </div>
       ) : (
         <div className="admin-layout">
-          <div className="admin-list">
-            <h2>Orders</h2>
-            {orders.length === 0 ? (
-              <p className="admin-note">No orders yet</p>
+          <div className="admin-orders">
+            <div className="admin-orders__header">
+              <div>
+                <h2>Today&apos;s active paid orders ({orders.length})</h2>
+                <p className="admin-orders__updated">
+                  {ordersUpdatedAt ? `Updated ${formatOrderTime(ordersUpdatedAt)}` : 'Checking for orders...'}
+                </p>
+              </div>
+              <span className="admin-orders__live">Live</span>
+            </div>
+            {ordersError ? <p className="admin-error">{ordersError}</p> : null}
+            {isOrdersLoading && orders.length === 0 ? <p className="admin-note">Loading orders...</p> : null}
+            {!isOrdersLoading && orders.length === 0 && !ordersError ? (
+              <p className="admin-note">No active paid orders today.</p>
             ) : (
-              <div style={{ display: 'grid', gap: '1rem' }}>
+              <div className="admin-orders__list">
                 {orders.map((order) => (
-                  <div
-                    key={order.id || order.orderId}
-                    style={{
-                      padding: '1rem',
-                      background: '#f9f9f9',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '4px',
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: '0.5rem',
-                      }}
-                    >
-                      <strong>Order {order.orderId ? order.orderId.slice(0, 12) : 'N/A'}...</strong>
-                      <span style={{ fontSize: '0.85rem', color: '#666' }}>
-                        {new Date(order.timestamp || order.createdAt).toLocaleTimeString()}
+                  <article key={getOrderKey(order)} className="admin-order-card">
+                    <div className="admin-order-card__header">
+                      <strong>Order #{order.orderId ? order.orderId.slice(-8) : 'unavailable'}</strong>
+                      <span className="admin-order-card__time">
+                        {formatOrderTime(order.timestamp || order.createdAt)}
                       </span>
                     </div>
-                    <p style={{ margin: '0.25rem 0' }}>
+                    <p className="admin-order-card__detail">
                       <strong>Customer:</strong> {order.customerName || 'Guest'}
                     </p>
                     {Array.isArray(order.items) && order.items.length > 0 ? (
-                      <div style={{ margin: '0.5rem 0', paddingLeft: '1rem' }}>
-                        <strong style={{ fontSize: '0.9rem' }}>Items:</strong>
-                        <ul style={{ margin: '0.25rem 0', paddingLeft: '1rem', fontSize: '0.85rem' }}>
-                          {order.items.map((item, index) => (
-                            <li key={`${order.orderId || order.id}-${index}`}>
-                              {item.quantity}x {item.name}
-                              {typeof item.price === 'number' ? ` ($${(item.price / 100).toFixed(2)})` : ''}
-                              {item.note ? ` - ${item.note}` : ''}
-                            </li>
-                          ))}
+                      <div className="admin-order-card__items">
+                        <strong>Items:</strong>
+                        <ul>
+                          {order.items.map((item, index) => {
+                            const itemPrice = getOrderItemPrice(item);
+                            return (
+                              <li key={`${getOrderKey(order)}-${index}`}>
+                                {item.quantity || 1}× {item.name || 'Item'}
+                                {itemPrice !== null ? ` (${formatMoney(itemPrice)})` : ''}
+                                {item.note ? ` — ${item.note}` : ''}
+                              </li>
+                            );
+                          })}
                         </ul>
                       </div>
                     ) : null}
-                    <p style={{ margin: '0.25rem 0' }}>
-                      <strong>Total:</strong> {typeof order.total === 'number' ? `$${(order.total / 100).toFixed(2)}` : 'Pending'}
+                    <p className="admin-order-card__detail">
+                      <strong>Total:</strong> {formatMoney(order.total)}
                     </p>
-                    <p style={{ margin: '0.25rem 0', fontSize: '0.85rem', color: '#666' }}>
-                      <strong>Status:</strong> {order.status || 'pending'}
+                    <p className="admin-order-card__detail">
+                      <strong>Status:</strong> {order.status || 'paid'}
                     </p>
-                  </div>
+                    <div className="admin-order-card__actions">
+                      <button
+                        type="button"
+                        className="admin-order-complete"
+                        onClick={() => handleOrderAction(order, 'complete')}
+                        disabled={updatingOrderId === order.orderId || !order.orderId}
+                      >
+                        {updatingOrderId === order.orderId ? 'Updating...' : 'Mark complete'}
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-order-dismiss"
+                        onClick={() => handleOrderAction(order, 'dismiss')}
+                        disabled={updatingOrderId === order.orderId || !order.orderId}
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  </article>
                 ))}
               </div>
             )}

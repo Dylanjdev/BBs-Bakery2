@@ -27,7 +27,7 @@ class ErrorBoundary extends React.Component {
         }}>
           <h2 style={{color: '#d65a8c', marginTop: 0}}>Oops! Something went wrong</h2>
           <p style={{color: '#6d6d6d'}}>Please try refreshing the page.</p>
-          {process.env.NODE_ENV === 'development' && (
+          {import.meta.env.DEV && (
             <details style={{marginTop: '1rem', textAlign: 'left'}}>
               <summary style={{cursor: 'pointer', color: '#d65a8c'}}>Error details</summary>
               <pre style={{background: '#f5f5f5', padding: '1rem', overflow: 'auto'}}>

@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const siteUrl = 'https://bbs-bakery.com';
-const routes = ['about', 'menu', 'reviews', 'hours', 'ordering-guide', 'custom-cakes', 'catering', 'faq', 'contact'];
+const routes = ['about', 'menu', 'reviews', 'hours', 'ordering-guide', 'custom-cakes', 'catering', 'faq', 'contact', 'admin'];
 
 const routeMetadata = {
   catering: {

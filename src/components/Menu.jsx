@@ -12,7 +12,6 @@ import {
 import '../menu.css';
 import '../cart.css';
 import { getApiBaseUrl } from '../lib/apiBaseUrl';
-import { isMenuItemUnavailableToday, loadDailyUnavailableMap } from '../lib/menuAvailability';
 import { squareVariationMap } from '../data/squareVariationMap';
 
 const API_BASE_URL = getApiBaseUrl();
@@ -620,6 +619,7 @@ const resolvePriceOption = (option, squareLookup) => {
     amount: live?.amount ?? option.fallbackAmount,
     currency: live?.currency || option.currency || 'USD',
     variationId: live?.variationId || fallbackVariationId,
+    visible: live?.visible,
   };
 };
 
@@ -637,21 +637,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
   const [squareLookup, setSquareLookup] = useState(new Map());
   const [error, setError] = useState('');
   const [selectedProteins, setSelectedProteins] = useState({});
-  const [dailyUnavailableMap, setDailyUnavailableMap] = useState(() => loadDailyUnavailableMap());
   const [isPreOrderWindowOpen, setIsPreOrderWindowOpen] = useState(() => isWithinPreOrderWindow());
-
-  useEffect(() => {
-    const handleStorage = (event) => {
-      if (event.key) {
-        setDailyUnavailableMap(loadDailyUnavailableMap());
-      }
-    };
-
-    window.addEventListener('storage', handleStorage);
-    return () => {
-      window.removeEventListener('storage', handleStorage);
-    };
-  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -709,10 +695,6 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
 
       const extrasBySection = new Map();
       squareItems.forEach((squareItem) => {
-        if (squareItem?.visible === false) {
-          return;
-        }
-
         const itemName = squareItem?.name || '';
         const targetSection = sections.some((section) => section.title === squareItem?.section)
           ? squareItem.section
@@ -741,7 +723,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             variationId: variation?.id || null,
             isOnlineOrderable: ORDERABLE_SECTION_TITLES.has(targetSection),
             visible: true,
-            isUnavailableToday: isMenuItemUnavailableToday(displayName, dailyUnavailableMap),
+            isUnavailableToday: squareItem?.visible === false,
             label: formatPriceLabel(variation.priceAmount, variation.currency || 'USD'),
           });
           extrasBySection.set(targetSection, existing);
@@ -769,6 +751,8 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                 const amount = live?.amount ?? priceOptions[0]?.amount ?? item.fallbackAmount;
                 const currency = live?.currency || priceOptions[0]?.currency || 'USD';
                 const priceRangeLabel = formatPriceRange(priceOptions);
+                const availabilitySource = [live, ...priceOptions, ...(sizeOptions || [])]
+                  .find((option) => typeof option?.visible === 'boolean');
 
                 return {
                   ...item,
@@ -778,10 +762,8 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                   isPreOrder: section.preOrder === true,
                   variationId: live?.variationId || priceOptions[0]?.variationId || fallbackVariationId,
                   isOnlineOrderable: ORDERABLE_SECTION_TITLES.has(section.title),
-                  visible: keepCuratedVisible ? true : live?.visible !== false,
-                  isUnavailableToday:
-                    isMenuItemUnavailableToday(item.lookupName, dailyUnavailableMap)
-                    || isMenuItemUnavailableToday(item.name, dailyUnavailableMap),
+                  visible: Boolean(live) || keepCuratedVisible,
+                  isUnavailableToday: availabilitySource?.visible === false,
                   label: priceRangeLabel || formatPriceLabel(amount, currency),
                 };
               })
@@ -810,7 +792,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
         })
         .filter((section) => section.items.length > 0);
     },
-    [squareLookup, squareItems, dailyUnavailableMap],
+    [squareLookup, squareItems],
   );
 
   const handleAddToCart = (item) => {
@@ -901,6 +883,9 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       <header className="menu-header">
         <h2 id="menu-heading">Our Menu</h2>
         <p className="tagline">Bringing the best bites to your day</p>
+        <p className="menu-availability-note">
+          Items with a + button are currently available to order online. If the + is not shown, that item is not available for online ordering.
+        </p>
       </header>
 
       <div className="menu-divider" />
@@ -970,15 +955,10 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                         <p>{item.description}</p>
                       </div>
                       <div className="bakery-item__actions">
-                        {item.isUnavailableToday ? (
-                          <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                            Unavailable Today
-                          </span>
-                        ) : null}
                         <span className="price">{item.label}</span>
                         <button
                           className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                           onClick={() => handleAddToCart(item)}
                           aria-label={`Add ${item.name} to cart`}
                           disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1037,15 +1017,10 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                             ))}
                           </select>
                         ) : null}
-                        {item.isUnavailableToday ? (
-                          <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                            Unavailable Today
-                          </span>
-                        ) : null}
                         <span className="price">{item.label}</span>
                         <button
                           className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                           onClick={() => handleAddToCart(item)}
                           aria-label={`Add ${item.name} to cart`}
                           disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1089,15 +1064,10 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                         <p>{item.description}</p>
                       </div>
                       <div className="breakfast-item__actions">
-                        {item.isUnavailableToday ? (
-                          <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                            Unavailable Today
-                          </span>
-                        ) : null}
                         <span className="price">{item.label}</span>
                         <button
                           className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                           onClick={() => handleAddToCart(item)}
                           aria-label={`Add ${item.name} to cart`}
                           disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1141,15 +1111,10 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                         <p>{item.description}</p>
                       </div>
                       <div className="breakfast-item__actions">
-                        {item.isUnavailableToday ? (
-                          <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                            Unavailable Today
-                          </span>
-                        ) : null}
                         <span className="price">{item.label}</span>
                         <button
                           className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                           onClick={() => handleAddToCart(item)}
                           aria-label={`Add ${item.name} to cart`}
                           disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1203,14 +1168,9 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           <p>{item.description}</p>
                         </div>
                         <div className="coffee-item__actions">
-                          {item.isUnavailableToday ? (
-                            <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                              Unavailable Today
-                            </span>
-                          ) : null}
                           <button
                             className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                             onClick={() => handleAddToCart(item)}
                             aria-label={`Add ${item.name} to cart`}
                             disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1234,14 +1194,9 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           <p>{item.description}</p>
                         </div>
                         <div className="coffee-item__actions">
-                          {item.isUnavailableToday ? (
-                            <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                              Unavailable Today
-                            </span>
-                          ) : null}
                           <button
                             className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                             onClick={() => handleAddToCart(item)}
                             aria-label={`Add ${item.name} to cart`}
                             disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1300,15 +1255,10 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                             <p>{item.description}</p>
                           </div>
                           <div className="coffee-item__actions">
-                            {item.isUnavailableToday ? (
-                              <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                                Unavailable Today
-                              </span>
-                            ) : null}
                             <span className="price">{formatPriceLabel(selectedSizeOption?.amount ?? item.fallbackAmount)}</span>
                             <button
                               className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                               onClick={() => handleAddToCart(item)}
                               aria-label={`Add ${item.name} to cart`}
                               disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1336,15 +1286,10 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                             <p>{item.description}</p>
                           </div>
                           <div className="coffee-item__actions">
-                            {item.isUnavailableToday ? (
-                              <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                                Unavailable Today
-                              </span>
-                            ) : null}
                             <span className="price">{formatPriceLabel(selectedSizeOption?.amount ?? item.fallbackAmount)}</span>
                             <button
                               className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                               onClick={() => handleAddToCart(item)}
                               aria-label={`Add ${item.name} to cart`}
                               disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1405,15 +1350,10 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                             <p>{item.description}</p>
                           </div>
                           <div className="coffee-item__actions">
-                            {item.isUnavailableToday ? (
-                              <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                                Unavailable Today
-                              </span>
-                            ) : null}
                             <span className="price">{formatPriceLabel(selectedSizeOption?.amount ?? item.fallbackAmount)}</span>
                             <button
                               className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                               onClick={() => handleAddToCart(item)}
                               aria-label={`Add ${item.name} to cart`}
                               disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1441,15 +1381,10 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                             <p>{item.description}</p>
                           </div>
                           <div className="coffee-item__actions">
-                            {item.isUnavailableToday ? (
-                              <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                                Unavailable Today
-                              </span>
-                            ) : null}
                             <span className="price">{formatPriceLabel(selectedSizeOption?.amount ?? item.fallbackAmount)}</span>
                             <button
                               className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                               onClick={() => handleAddToCart(item)}
                               aria-label={`Add ${item.name} to cart`}
                               disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1508,14 +1443,9 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           <p>{item.description}</p>
                         </div>
                         <div className="coffee-item__actions">
-                          {item.isUnavailableToday ? (
-                            <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                              Unavailable Today
-                            </span>
-                          ) : null}
                           <button
                             className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                             onClick={() => handleAddToCart(item)}
                             aria-label={`Add ${item.name} to cart`}
                             disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1539,14 +1469,9 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                           <p>{item.description}</p>
                         </div>
                         <div className="coffee-item__actions">
-                          {item.isUnavailableToday ? (
-                            <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                              Unavailable Today
-                            </span>
-                          ) : null}
                           <button
                             className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                             onClick={() => handleAddToCart(item)}
                             aria-label={`Add ${item.name} to cart`}
                             disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1629,7 +1554,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                         <span className="price">{item.label}</span>
                         <button
                           className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                           onClick={() => handleAddToCart(item)}
                           aria-label={`Add ${item.name} to cart`}
                           disabled={!orderingStatus?.isOrderingAllowed || !isPreOrderWindowOpen || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
@@ -1686,15 +1611,10 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                         ))}
                       </select>
                     ) : null}
-                    {item.isUnavailableToday ? (
-                      <span className="menu-unavailable-chip" aria-label={`${item.name} unavailable today`}>
-                        Unavailable Today
-                      </span>
-                    ) : null}
                     <span className="price">{item.label}</span>
                     <button
                       className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable ? undefined : 'none' }}
+                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
                       onClick={() => handleAddToCart(item)}
                       aria-label={`Add ${item.name} to cart`}
                       disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
