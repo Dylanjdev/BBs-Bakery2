@@ -97,6 +97,7 @@ const sections = [
   {
     title: 'Daily Bakes',
     dailyMenu: true,
+    availableDays: [0, 1, 2, 3, 4, 5, 6], // All days
     items: [
       { name: 'Blueberry Scones', lookupName: 'Scone (Regular)', variationId: 'B26BFSNNVQMR2LTHWV75JJBH', fallbackAmount: 300 },
       { name: 'Pumpkin Roll Slice', variationId: 'TQ7TU26C5LVCIJVCULF5RK7L', fallbackAmount: 300 },
@@ -108,6 +109,7 @@ const sections = [
   {
     title: 'Tuesday Spotlight Bake',
     dailyMenu: true,
+    availableDays: [2], // Tuesday
     items: [
       { name: 'Cookie Butter Tres Leches', lookupName: 'Slice Of Cake (tres leches)', variationId: 'CZT35QGKBILYS3FD22RCHYAU', fallbackAmount: 500 },
     ],
@@ -115,6 +117,7 @@ const sections = [
   {
     title: 'Wednesday Spotlight Bake',
     dailyMenu: true,
+    availableDays: [3], // Wednesday
     items: [
       { name: 'Apple Butter Danishes', lookupName: 'Danish (Regular)', variationId: 'NANPTO7A32H2D2STQDXD4CEI', fallbackAmount: 400 },
       { name: 'Cinnamon Rolls', lookupName: 'Cinnamon Roll (Regular)', variationId: '4EVFHDZ3LHYZOXF4EOGMD3JZ', fallbackAmount: 500 },
@@ -123,6 +126,7 @@ const sections = [
   {
     title: 'Thursday Spotlight Bake',
     dailyMenu: true,
+    availableDays: [4], // Thursday
     items: [
       { name: 'Little Debbie Christmas Tree Cheesecake Slice', lookupName: 'Slice Of Cake (cheesecake slice)', variationId: 'S3CPM4OGZKJPDIYCEPDLXQVM', fallbackAmount: 600 },
     ],
@@ -130,6 +134,7 @@ const sections = [
   {
     title: 'Friday Spotlight Bake',
     dailyMenu: true,
+    availableDays: [5], // Friday
     items: [
       { name: 'Little Debbie Christmas Tree Cheesecake Slice', lookupName: 'Slice Of Cake (cheesecake slice)', variationId: 'S3CPM4OGZKJPDIYCEPDLXQVM', fallbackAmount: 600 },
       { name: 'Sun Dried Tomato & Feta Quiche', lookupName: 'Quiche Slice (single)', variationId: 'BJ6WQGCEQMZV2XAPYNUUH533', fallbackAmount: 350 },
@@ -138,6 +143,7 @@ const sections = [
   {
     title: 'Saturday Spotlight Bake',
     dailyMenu: true,
+    availableDays: [6], // Saturday
     items: [
       { name: 'Carrot Cake', lookupName: 'Slice Of Cake (3 layer/specialty)', variationId: 'XDNGFNGIS7L4ZOVUID3XGINS', fallbackAmount: 600 },
     ],
@@ -757,6 +763,14 @@ const formatPriceRange = (priceOptions = []) => {
   const uniqueLabels = [...new Set(labels)];
 
   return uniqueLabels.join('–');
+};
+
+const isAvailableToday = (section) => {
+  if (!section.availableDays || section.availableDays.length === 0) {
+    return true; // If no availableDays specified, always available
+  }
+  const today = new Date().getDay();
+  return section.availableDays.includes(today);
 };
 
 const Menu = ({ onAddToCart, orderingStatus }) => {
@@ -1475,7 +1489,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
 
             <div className="daily-menu-columns">
               {enrichedSections
-                .filter((section) => section.dailyMenu)
+                .filter((section) => section.dailyMenu && isAvailableToday(section))
                 .map((section, sectionIndex) => (
                   <section
                     className={`daily-menu-group${sectionIndex === 0 ? ' daily-menu-group--primary' : ''}`}
