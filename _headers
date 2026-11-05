@@ -1,0 +1,48 @@
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Cache HTML files only briefly (revalidate often for SEO updates)
+/index.html
+  Cache-Control: public, max-age=3600, must-revalidate
+  Content-Type: text/html; charset=utf-8
+
+# Cache static assets for longer
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache JavaScript and CSS chunks
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Don't cache 404.html
+/404.html
+  Cache-Control: public, max-age=300
+  Content-Type: text/html; charset=utf-8
+
+# Ensure proper MIME types and no-cache for HTML
+/about/index.html
+/menu/index.html
+/reviews/index.html
+/hours/index.html
+/ordering-guide/index.html
+/custom-cakes/index.html
+/catering/index.html
+/faq/index.html
+/contact/index.html
+  Cache-Control: public, max-age=3600, must-revalidate
+  Content-Type: text/html; charset=utf-8
+
+# Don't cache sitemap and robots
+/sitemap.xml
+  Cache-Control: public, max-age=86400
+  Content-Type: application/xml
+
+/robots.txt
+  Cache-Control: public, max-age=86400
+  Content-Type: text/plain
