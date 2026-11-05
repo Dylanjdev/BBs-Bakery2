@@ -45,6 +45,11 @@ const SPECIALTY_COFFEE_PREPARATIONS = [
     ],
   },
 ];
+const LOADED_ENERGY_SIZE_OPTIONS = [
+  { key: '16-oz', label: '16 oz', lookupName: 'Loaded Energy (16 oz)', variationId: 'XBWECXD7PPSVJW4R7CECTFKC', fallbackAmount: 600 },
+  { key: '20-oz', label: '20 oz', lookupName: 'Loaded Energy (20 oz)', variationId: 'S4PHLOMKZMYNWHTG64CBLEFO', fallbackAmount: 700 },
+  { key: '32-oz', label: '32 oz', lookupName: 'Loaded Energy (32 oz)', variationId: '2CPEPVFU3XXQLC5GS7CGVR2V', fallbackAmount: 800 },
+];
 const thanksgivingPreOrderItems = [
   {
     name: 'Pumpkin Pie',
@@ -93,47 +98,47 @@ const sections = [
     title: 'Daily Bakes',
     dailyMenu: true,
     items: [
-      { name: 'Double Chocolate Brownies', lookupName: 'Brownie (Regular)', variationId: 'BCSSMOTHSCZF5RILWMPKGVBI', fallbackAmount: 300 },
-      { name: 'Double Chocolate Cookies', lookupName: 'Cookie (Regular)', variationId: '7WCHB3ZABC72COZYGSSTF2SS', fallbackAmount: 250 },
-      { name: 'Pumpkin Muffins', lookupName: 'Muffin (single)', variationId: 'YATUUQKWZKNHIJAL5PKKXWQH', fallbackAmount: 300 },
-      { name: 'Cran-Orange Scones', lookupName: 'Scone (Regular)', variationId: 'B26BFSNNVQMR2LTHWV75JJBH', fallbackAmount: 350 },
-      { name: 'Apple Crumb Cake', lookupName: 'Slice Of Cake (1 layer/ Regular)', variationId: 'DHU62MYYBTNIHLQFV5NG4Q4L', fallbackAmount: 400 },
+      { name: 'Double Chocolate Brownies', variationId: 'BCSSMOTHSCZF5RILWMPKGVBI', fallbackAmount: 300 },
+      { name: 'Double Chocolate Cookies', variationId: '7WCHB3ZABC72COZYGSSTF2SS', fallbackAmount: 250 },
+      { name: 'Pumpkin Muffins', variationId: 'YATUUQKWZKNHIJAL5PKKXWQH', fallbackAmount: 350 },
+      { name: 'Cran-Orange Scones', variationId: 'B26BFSNNVQMR2LTHWV75JJBH', fallbackAmount: 350 },
+      { name: 'Apple Crumb Cake', variationId: 'DHU62MYYBTNIHLQFV5NG4Q4L', fallbackAmount: 400 },
     ],
   },
   {
     title: 'Tuesday Spotlight Bake',
     dailyMenu: true,
     items: [
-      { name: 'Carrot Cupcakes with Cream Cheese Buttercream', lookupName: 'Cupcake (regular)', variationId: 'K6NFLCWFO7T53G2V6Z72E5TK', fallbackAmount: 350 },
+      { name: 'Carrot Cupcakes with Cream Cheese Buttercream', variationId: 'K6NFLCWFO7T53G2V6Z72E5TK', fallbackAmount: 350 },
     ],
   },
   {
     title: 'Wednesday Spotlight Bake',
     dailyMenu: true,
     items: [
-      { name: 'Maple Pecan Cream Cheese Danishes', lookupName: 'Danish', variationId: 'NANPTO7A32H2D2STQDXD4CEI', fallbackAmount: 400 },
+      { name: 'Maple Pecan Cream Cheese Danishes', variationId: 'NANPTO7A32H2D2STQDXD4CEI', fallbackAmount: 400 },
     ],
   },
   {
     title: 'Thursday Spotlight Bake',
     dailyMenu: true,
     items: [
-      { name: 'Cinnamon Rolls', lookupName: 'Cinnamon Roll (Regular)', variationId: '4EVFHDZ3LHYZOXF4EOGMD3JZ', fallbackAmount: 500 },
+      { name: 'Cinnamon Rolls', variationId: '4EVFHDZ3LHYZOXF4EOGMD3JZ', fallbackAmount: 500 },
     ],
   },
   {
     title: 'Friday Spotlight Bake',
     dailyMenu: true,
     items: [
-      { name: 'Southwest Quiche', lookupName: 'Mini Quiche (single)', variationId: 'BJ6WQGCEQMZV2XAPYNUUH533', fallbackAmount: 300, priceSuffix: '/slice' },
-      { name: 'Brown Butter Pecan Cheesecake', lookupName: 'Mini Cheesecake (Regular)', variationId: '3LMSDYWNKQESPH3ESB6NHWVS', fallbackAmount: 600, priceSuffix: '/slice' },
+      { name: 'Southwest Quiche', variationId: 'BJ6WQGCEQMZV2XAPYNUUH533', fallbackAmount: 350 },
+      { name: 'Brown Butter Pecan Cheesecake', variationId: '3LMSDYWNKQESPH3ESB6NHWVS', fallbackAmount: 600 },
     ],
   },
   {
     title: 'Saturday Spotlight Bake',
     dailyMenu: true,
     items: [
-      { name: 'Nutella Croissants', lookupName: 'Croissant (specialty)', variationId: 'IU5OOQJJI5XQD3YQ2O7TFAEC', fallbackAmount: 500 },
+      { name: 'Nutella Croissants', variationId: 'IU5OOQJJI5XQD3YQ2O7TFAEC', fallbackAmount: 500 },
     ],
   },
   {
@@ -199,8 +204,9 @@ const sections = [
   },
   {
     title: 'Loaded Energy',
-    note: '32 oz • $8.00',
-    priceLookupName: 'Loaded Energy (Large)',
+    note: 'Choose a size',
+    dynamicSizePricing: true,
+    sizeOptions: LOADED_ENERGY_SIZE_OPTIONS,
     items: [
       {
         name: 'Tater Colada',
@@ -757,6 +763,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
   const [squareLookup, setSquareLookup] = useState(new Map());
   const [error, setError] = useState('');
   const [selectedProteins, setSelectedProteins] = useState({});
+  const [selectedDrinkSizes, setSelectedDrinkSizes] = useState({});
   const [selectedCoffeePreparations, setSelectedCoffeePreparations] = useState({});
   const [selectedCoffeeSizes, setSelectedCoffeeSizes] = useState({});
   const [isPreOrderWindowOpen, setIsPreOrderWindowOpen] = useState(() => isWithinPreOrderWindow());
@@ -899,14 +906,20 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                 const live = findSquarePrice(squareLookup, priceLookupName, fallbackVariationId);
                 const priceOptions = item.priceOptions?.map((option) =>
                   resolvePriceOption(option, squareLookup)) || [];
-                const sizeOptions = item.sizeOptions?.map((option) =>
+                const sizeOptions = (item.sizeOptions || section.sizeOptions)?.map((option) =>
                   resolvePriceOption(option, squareLookup));
-                const amount = live?.amount ?? priceOptions[0]?.amount ?? item.fallbackAmount;
-                const currency = live?.currency || priceOptions[0]?.currency || 'USD';
+                const amount = live?.amount ?? priceOptions[0]?.amount ?? sizeOptions?.[0]?.amount ?? item.fallbackAmount;
+                const currency = live?.currency || priceOptions[0]?.currency || sizeOptions?.[0]?.currency || 'USD';
                 const priceRangeLabel = formatPriceRange(priceOptions);
                 const availabilitySource = [live, ...priceOptions, ...(sizeOptions || [])]
                   .find((option) => typeof option?.visible === 'boolean');
-                const orderOption = sizeOptions?.[0] || live || priceOptions[0];
+                const orderOption = sizeOptions?.find(isSquareOptionOrderable)
+                  || sizeOptions?.[0]
+                  || live
+                  || priceOptions[0];
+                const hasOrderableSize = sizeOptions?.length
+                  ? sizeOptions.some(isSquareOptionOrderable)
+                  : null;
 
                 return {
                   ...item,
@@ -915,19 +928,19 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                   priceOptions,
                   sizeOptions,
                   isPreOrder: section.preOrder === true,
-                  variationId: live?.variationId || priceOptions[0]?.variationId || fallbackVariationId,
+                  variationId: live?.variationId || priceOptions[0]?.variationId || sizeOptions?.[0]?.variationId || fallbackVariationId,
                   stockLimit: orderOption?.stockLimit,
                   remainingStock: orderOption?.remainingStock,
                   stockConfigured: orderOption?.stockConfigured === true,
                   isOnlineOrderable:
                     availabilitySource?.visible !== false
-                    && isSquareOptionOrderable(orderOption),
+                    && (hasOrderableSize ?? isSquareOptionOrderable(orderOption)),
                   // Curated menu entries always stay visible. Square availability
                   // controls ordering below, not whether the published menu vanishes.
                   visible: Boolean(live) || keepCuratedVisible,
                   isUnavailableToday:
                     availabilitySource?.visible === false
-                    || !isSquareOptionOrderable(orderOption),
+                    || !(hasOrderableSize ?? isSquareOptionOrderable(orderOption)),
                   label: `${
                     section.dailyMenu
                       ? formatDailyMenuPrice(amount)
@@ -952,9 +965,6 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
           return {
             ...section,
             items: resolvedItems,
-            note: section.title === 'Loaded Energy' && resolvedItems[0]
-              ? `32 oz • ${formatPriceLabel(resolvedItems[0].amount)}`
-              : section.note,
             pricingLines: pricingLines.length ? pricingLines : section.pricingLines,
           };
         })
@@ -1013,6 +1023,51 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       ...current,
       [itemKey]: value,
     }));
+  };
+
+  const getSizedDrinkSelection = (item) => {
+    const itemKey = item.lookupName || item.name;
+    const requestedSizeKey = selectedDrinkSizes[itemKey];
+    const sizeOptions = item.sizeOptions || [];
+    const getOptionKey = (option) => option.key || normalize(option.label);
+    const sizeOption = sizeOptions.find(
+      (option) => getOptionKey(option) === requestedSizeKey,
+    ) || sizeOptions.find(isSquareOptionOrderable) || sizeOptions[0];
+
+    return {
+      itemKey,
+      sizeOption,
+      getOptionKey,
+      isOrderable:
+        sizeOption?.visible !== false
+        && isSquareOptionOrderable(sizeOption),
+    };
+  };
+
+  const handleDrinkSizeChange = (item, value) => {
+    const itemKey = item.lookupName || item.name;
+    setSelectedDrinkSizes((current) => ({
+      ...current,
+      [itemKey]: value,
+    }));
+  };
+
+  const handleSizedDrinkAdd = (item, drinkType) => {
+    const { sizeOption, isOrderable } = getSizedDrinkSelection(item);
+    if (!isOrderable || !orderingStatus?.isOrderingAllowed) {
+      return;
+    }
+
+    const stockConfigured = sizeOption.stockConfigured === true;
+    onAddToCart({
+      name: `${item.name} (${sizeOption.label})`,
+      amount: sizeOption.amount,
+      label: formatPriceLabel(sizeOption.amount, sizeOption.currency),
+      variationId: sizeOption.variationId,
+      note: `${drinkType}: ${item.name} · Size: ${sizeOption.label}`,
+      isUnavailableToday: false,
+      maxQuantity: stockConfigured ? sizeOption.remainingStock : undefined,
+    });
   };
 
   const getSpecialtyCoffeeSelection = (item) => {
@@ -1108,6 +1163,53 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       isSeasonalPreOrder: true,
       isUnavailableToday: false,
     });
+  };
+
+  const renderSizedDrinkItem = (item, key, drinkType) => {
+    const { sizeOption, getOptionKey, isOrderable } = getSizedDrinkSelection(item);
+    const canShowOrderControls =
+      item.isOnlineOrderable
+      && orderingStatus?.isGloballyEnabled !== false;
+
+    return (
+      <div className="coffee-item sized-drink-item" role="listitem" key={key}>
+        <div className="coffee-item__text">
+          <h4>{item.name}</h4>
+          <p>{item.description}</p>
+        </div>
+        <div className="coffee-item__actions sized-drink-actions">
+          <select
+            className="coffee-option-select sized-drink-select"
+            value={sizeOption ? getOptionKey(sizeOption) : ''}
+            onChange={(event) => handleDrinkSizeChange(item, event.target.value)}
+            aria-label={`Choose a size for ${item.name}`}
+            disabled={!item.sizeOptions?.length}
+          >
+            {item.sizeOptions?.map((option) => (
+              <option
+                key={`${item.name}-${getOptionKey(option)}`}
+                value={getOptionKey(option)}
+                disabled={option.visible === false || !isSquareOptionOrderable(option)}
+              >
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <span className="price">
+            {formatPriceLabel(sizeOption?.amount ?? item.fallbackAmount, sizeOption?.currency)}
+          </span>
+          <button
+            className="add-to-cart-btn"
+            style={{ display: canShowOrderControls ? undefined : 'none' }}
+            onClick={() => handleSizedDrinkAdd(item, drinkType)}
+            aria-label={`Add ${item.name}, ${sizeOption?.label || 'selected size'} to cart`}
+            disabled={!orderingStatus?.isOrderingAllowed || !isOrderable}
+          >
+            <FontAwesomeIcon icon={faPlus} />
+          </button>
+        </div>
+      </div>
+    );
   };
 
   const renderSpecialtyCoffeeItem = (item, key) => {
@@ -1626,59 +1728,26 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                   <h3 className="bakery-heading">{section.title}</h3>
                   <div className="coffee-pricing-card" aria-label="Loaded energy size and price">
                     <p>{section.note}</p>
+                    {section.pricingLines?.map((line) => (
+                      <span key={line}>{line}</span>
+                    ))}
                   </div>
                 </div>
 
                 <div className="coffee-grid" role="list" aria-label="Loaded energy items">
                   <div className="coffee-list-column">
-                    {leftColumnItems.map((item, itemIndex) => (
-                      <div
-                        className="coffee-item"
-                        role="listitem"
-                        key={`${section.title}-left-${item.variationId || item.lookupName || item.name}-${itemIndex}`}
-                      >
-                        <div className="coffee-item__text">
-                          <h4>{item.name}</h4>
-                          <p>{item.description}</p>
-                        </div>
-                        <div className="coffee-item__actions">
-                          <button
-                            className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
-                            onClick={() => handleAddToCart(item)}
-                            aria-label={`Add ${item.name} to cart`}
-                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
-                          >
-                            <FontAwesomeIcon icon={faPlus} />
-                          </button>
-                        </div>
-                      </div>
+                    {leftColumnItems.map((item, itemIndex) => renderSizedDrinkItem(
+                      item,
+                      `${section.title}-left-${item.variationId || item.lookupName || item.name}-${itemIndex}`,
+                      'Loaded energy',
                     ))}
                   </div>
 
                   <div className="coffee-list-column">
-                    {rightColumnItems.map((item, itemIndex) => (
-                      <div
-                        className="coffee-item"
-                        role="listitem"
-                        key={`${section.title}-right-${item.variationId || item.lookupName || item.name}-${itemIndex}`}
-                      >
-                        <div className="coffee-item__text">
-                          <h4>{item.name}</h4>
-                          <p>{item.description}</p>
-                        </div>
-                        <div className="coffee-item__actions">
-                          <button
-                            className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
-                            onClick={() => handleAddToCart(item)}
-                            aria-label={`Add ${item.name} to cart`}
-                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
-                          >
-                            <FontAwesomeIcon icon={faPlus} />
-                          </button>
-                        </div>
-                      </div>
+                    {rightColumnItems.map((item, itemIndex) => renderSizedDrinkItem(
+                      item,
+                      `${section.title}-right-${item.variationId || item.lookupName || item.name}-${itemIndex}`,
+                      'Loaded energy',
                     ))}
                   </div>
                 </div>
@@ -1715,65 +1784,19 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                 </div>
                 <div className="coffee-grid" role="list" aria-label="Dirty soda items">
                   <div className="coffee-list-column">
-                    {leftColumnItems.map((item, itemIndex) => {
-                      const selectedSizeOption = item.sizeOptions?.[0];
-
-                      return (
-                        <div
-                          className="coffee-item"
-                          role="listitem"
-                          key={`${section.title}-left-${item.variationId || item.lookupName || item.name}-${itemIndex}`}
-                        >
-                          <div className="coffee-item__text">
-                            <h4>{item.name}</h4>
-                            <p>{item.description}</p>
-                          </div>
-                          <div className="coffee-item__actions">
-                            <span className="price">{formatPriceLabel(selectedSizeOption?.amount ?? item.fallbackAmount)}</span>
-                            <button
-                              className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
-                              onClick={() => handleAddToCart(item)}
-                              aria-label={`Add ${item.name} to cart`}
-                              disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
-                            >
-                              <FontAwesomeIcon icon={faPlus} />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {leftColumnItems.map((item, itemIndex) => renderSizedDrinkItem(
+                      item,
+                      `${section.title}-left-${item.variationId || item.lookupName || item.name}-${itemIndex}`,
+                      'Dirty soda',
+                    ))}
                   </div>
 
                   <div className="coffee-list-column">
-                    {rightColumnItems.map((item, itemIndex) => {
-                      const selectedSizeOption = item.sizeOptions?.[0];
-
-                      return (
-                        <div
-                          className="coffee-item"
-                          role="listitem"
-                          key={`${section.title}-right-${item.variationId || item.lookupName || item.name}-${itemIndex}`}
-                        >
-                          <div className="coffee-item__text">
-                            <h4>{item.name}</h4>
-                            <p>{item.description}</p>
-                          </div>
-                          <div className="coffee-item__actions">
-                            <span className="price">{formatPriceLabel(selectedSizeOption?.amount ?? item.fallbackAmount)}</span>
-                            <button
-                              className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
-                              onClick={() => handleAddToCart(item)}
-                              aria-label={`Add ${item.name} to cart`}
-                              disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
-                            >
-                              <FontAwesomeIcon icon={faPlus} />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {rightColumnItems.map((item, itemIndex) => renderSizedDrinkItem(
+                      item,
+                      `${section.title}-right-${item.variationId || item.lookupName || item.name}-${itemIndex}`,
+                      'Dirty soda',
+                    ))}
                   </div>
                 </div>
               </div>
