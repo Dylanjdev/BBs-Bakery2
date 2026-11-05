@@ -8,7 +8,19 @@ import CartModal from './CartModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 
+const NAV_LINKS = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/menu', label: 'Menu' },
+  { href: '/reviews', label: 'Reviews' },
+  { href: '/catering', label: 'Catering' },
+  { href: '/faq', label: 'FAQ' },
+  { href: '/custom-cakes', label: 'Custom Cakes' },
+  { href: '/contact', label: 'Contact' },
+];
+
 const Header = memo(({
+  currentPath,
   cart,
   onUpdateQuantity,
   onCheckout,
@@ -66,323 +78,63 @@ const Header = memo(({
   return (
     <>
       <a href="#main-content" style={{position: 'fixed', top: 0, left: 0, background: '#d65a8c', color: 'white', padding: '8px', zIndex: 10012, clip: 'rect(0,0,0,0)', width: '1px', height: '1px', overflow: 'hidden'}} onFocus={(e) => e.target.style.clip = 'auto'} onBlur={(e) => e.target.style.clip = 'rect(0,0,0,0)'}>Skip to main content</a>
-      <header 
-      className="flex items-center justify-between sticky-header"
-      style={{
-        borderBottom: '1px solid #efefef',
-        boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
-        backdropFilter: 'blur(30px)',
-        background: 'rgba(255, 255, 255, 0.95)',
-        padding: 'clamp(1rem, 2.5vw, 1.5rem) clamp(1.5rem, 5vw, 2.5rem)',
-        minHeight: '75px',
-        height: 'auto',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 10010
-      }}
-    >
+      <header className="sticky-header">
       <a
         href="/"
-        className="logo flex items-center no-underline"
-        style={{gap: '1rem', flexShrink: 0, minWidth: '0'}}
+        className="site-logo no-underline"
         onClick={(e) => handleInternalNavigate(e, '/')}
         aria-label="BB's Bakery home"
       >
         <img 
           src="/assets/images/logo.webp" 
           alt="BB's Bakery & Cafe - Fresh Baked Goods in Pennington Gap, Virginia" 
-          width="60" 
-          height="60" 
-          className="br-100" 
-          style={{
-            boxShadow: '0 4px 12px rgba(214, 90, 140, 0.2)',
-            border: '2px solid #f0f0f0',
-            objectFit: 'cover'
-          }} 
+          width="52"
+          height="52"
+          className="site-logo__image"
           fetchPriority="auto"
           decoding="async"
         />
-        <span 
-          className="fw7" 
-          style={{
-            fontFamily: 'Playfair Display, serif',
-            color: '#1a1a1a',
-            fontSize: 'clamp(1rem, 4vw, 1.3rem)',
-            letterSpacing: '-0.5px'
-          }}
-        >
+        <span className="site-logo__name">
           BB's Bakery
         </span>
       </a>
       
-      {/* Desktop Nav - hidden when burger menu is open */}
-      <nav 
-        className="dn db-ns flex items-center"
-        style={{gap: 'clamp(1rem, 3vw, 2rem)'}} 
-        role="navigation" 
+      <nav
+        className="desktop-nav"
+        role="navigation"
         aria-label="Main navigation"
       >
-        {/* ...existing code for links... */}
-        <a
-          href="/"
-          className="fw6 br-pill no-underline"
-          style={{
-            color: '#6d6d6d',
-            transition: 'all 0.25s ease',
-            fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }}
-          onClick={(e) => handleInternalNavigate(e, '/')}
-          onMouseOver={(e) => {
-            e.target.style.background = '#f5f5f5';
-            e.target.style.color = '#1a1a1a';
-          }}
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = '#6d6d6d';
-          }}
-        >
-          Home
-        </a>
-        <a 
-          href="/about" 
-          className="fw6 br-pill no-underline" 
-          style={{
-            color: '#6d6d6d',
-            transition: 'all 0.25s ease',
-            fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }} 
-          onClick={(e) => handleInternalNavigate(e, '/about')}
-          onMouseOver={(e) => {
-            e.target.style.background = '#f5f5f5';
-            e.target.style.color = '#1a1a1a';
-          }} 
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = '#6d6d6d';
-          }}
-        >
-          About
-        </a>
-        <a 
-          href="/menu" 
-          className="fw6 br-pill no-underline" 
-          style={{
-            color: '#6d6d6d',
-            transition: 'all 0.25s ease',
-            fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }} 
-          onClick={(e) => handleInternalNavigate(e, '/menu')}
-          onMouseOver={(e) => {
-            e.target.style.background = '#f5f5f5';
-            e.target.style.color = '#1a1a1a';
-          }} 
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = '#6d6d6d';
-          }}
-        >
-          Menu
-        </a>
-        <a 
-          href="/reviews" 
-          className="fw6 br-pill no-underline" 
-          style={{
-            color: '#6d6d6d',
-            transition: 'all 0.25s ease',
-            fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }} 
-          onClick={(e) => handleInternalNavigate(e, '/reviews')}
-          onMouseOver={(e) => {
-            e.target.style.background = '#f5f5f5';
-            e.target.style.color = '#1a1a1a';
-          }} 
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = '#6d6d6d';
-          }}
-        >
-          Reviews
-        </a>
-        <a
-          href="/catering"
-          className="fw6 br-pill no-underline"
-          style={{
-            color: '#6d6d6d',
-            transition: 'all 0.25s ease',
-            fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }}
-          onClick={(e) => handleInternalNavigate(e, '/catering')}
-          onMouseOver={(e) => {
-            e.target.style.background = '#f5f5f5';
-            e.target.style.color = '#1a1a1a';
-          }}
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = '#6d6d6d';
-          }}
-        >
-          Catering
-        </a>
-        <a 
-          href="/faq" 
-          className="fw6 br-pill no-underline" 
-          style={{
-            color: '#6d6d6d',
-            transition: 'all 0.25s ease',
-            fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }} 
-          onClick={(e) => handleInternalNavigate(e, '/faq')}
-          onMouseOver={(e) => {
-            e.target.style.background = '#f5f5f5';
-            e.target.style.color = '#1a1a1a';
-          }} 
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = '#6d6d6d';
-          }}
-        >
-          FAQ
-        </a>
-        <a
-          href="/custom-cakes"
-          className="fw6 br-pill no-underline"
-          style={{
-            color: '#6d6d6d',
-            transition: 'all 0.25s ease',
-            fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }}
-          onClick={(e) => handleInternalNavigate(e, '/custom-cakes')}
-          onMouseOver={(e) => {
-            e.target.style.background = '#f5f5f5';
-            e.target.style.color = '#1a1a1a';
-          }}
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = '#6d6d6d';
-          }}
-        >
-          Custom Cakes
-        </a>
-        <a 
-          href="/contact" 
-          className="fw6 br-pill no-underline" 
-          style={{
-            color: '#6d6d6d',
-            transition: 'all 0.25s ease',
-            fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }} 
-          onClick={(e) => handleInternalNavigate(e, '/contact')}
-          onMouseOver={(e) => {
-            e.target.style.background = '#f5f5f5';
-            e.target.style.color = '#1a1a1a';
-          }} 
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = '#6d6d6d';
-          }}
-        >
-          Contact
-        </a>
-        <a 
-          href="/admin" 
-          className="fw6 br-pill no-underline" 
-          style={{
-            color: '#6d6d6d',
-            transition: 'all 0.25s ease',
-            fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-            padding: 'clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.3rem)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }} 
-          onClick={(e) => handleInternalNavigate(e, '/admin')}
-          onMouseOver={(e) => {
-            e.target.style.background = '#f5f5f5';
-            e.target.style.color = '#1a1a1a';
-          }} 
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = '#6d6d6d';
-          }}
-        >
-          Admin
-        </a>
+        <div className="desktop-nav__links">
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className={`desktop-nav__link no-underline${currentPath === link.href ? ' active' : ''}`}
+              onClick={(event) => handleInternalNavigate(event, link.href)}
+              aria-current={currentPath === link.href ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
         <div className="desktop-cta-group">
-        <a 
-          href="tel:2765370189" 
-          className="fw6 br-pill flex items-center no-underline white" 
-          style={{
-            background: 'linear-gradient(135deg, #d65a8c 0%, #c9a961 100%)',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 16px rgba(214, 90, 140, 0.25)',
-            fontFamily: 'Quicksand, sans-serif',
-            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-            fontWeight: '600',
-            letterSpacing: '0.3px',
-            padding: 'clamp(0.7rem, 1.5vw, 1rem) clamp(1.2rem, 2.5vw, 1.5rem)',
-            whiteSpace: 'nowrap'
-          }} 
-          onMouseOver={(e) => {
-            e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 6px 24px rgba(214, 90, 140, 0.35)';
-          }} 
-          onMouseOut={(e) => {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 4px 16px rgba(214, 90, 140, 0.25)';
-          }}
-        >
-          <FontAwesomeIcon icon={faPhone} className="mr2" /> (276) 537-0189
-        </a>
-        <button
-          type="button"
-          className="fw6 br-pill flex items-center desktop-cart-btn"
-          onClick={handleOpenCart}
-          aria-label={`Open cart${cart.length ? ` with ${cart.length} items` : ''}`}
-        >
-          <FontAwesomeIcon icon={faShoppingCart} className="mr2" /> Cart
-          {cart.length > 0 && (
-            <span className="desktop-cart-badge">
-              {cart.length}
-            </span>
-          )}
-        </button>
+          <a href="tel:2765370189" className="desktop-phone-link no-underline">
+            <FontAwesomeIcon icon={faPhone} aria-hidden="true" />
+            <span className="desktop-phone-link__full">(276) 537-0189</span>
+            <span className="desktop-phone-link__short">Call</span>
+          </a>
+          <button
+            type="button"
+            className="desktop-cart-btn"
+            onClick={handleOpenCart}
+            aria-label={`Open cart${cart.length ? ` with ${cart.length} items` : ''}`}
+          >
+            <FontAwesomeIcon icon={faShoppingCart} aria-hidden="true" />
+            <span>Cart</span>
+            {cart.length > 0 && (
+              <span className="desktop-cart-badge">{cart.length}</span>
+            )}
+          </button>
         </div>
       </nav>
       
@@ -497,159 +249,18 @@ const Header = memo(({
           ×
         </button>
       </div>
-      <a
-        href="/"
-        className="no-underline"
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={(e) => handleInternalNavigate(e, '/')}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        Home
-      </a>
-      <a 
-        href="/about" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={(e) => handleInternalNavigate(e, '/about')}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        About
-      </a>
-      <a 
-        href="/menu" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={(e) => handleInternalNavigate(e, '/menu')}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        Menu
-      </a>
-      <a 
-        href="/reviews" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={(e) => handleInternalNavigate(e, '/reviews')}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        Reviews
-      </a>
-      <a
-        href="/catering"
-        className="no-underline"
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={(e) => handleInternalNavigate(e, '/catering')}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        Catering
-      </a>
-      <a 
-        href="/faq" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={(e) => handleInternalNavigate(e, '/faq')}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        FAQ
-      </a>
-      <a 
-        href="/contact" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={(e) => handleInternalNavigate(e, '/contact')}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        Contact
-      </a>
-      <a
-        href="/custom-cakes"
-        className="no-underline"
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={(e) => handleInternalNavigate(e, '/custom-cakes')}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        Custom Cakes
-      </a>
-      <a 
-        href="/admin" 
-        className="no-underline" 
-        style={{
-          color: '#1a1a1a',
-          padding: '0.6rem 0.8rem',
-          borderBottom: '1px solid #f0f0f0',
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onClick={(e) => handleInternalNavigate(e, '/admin')}
-        onMouseOver={(e) => e.target.style.background = '#f5f5f5'}
-        onMouseOut={(e) => e.target.style.background = 'transparent'}
-      >
-        Admin
-      </a>
+      {NAV_LINKS.map((link) => (
+        <a
+          key={link.href}
+          href={link.href}
+          className={`mobile-nav-link no-underline${currentPath === link.href ? ' active' : ''}`}
+          onClick={(event) => handleInternalNavigate(event, link.href)}
+          aria-current={currentPath === link.href ? 'page' : undefined}
+          tabIndex={menuOpen ? 0 : -1}
+        >
+          {link.label}
+        </a>
+      ))}
       <a 
         href="tel:2765370189" 
         className="no-underline" 

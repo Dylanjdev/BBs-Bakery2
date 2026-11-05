@@ -27,8 +27,8 @@ const footerColumns = [
     title: 'Hours',
     content: (
       <>
-        <span>Tuesday - Friday: 7:00 AM - 4:00 PM</span>
-        <span>Saturday: 8:00 AM - 4:00 PM</span>
+        <span>Tuesday - Friday: 7:00 AM - 3:00 PM</span>
+        <span>Saturday: 8:00 AM - 3:00 PM</span>
         <span>Sunday & Monday: Closed</span>
       </>
     ),

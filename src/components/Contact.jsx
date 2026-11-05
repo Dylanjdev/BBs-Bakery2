@@ -43,12 +43,12 @@ const quickInfo = [
   {
     icon: faClock,
     title: 'Hours',
-    lines: ['Tuesday-Friday: 7:00 AM - 4:00 PM', 'Saturday: 8:00 AM - 4:00 PM', 'Sunday & Monday: Closed'],
+    lines: ['Tuesday-Friday: 7:00 AM - 3:00 PM', 'Saturday: 8:00 AM - 3:00 PM', 'Sunday & Monday: Closed'],
   },
   {
     icon: faMugHot,
     title: 'Ordering Notes',
-    lines: ['Online ordering starts at 8:00 AM Tue-Fri.', 'Saturday online ordering starts at 10:00 AM.', 'Custom requests are best discussed before 4:00 PM.'],
+    lines: ['Online ordering starts at 8:00 AM Tue-Fri.', 'Saturday online ordering starts at 10:00 AM.', 'Custom requests are best discussed before 3:00 PM.'],
   },
 ];
 

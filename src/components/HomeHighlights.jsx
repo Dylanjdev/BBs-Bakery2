@@ -35,7 +35,7 @@ const quickInfo = [
   },
   {
     heading: 'Order Ahead',
-    text: 'Online ordering is available during shop hours for eligible breakfast, lunch, and pre-order items.',
+    text: 'Online ordering is available for eligible breakfast, lunch, and pre-order items whenever ordering is switched on.',
   },
   {
     heading: 'Custom Cakes',

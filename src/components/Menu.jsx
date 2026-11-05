@@ -15,54 +15,93 @@ import { getApiBaseUrl } from '../lib/apiBaseUrl';
 import { squareVariationMap } from '../data/squareVariationMap';
 
 const API_BASE_URL = getApiBaseUrl();
-const ORDERABLE_SECTION_TITLES = new Set(['Breakfast', 'Lunch', 'Pre-Orders']);
-
-const specialOfDay = [
-  'Sunday – Closed',
-  'Monday – Croissants',
-  'Tuesday – $10 Coffee Cake & Small/Medium Coffee (Hot or Iced)',
-  'Wednesday – Danishes',
-  'Thursday – $7 Frappee',
-  'Friday – Quiche Day',
-  "Saturday – Baker's Choice",
+const THANKSGIVING_PICKUP_NOTE = 'Thanksgiving pre-order · Pickup November 25 by 2 PM';
+const thanksgivingPreOrderItems = [
+  {
+    name: 'Pumpkin Pie',
+    variationId: '25V2R7LMAAQTN5SFQU7TJPAN',
+    fallbackAmount: 2500,
+  },
+  {
+    name: 'Carrot Cake',
+    description: '8 inch · 3 layers',
+    variationId: 'UAXGS4GAP54A4KQQQ3YVN5G3',
+    fallbackAmount: 6500,
+  },
+  {
+    name: 'Brown Butter Pecan Cake',
+    description: '8 inch · 3 layers',
+    variationId: '7SUP6N44FVRWKHUDHCM74RTJ',
+    fallbackAmount: 6500,
+  },
+  {
+    name: 'Pumpkin Pie Cheesecake',
+    variationId: 'XCTRTZVC2WW456E24PT57DRY',
+    fallbackAmount: 6500,
+  },
+  {
+    name: 'Mini Butter Croissants',
+    options: [
+      { key: 'half-dozen', label: 'Half dozen', variationId: '4MJVXWDXBL3FIS7A6XLA7QNJ', fallbackAmount: 1000 },
+      { key: 'dozen', label: 'Dozen', variationId: 'JIRL32DOYUYM42M3BZVH4XPC', fallbackAmount: 1800 },
+    ],
+  },
+  {
+    name: 'Cookies',
+    flavors: ['Kitchen sink', 'Chocolate chunk', 'Snickerdoodle', 'Oatmeal'],
+    options: [
+      { key: 'half-dozen', label: 'Half dozen', variationId: 'BOTR62XDUWWRXESSFAXNLYDW', fallbackAmount: 1200 },
+      { key: 'dozen', label: 'Dozen', variationId: 'U4JY6NDESFWAFR77SM3RIFWN', fallbackAmount: 2400 },
+    ],
+  },
 ];
 
 const sections = [
   {
-    title: 'Bakery Items',
-    special: true,
-    note: '*selection varies daily*',
+    title: 'Daily Bakes',
+    dailyMenu: true,
     items: [
-      { name: 'Muffins', description: 'flour + butter + eggs + sugar + fruit variety', fallbackAmount: 350 },
-      { name: 'Brownies', description: 'flour + cocoa powder + eggs + sugar + milk', fallbackAmount: 300 },
-      { name: 'Scones', description: 'flour + butter + eggs + buttermilk + fruit variety/savory', fallbackAmount: 350 },
-      { name: 'Cinnamon Rolls', description: 'flour + butter + milk + eggs + yeast + cinnamon + sugar + cream cheese', fallbackAmount: 500 },
-      {
-        name: 'Croissants',
-        description: 'flour + milk + butter + salt + yeast',
-        fallbackAmount: 300,
-        priceOptions: [
-          { lookupName: 'Croissant (Regular)', fallbackAmount: 300 },
-          { lookupName: 'Croissant (specialty)', fallbackAmount: 500 },
-        ],
-      },
-      { name: 'Mini loaf', description: 'flour + butter + eggs + sugar + fruit variety', fallbackAmount: 500 },
-      { name: 'Mini Bundts', description: 'flour + sugar + milk + eggs + variety', fallbackAmount: 500 },
-      { name: 'Danish', description: 'flour + butter + cream cheese + eggs + fruit variety', fallbackAmount: 400 },
-      { name: 'Pastry', description: 'flour + butter + sweet/savory filling variety', fallbackAmount: 400 },
-      { name: 'Specialty Buns', description: 'flour + milk + butter + eggs + yeast + sweet/savory variety', fallbackAmount: 500 },
-      { name: 'Donuts – Glazed or Powdered', priceLookupName: 'Donut (glazed)', description: 'flour + sugar + yeast + butter + milk + glazed or powdered sugar', fallbackAmount: 200 },
-      { name: 'Donuts – Chocolate Glazed', priceLookupName: 'Donut (chocolate glazed)', description: 'flour + sugar + yeast + butter + milk + chocolate glaze', fallbackAmount: 250 },
-      {
-        name: 'Donuts – Specialty',
-        description: 'flour + sugar + yeast + butter + milk + specialty topping variety',
-        fallbackAmount: 200,
-        priceOptions: [
-          { lookupName: 'Donut (blueberry glaze)', fallbackAmount: 200 },
-          { lookupName: 'Donut (cookie butter)', fallbackAmount: 250 },
-        ],
-      },
-      { name: 'Cupcakes', description: 'flour + butter + eggs + sugar + frosting variety', fallbackAmount: 350 },
+      { name: 'Double Chocolate Brownies', lookupName: 'Brownie (Regular)', variationId: 'BCSSMOTHSCZF5RILWMPKGVBI', fallbackAmount: 300 },
+      { name: 'Double Chocolate Cookies', lookupName: 'Cookie (Regular)', variationId: '7WCHB3ZABC72COZYGSSTF2SS', fallbackAmount: 250 },
+      { name: 'Pumpkin Muffins', fallbackAmount: 300 },
+      { name: 'Cran-Orange Scones', lookupName: 'Scone (Regular)', variationId: 'B26BFSNNVQMR2LTHWV75JJBH', fallbackAmount: 350 },
+      { name: 'Apple Crumb Cake', lookupName: 'Slice Of Cake (1 layer/ Regular)', variationId: 'DHU62MYYBTNIHLQFV5NG4Q4L', fallbackAmount: 400 },
+    ],
+  },
+  {
+    title: 'Tuesday Spotlight Bake',
+    dailyMenu: true,
+    items: [
+      { name: 'Carrot Cupcakes with Cream Cheese Buttercream', lookupName: 'Cupcake (regular)', variationId: 'K6NFLCWFO7T53G2V6Z72E5TK', fallbackAmount: 350 },
+    ],
+  },
+  {
+    title: 'Wednesday Spotlight Bake',
+    dailyMenu: true,
+    items: [
+      { name: 'Maple Pecan Cream Cheese Danishes', lookupName: 'Danish', variationId: 'NANPTO7A32H2D2STQDXD4CEI', fallbackAmount: 400 },
+    ],
+  },
+  {
+    title: 'Thursday Spotlight Bake',
+    dailyMenu: true,
+    items: [
+      { name: 'Cinnamon Rolls', lookupName: 'Cinnamon Roll (Regular)', variationId: '4EVFHDZ3LHYZOXF4EOGMD3JZ', fallbackAmount: 500 },
+    ],
+  },
+  {
+    title: 'Friday Spotlight Bake',
+    dailyMenu: true,
+    items: [
+      { name: 'Southwest Quiche', lookupName: 'Mini Quiche (single)', variationId: 'BJ6WQGCEQMZV2XAPYNUUH533', fallbackAmount: 300, priceSuffix: '/slice' },
+      { name: 'Brown Butter Pecan Cheesecake', lookupName: 'Mini Cheesecake (Regular)', variationId: '3LMSDYWNKQESPH3ESB6NHWVS', fallbackAmount: 600, priceSuffix: '/slice' },
+    ],
+  },
+  {
+    title: 'Saturday Spotlight Bake',
+    dailyMenu: true,
+    items: [
+      { name: 'Nutella Croissants', lookupName: 'Croissant (specialty)', variationId: 'IU5OOQJJI5XQD3YQ2O7TFAEC', fallbackAmount: 500 },
     ],
   },
   {
@@ -518,6 +557,41 @@ const isWithinPreOrderWindow = (date = new Date()) => {
   return true;
 };
 
+const getBakeryDateParts = (date = new Date()) => {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hourCycle: 'h23',
+  }).formatToParts(date);
+
+  return Object.fromEntries(
+    parts
+      .filter((part) => part.type !== 'literal')
+      .map((part) => [part.type, Number(part.value)]),
+  );
+};
+
+const getThanksgivingPreOrderStatus = (date = new Date()) => {
+  const { month, day, hour, minute } = getBakeryDateParts(date);
+  const beforeOpening = month < 10;
+  const afterClosing = month > 11
+    || (month === 11 && (day > 19 || (day === 19 && ((hour * 60) + minute >= 17 * 60))));
+  const isOpen = !beforeOpening && !afterClosing;
+
+  return {
+    isOpen,
+    label: isOpen
+      ? 'Pre-order'
+      : afterClosing
+        ? 'Pre-orders closed'
+        : 'Opens October 1',
+  };
+};
+
 const formatPriceLabel = (amount, currency = 'USD') => {
   if (!Number.isFinite(amount)) {
     return '$0.00';
@@ -528,6 +602,14 @@ const formatPriceLabel = (amount, currency = 'USD') => {
     currency,
     minimumFractionDigits: 2,
   }).format(amount / 100);
+};
+
+const formatDailyMenuPrice = (amount) => {
+  if (!Number.isFinite(amount)) {
+    return '$0';
+  }
+
+  return `$${(amount / 100).toFixed(2).replace(/\.00$/, '')}`;
 };
 
 const toDisplayName = (itemName, variationName) => {
@@ -575,6 +657,10 @@ const buildSquareLookup = (squareItems = []) => {
         amount: variation.priceAmount,
         currency: variation.currency || 'USD',
         visible: item?.visible !== false,
+        stockLimit: variation.stockLimit,
+        remainingStock: variation.remainingStock,
+        stockConfigured: variation.stockConfigured === true,
+        menuName: variation.menuName || '',
         rank: getPreferredVariationRank(variation.name),
       };
 
@@ -620,6 +706,10 @@ const resolvePriceOption = (option, squareLookup) => {
     currency: live?.currency || option.currency || 'USD',
     variationId: live?.variationId || fallbackVariationId,
     visible: live?.visible,
+    stockLimit: live?.stockLimit,
+    remainingStock: live?.remainingStock,
+    stockConfigured: live?.stockConfigured === true,
+    menuName: live?.menuName || '',
   };
 };
 
@@ -638,13 +728,19 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
   const [error, setError] = useState('');
   const [selectedProteins, setSelectedProteins] = useState({});
   const [isPreOrderWindowOpen, setIsPreOrderWindowOpen] = useState(() => isWithinPreOrderWindow());
+  const [thanksgivingStatus, setThanksgivingStatus] = useState(() => getThanksgivingPreOrderStatus());
+  const [thanksgivingOptions, setThanksgivingOptions] = useState({
+    'Mini Butter Croissants': 'half-dozen',
+    Cookies: 'half-dozen',
+  });
+  const [cookieFlavor, setCookieFlavor] = useState('Kitchen sink');
 
   useEffect(() => {
     let isMounted = true;
 
     const loadMenu = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/menu?includeHidden=true`);
+        const response = await fetch(`${API_BASE_URL}/menu?includeHidden=true`, { cache: 'no-store' });
         const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
@@ -663,16 +759,19 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       }
     };
 
-    loadMenu();
+    void loadMenu();
+    const intervalId = window.setInterval(loadMenu, 30_000);
 
     return () => {
       isMounted = false;
+      window.clearInterval(intervalId);
     };
   }, []);
 
   useEffect(() => {
     const syncWindowState = () => {
       setIsPreOrderWindowOpen(isWithinPreOrderWindow());
+      setThanksgivingStatus(getThanksgivingPreOrderStatus());
     };
 
     const intervalId = window.setInterval(syncWindowState, 60_000);
@@ -683,7 +782,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
 
   const enrichedSections = useMemo(
     () => {
-      const lockedCuratedSections = new Set(['Bakery Items', 'Breakfast', 'Lunch', 'Loaded Energy', 'Specialty Coffee', 'Classic Espresso', 'Iced Latte', 'Hot Latte', 'Frappes', 'Dirty Sodas', 'Smoothies', 'Pre-Orders']);
+      const lockedCuratedSections = new Set(sections.map((section) => section.title));
       const curatedNames = new Set(
         sections.flatMap((section) =>
           section.items.flatMap((item) => [
@@ -695,10 +794,14 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
 
       const extrasBySection = new Map();
       squareItems.forEach((squareItem) => {
+        if (squareItem?.visible === false) {
+          return;
+        }
+
         const itemName = squareItem?.name || '';
         const targetSection = sections.some((section) => section.title === squareItem?.section)
           ? squareItem.section
-          : 'Bakery Items';
+          : 'Daily Bakes';
         if (lockedCuratedSections.has(targetSection)) {
           return;
         }
@@ -721,9 +824,14 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             description: squareItem?.description || 'Freshly prepared.',
             amount: variation.priceAmount,
             variationId: variation?.id || null,
-            isOnlineOrderable: ORDERABLE_SECTION_TITLES.has(targetSection),
+            stockLimit: variation?.stockLimit,
+            remainingStock: variation?.remainingStock,
+            stockConfigured: variation?.stockConfigured === true,
+            isOnlineOrderable:
+              variation?.stockConfigured === true && variation?.remainingStock > 0,
             visible: true,
-            isUnavailableToday: squareItem?.visible === false,
+            isUnavailableToday:
+              variation?.stockConfigured !== true || variation?.remainingStock <= 0,
             label: formatPriceLabel(variation.priceAmount, variation.currency || 'USD'),
           });
           extrasBySection.set(targetSection, existing);
@@ -753,18 +861,33 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                 const priceRangeLabel = formatPriceRange(priceOptions);
                 const availabilitySource = [live, ...priceOptions, ...(sizeOptions || [])]
                   .find((option) => typeof option?.visible === 'boolean');
+                const orderOption = sizeOptions?.[0] || live || priceOptions[0];
 
                 return {
                   ...item,
+                  name: section.dailyMenu && live?.menuName ? live.menuName : item.name,
                   amount,
                   priceOptions,
                   sizeOptions,
                   isPreOrder: section.preOrder === true,
                   variationId: live?.variationId || priceOptions[0]?.variationId || fallbackVariationId,
-                  isOnlineOrderable: ORDERABLE_SECTION_TITLES.has(section.title),
+                  stockLimit: orderOption?.stockLimit,
+                  remainingStock: orderOption?.remainingStock,
+                  stockConfigured: orderOption?.stockConfigured === true,
+                  isOnlineOrderable:
+                    orderOption?.stockConfigured === true && orderOption?.remainingStock > 0,
+                  // Curated menu entries always stay visible. Square availability
+                  // controls ordering below, not whether the published menu vanishes.
                   visible: Boolean(live) || keepCuratedVisible,
-                  isUnavailableToday: availabilitySource?.visible === false,
-                  label: priceRangeLabel || formatPriceLabel(amount, currency),
+                  isUnavailableToday:
+                    availabilitySource?.visible === false
+                    || orderOption?.stockConfigured !== true
+                    || orderOption?.remainingStock <= 0,
+                  label: `${
+                    section.dailyMenu
+                      ? formatDailyMenuPrice(amount)
+                      : priceRangeLabel || formatPriceLabel(amount, currency)
+                  }${item.priceSuffix || ''}`,
                 };
               })
               .filter((item) => item.visible),
@@ -816,8 +939,9 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       ? selectedProteins[itemKey] || item.proteinOptions[0]
       : null;
     const resolvedVariationId = selectedSizeOption?.variationId || item.variationId;
+    const remainingStock = selectedSizeOption?.remainingStock ?? item.remainingStock ?? 0;
 
-    if (!resolvedVariationId) {
+    if (!resolvedVariationId || remainingStock <= 0) {
       return;
     }
 
@@ -832,6 +956,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       variationId: resolvedVariationId,
       note: selectedProtein ? `Protein: ${selectedProtein}` : '',
       isUnavailableToday: item.isUnavailableToday,
+      maxQuantity: remainingStock,
     });
   };
 
@@ -841,6 +966,42 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       ...current,
       [itemKey]: value,
     }));
+  };
+
+  const getThanksgivingSelection = (item) => {
+    const option = item.options?.find(
+      (candidate) => candidate.key === thanksgivingOptions[item.name],
+    ) || item.options?.[0] || item;
+    const live = findSquarePrice(squareLookup, null, option.variationId);
+
+    return {
+      option,
+      amount: live?.amount ?? option.fallbackAmount,
+      variationId: live?.variationId || option.variationId,
+    };
+  };
+
+  const handleThanksgivingPreOrder = (item) => {
+    if (!thanksgivingStatus.isOpen) {
+      return;
+    }
+
+    const selection = getThanksgivingSelection(item);
+    const optionLabel = item.options?.length ? selection.option.label : '';
+    const flavorLabel = item.flavors?.length ? cookieFlavor : '';
+    const cartDetails = [optionLabel, flavorLabel].filter(Boolean).join(' · ');
+
+    onAddToCart({
+      name: cartDetails ? `${item.name} (${cartDetails})` : item.name,
+      amount: selection.amount,
+      label: formatPriceLabel(selection.amount),
+      variationId: selection.variationId,
+      note: [THANKSGIVING_PICKUP_NOTE, flavorLabel ? `Flavor: ${flavorLabel}` : '']
+        .filter(Boolean)
+        .join(' · '),
+      isSeasonalPreOrder: true,
+      isUnavailableToday: false,
+    });
   };
 
   return (
@@ -866,7 +1027,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
               fontFamily: 'Playfair Display, serif',
             }}
           >
-            ⏰ Ordering Currently Closed
+            {thanksgivingStatus.isOpen ? '🦃 Thanksgiving Pre-Orders Open' : '⏰ Ordering Currently Closed'}
           </p>
           <p
             style={{
@@ -875,7 +1036,9 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
               color: '#666',
             }}
           >
-            {orderingStatus?.message || 'Orders are not available at this time.'}
+            {thanksgivingStatus.isOpen
+              ? 'Daily ordering is closed, but Thanksgiving items can still be pre-ordered below.'
+              : orderingStatus?.message || 'Orders are not available at this time.'}
           </p>
         </div>
       )}
@@ -884,7 +1047,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
         <h2 id="menu-heading">Our Menu</h2>
         <p className="tagline">Bringing the best bites to your day</p>
         <p className="menu-availability-note">
-          Items with a + button are currently available to order online. If the + is not shown, that item is not available for online ordering.
+          Today&apos;s quantities come directly from the bakery. Items can only be added while daily stock remains.
         </p>
       </header>
 
@@ -892,11 +1055,169 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
 
       {error ? (
         <p style={{ textAlign: 'center', color: '#d65a8c', marginBottom: '1.5rem' }}>
-          Live Square sync is temporarily unavailable. Showing fallback menu pricing.
+          Live Square sync is temporarily unavailable. Displayed prices may use the published fallback menu.
         </p>
       ) : null}
 
-      {enrichedSections.map((section) => {
+      <div className="thanksgiving-menu" aria-labelledby="thanksgiving-menu-heading">
+        <div className="thanksgiving-menu__eyebrow">BB&apos;s Bakery &amp; Cafe</div>
+        <div className="thanksgiving-menu__heading-row">
+          <span className="thanksgiving-menu__ornament" aria-hidden="true">✦</span>
+          <h3 id="thanksgiving-menu-heading">
+            Thanksgiving <span>Bakery Pre-Order Menu</span>
+          </h3>
+          <span className="thanksgiving-menu__ornament" aria-hidden="true">✦</span>
+        </div>
+
+        <div className="thanksgiving-menu__items" role="list" aria-label="Thanksgiving pre-order items">
+          {thanksgivingPreOrderItems.map((item) => {
+            const selection = getThanksgivingSelection(item);
+
+            return (
+              <div className="thanksgiving-menu__item" role="listitem" key={item.name}>
+                <div className="thanksgiving-menu__item-copy">
+                  <h4>{item.name}</h4>
+                  {item.description ? <p>{item.description}</p> : null}
+                  {item.flavors?.length ? (
+                    <label className="thanksgiving-menu__field">
+                      <span>Flavor</span>
+                      <select
+                        value={cookieFlavor}
+                        onChange={(event) => setCookieFlavor(event.target.value)}
+                      >
+                        {item.flavors.map((flavor) => (
+                          <option key={flavor} value={flavor}>{flavor}</option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : null}
+                  {item.options?.length ? (
+                    <label className="thanksgiving-menu__field">
+                      <span>Quantity</span>
+                      <select
+                        value={thanksgivingOptions[item.name] || item.options[0].key}
+                        onChange={(event) => setThanksgivingOptions((current) => ({
+                          ...current,
+                          [item.name]: event.target.value,
+                        }))}
+                      >
+                        {item.options.map((option) => (
+                          <option key={option.key} value={option.key}>
+                            {option.label} — {formatPriceLabel(
+                              findSquarePrice(squareLookup, null, option.variationId)?.amount
+                                ?? option.fallbackAmount,
+                            )}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : null}
+                </div>
+                <div className="thanksgiving-menu__item-actions">
+                  <strong>{formatPriceLabel(selection.amount)}</strong>
+                  <button
+                    type="button"
+                    className="thanksgiving-menu__order-button"
+                    onClick={() => handleThanksgivingPreOrder(item)}
+                    disabled={!thanksgivingStatus.isOpen || !selection.variationId}
+                    aria-label={`${thanksgivingStatus.label} ${item.name}`}
+                  >
+                    <FontAwesomeIcon icon={faPlus} aria-hidden="true" />
+                    {thanksgivingStatus.label}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="thanksgiving-menu__details">
+          <h4>Thanksgiving Pre-Order Information</h4>
+          <p>
+            Pre-orders and custom orders can be placed by phone, DM, in person, or on our website.
+            Orders open <strong>October 1</strong> and close <strong>November 19 at 5 PM</strong>.
+            All orders must be paid for when booked and picked up <strong>November 25 by 2 PM</strong>.
+          </p>
+          <address>
+            <span>103 Main St., Pennington Gap, VA</span>
+            <a href="tel:+12765370189">276-537-0189</a>
+          </address>
+        </div>
+      </div>
+
+      {enrichedSections.some((section) => section.dailyMenu) ? (
+        <div className="menu-content bakery-layout daily-menu-layout">
+          <div className="menu-column bakery-panel daily-menu-board">
+            <span className="daily-menu-floral-frame" aria-hidden="true">
+              <span className="daily-menu-floral-edge daily-menu-floral-edge--top" />
+              <span className="daily-menu-floral-edge daily-menu-floral-edge--right" />
+              <span className="daily-menu-floral-edge daily-menu-floral-edge--bottom" />
+              <span className="daily-menu-floral-edge daily-menu-floral-edge--left" />
+              <span className="daily-menu-floral-corner daily-menu-floral-corner--top-left" />
+              <span className="daily-menu-floral-corner daily-menu-floral-corner--top-right" />
+              <span className="daily-menu-floral-corner daily-menu-floral-corner--bottom-right" />
+              <span className="daily-menu-floral-corner daily-menu-floral-corner--bottom-left" />
+            </span>
+            <div className="bakery-branding">
+              <FontAwesomeIcon icon={faBreadSlice} className="bakery-branding__icon" aria-hidden="true" />
+              <div>
+                <p className="bakery-branding__name">BB&apos;s Bakery & Cafe</p>
+                <p className="bakery-branding__tagline">Fresh bakes and spotlight favorites</p>
+              </div>
+            </div>
+
+            <div className="menu-divider bakery-divider" />
+
+            <div className="daily-menu-columns">
+              {enrichedSections
+                .filter((section) => section.dailyMenu)
+                .map((section, sectionIndex) => (
+                  <section
+                    className={`daily-menu-group${sectionIndex === 0 ? ' daily-menu-group--primary' : ''}`}
+                    key={section.title}
+                    aria-labelledby={`daily-menu-group-${sectionIndex}`}
+                  >
+                    <h3 id={`daily-menu-group-${sectionIndex}`}>{section.title}</h3>
+                    <div className="daily-menu-list" role="list">
+                      {section.items.map((item, itemIndex) => (
+                        <div
+                          className="daily-menu-item"
+                          role="listitem"
+                          key={`${section.title}-${item.variationId || item.lookupName || item.name}-${itemIndex}`}
+                        >
+                          <div className="daily-menu-item__details">
+                            <h4>{item.name}</h4>
+                            {item.stockConfigured ? (
+                              <span className={`daily-stock-chip${item.remainingStock > 0 ? '' : ' sold-out'}`}>
+                                {item.remainingStock > 0
+                                  ? `${item.remainingStock} left today`
+                                  : 'Sold out'}
+                              </span>
+                            ) : null}
+                          </div>
+                          <div className="daily-menu-item__actions">
+                            <span className="price">{item.label}</span>
+                            <button
+                              className="add-to-cart-btn"
+                              style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
+                              onClick={() => handleAddToCart(item)}
+                              aria-label={`Add ${item.name} to cart`}
+                              disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !item.variationId}
+                            >
+                              <FontAwesomeIcon icon={faPlus} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {enrichedSections.filter((section) => !section.dailyMenu).map((section) => {
         const simpleSheetSectionConfig = {
           'Classic Espresso': {
             icon: faMugHot,
@@ -916,7 +1237,6 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
           },
         };
 
-        const isBakerySection = section.title === 'Bakery Items';
         const isBreakfastSection = section.title === 'Breakfast';
         const isLunchSection = section.title === 'Lunch';
         const isLoadedEnergySection = section.title === 'Loaded Energy';
@@ -925,54 +1245,6 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
         const isSpecialtyCoffeeSection = section.title === 'Specialty Coffee';
         const isPreOrdersSection = section.title === 'Pre-Orders';
         const simpleSheetSection = simpleSheetSectionConfig[section.title];
-
-        if (isBakerySection) {
-          return (
-            <div className="menu-content bakery-layout" key={section.title}>
-              <div className="menu-column bakery-panel">
-                <div className="bakery-branding">
-                  <FontAwesomeIcon icon={faBreadSlice} className="bakery-branding__icon" aria-hidden="true" />
-                  <div>
-                    <p className="bakery-branding__name">BB&apos;s Bakery & Cafe</p>
-                    <p className="bakery-branding__tagline">Bringing the best bites to your day</p>
-                  </div>
-                </div>
-
-                <div className="menu-divider bakery-divider" />
-
-                <h3 className="bakery-heading">{section.title}</h3>
-                {section.note ? <p className="bakery-note">{section.note}</p> : null}
-
-                <div className="bakery-grid" role="list" aria-label="Bakery items">
-                  {section.items.map((item, itemIndex) => (
-                    <div
-                      className="bakery-item"
-                      role="listitem"
-                      key={`${section.title}-${item.variationId || item.lookupName || item.name}-${itemIndex}`}
-                    >
-                      <div className="bakery-item__text">
-                        <h4>{item.name}</h4>
-                        <p>{item.description}</p>
-                      </div>
-                      <div className="bakery-item__actions">
-                        <span className="price">{item.label}</span>
-                        <button
-                          className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
-                          onClick={() => handleAddToCart(item)}
-                          aria-label={`Add ${item.name} to cart`}
-                          disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
-                        >
-                          <FontAwesomeIcon icon={faPlus} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          );
-        }
 
         if (isBreakfastSection) {
           return (
@@ -1574,17 +1846,6 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
           <div className="menu-content" key={section.title}>
             <div className="menu-column">
               <h3>{section.title}</h3>
-
-              {section.special ? (
-                <div className="menu-special">
-                  <h4>✨ Special of the Day</h4>
-                  <ul>
-                    {specialOfDay.map((line) => (
-                      <li key={line}>{line}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
 
               {section.items.map((item, itemIndex) => (
                 <div

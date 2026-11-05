@@ -10,7 +10,7 @@ const faqGroups = [
     questions: [
       {
         question: "What are BB's Bakery & Cafe hours?",
-        answer: "We're open Tuesday through Friday from 7:00 AM to 4:00 PM and Saturday from 8:00 AM to 4:00 PM. We are closed on Sundays and Mondays.",
+        answer: "We're open Tuesday through Friday from 7:00 AM to 3:00 PM and Saturday from 8:00 AM to 3:00 PM. We are closed on Sundays and Mondays.",
       },
       {
         question: "Where is BB's Bakery & Cafe located?",
@@ -33,7 +33,7 @@ const faqGroups = [
       },
       {
         question: 'When do I pick up an online order?',
-        answer: 'Pickup windows follow our ordering hours. Tuesday through Friday pickup is 8:00 AM to 4:00 PM, and Saturday pickup is 10:00 AM to 4:00 PM.',
+        answer: 'Pickup windows follow our ordering hours. Tuesday through Friday pickup is 8:00 AM to 3:00 PM, and Saturday pickup is 10:00 AM to 3:00 PM.',
       },
     ],
   },

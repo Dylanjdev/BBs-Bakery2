@@ -6,20 +6,32 @@ const API_BASE_URL = getApiBaseUrl();
 const TOKEN_KEY = 'bb_admin_token';
 const ORDER_POLL_INTERVAL_MS = 3000;
 const SECTION_OPTIONS = [
-  'Baked Goods',
+  'Daily Bakes',
+  'Tuesday Spotlight Bake',
+  'Wednesday Spotlight Bake',
+  'Thursday Spotlight Bake',
+  'Friday Spotlight Bake',
+  'Saturday Spotlight Bake',
   'Breakfast',
   'Lunch',
+  'Pre-Orders',
   'Loaded Energy',
   'Specialty Coffee',
   'Classic Espresso',
   'Iced Latte',
   'Hot Latte',
   'Frappes',
-  '💥 Dirty Sodas & Lemonades',
-  '🍓 Smoothies',
+  'Dirty Sodas',
+  'Smoothies',
 ];
 
-const defaultVariation = { name: 'Regular', priceAmount: '' };
+const defaultVariation = {
+  id: null,
+  name: 'Regular',
+  menuName: '',
+  priceAmount: '',
+  stockLimit: '0',
+};
 
 const getOrderKey = (order) => order?.orderId || order?.id || '';
 
@@ -62,16 +74,22 @@ const toFormState = (item) => ({
   name: item?.name || '',
   description: item?.description || '',
   categoryId: item?.categoryId || '',
-  section: item?.section || 'Baked Goods',
+  section: item?.section || 'Daily Bakes',
   visibility: item?.visible === false ? 'hidden' : 'public',
   variations:
     Array.isArray(item?.variations) && item.variations.length
       ? item.variations.map((variation) => ({
+          id: variation?.id || null,
           name: variation?.name || 'Regular',
+          menuName: variation?.menuName || '',
           priceAmount:
             typeof variation?.priceAmount === 'number'
               ? String((variation.priceAmount / 100).toFixed(2))
               : '',
+          stockLimit:
+            typeof variation?.stockLimit === 'number'
+              ? String(variation.stockLimit)
+              : '0',
         }))
       : [{ ...defaultVariation }],
 });
@@ -84,9 +102,12 @@ const toPayload = (form) => ({
   visible: form.visibility !== 'hidden',
   variations: form.variations
     .map((variation) => ({
+      id: variation.id || undefined,
       name: variation.name.trim() || 'Regular',
+      menuName: variation.menuName.trim(),
       priceAmount: Math.round(Number(variation.priceAmount || 0) * 100),
       currency: 'USD',
+      stockLimit: Number(variation.stockLimit),
     }))
     .filter((variation) => Number.isFinite(variation.priceAmount) && variation.priceAmount > 0),
 });
@@ -127,19 +148,163 @@ async function apiRequest(path, options = {}, token = null) {
   return data;
 }
 
-function ItemForm({ form, onChange, onVariationChange, onAddVariation, onRemoveVariation, onSubmit, onCancel, isSaving }) {
+function ItemForm({
+  form,
+  catalogItems,
+  catalogPickerEnabled,
+  onCatalogItemSelect,
+  onChange,
+  onVariationChange,
+  onAddVariation,
+  onRemoveVariation,
+  onSubmit,
+  onCancel,
+  isSaving,
+}) {
+  const [catalogQuery, setCatalogQuery] = useState('');
+  const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const catalogMatches = useMemo(() => {
+    const query = catalogQuery.trim().toLowerCase();
+    if (!query) {
+      return catalogItems.slice(0, 8);
+    }
+
+    return catalogItems
+      .filter((item) => item?.name?.toLowerCase().includes(query))
+      .sort((firstItem, secondItem) => {
+        const firstStartsWithQuery = firstItem.name.toLowerCase().startsWith(query);
+        const secondStartsWithQuery = secondItem.name.toLowerCase().startsWith(query);
+        if (firstStartsWithQuery !== secondStartsWithQuery) {
+          return firstStartsWithQuery ? -1 : 1;
+        }
+        return firstItem.name.localeCompare(secondItem.name);
+      })
+      .slice(0, 8);
+  }, [catalogItems, catalogQuery]);
+
+  const selectCatalogItem = (item) => {
+    setCatalogQuery(item.name || '');
+    setIsCatalogOpen(false);
+    onCatalogItemSelect(item);
+  };
+
   return (
     <form className="admin-form" onSubmit={onSubmit}>
-      <h2>{form.id ? 'Edit Item' : 'Add Item'}</h2>
+      <header className="admin-form__heading">
+        <p>{form.id ? 'Editing menu item' : 'Creating a menu item'}</p>
+        <h2>{form.name || 'New item'}</h2>
+        <span>
+          Current section: <strong>{form.section}</strong>
+        </span>
+      </header>
+
+      <div className="admin-form__section-picker">
+        <label>
+          Menu section
+          <select
+            value={form.section}
+            onChange={(event) => onChange('section', event.target.value)}
+            required
+          >
+            {SECTION_OPTIONS.map((section) => (
+              <option key={section} value={section}>{section}</option>
+            ))}
+          </select>
+        </label>
+        <p>
+          This item will appear in <strong>{form.section}</strong> on the customer menu.
+        </p>
+      </div>
+
+      {catalogPickerEnabled ? (
+        <div
+          className="admin-catalog-picker"
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              setIsCatalogOpen(false);
+            }
+          }}
+        >
+          <label htmlFor="admin-catalog-search">
+            Find an existing item in Square
+            <input
+              id="admin-catalog-search"
+              type="search"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={isCatalogOpen}
+              aria-controls="admin-catalog-results"
+              autoComplete="off"
+              value={catalogQuery}
+              placeholder="Start typing an item name..."
+              onFocus={() => setIsCatalogOpen(true)}
+              onChange={(event) => {
+                setCatalogQuery(event.target.value);
+                setIsCatalogOpen(true);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  setIsCatalogOpen(false);
+                }
+                if (event.key === 'Enter' && isCatalogOpen && catalogMatches.length > 0) {
+                  event.preventDefault();
+                  selectCatalogItem(catalogMatches[0]);
+                }
+              }}
+            />
+          </label>
+          <small className="admin-field-help">
+            Search by part of the name, then select the correct Square item. Its category, description, prices, and options will fill in automatically.
+          </small>
+
+          {isCatalogOpen ? (
+            <div className="admin-catalog-results" id="admin-catalog-results" role="listbox">
+              {catalogMatches.length > 0 ? catalogMatches.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className="admin-catalog-result"
+                  role="option"
+                  aria-selected={form.id === item.id}
+                  onClick={() => selectCatalogItem(item)}
+                >
+                  <strong>{item.name}</strong>
+                  <span>
+                    {item.variations?.length || 0} {(item.variations?.length || 0) === 1 ? 'price option' : 'price options'}
+                    {' • '}
+                    {item.categoryId ? 'Square category included' : 'Category will be assigned automatically'}
+                  </span>
+                </button>
+              )) : (
+                <p className="admin-catalog-results__empty">
+                  No Square items match “{catalogQuery.trim()}”. You can enter a new item below instead.
+                </p>
+              )}
+            </div>
+          ) : null}
+
+          {form.id ? (
+            <p className="admin-catalog-selected">
+              <span aria-hidden="true">✓</span>
+              Selected from Square: <strong>{form.name}</strong>
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <label>
-        Item Name
+        Square item name
         <input
           type="text"
           value={form.name}
           onChange={(event) => onChange('name', event.target.value)}
           required
         />
+        <small className="admin-field-help">
+          {form.id
+            ? 'This is linked to the selected Square catalog item.'
+            : 'Use this only when the item does not already exist in Square.'}
+        </small>
       </label>
 
       <label>
@@ -152,81 +317,116 @@ function ItemForm({ form, onChange, onVariationChange, onAddVariation, onRemoveV
       </label>
 
       <label>
-        Category ID (optional, auto-filled from section if blank)
-        <input
-          type="text"
-          value={form.categoryId}
-          onChange={(event) => onChange('categoryId', event.target.value)}
-        />
-        <small className="admin-field-help">
-          Square category identifier for reporting/organization. Leave blank to auto-use the section&apos;s category.
-        </small>
-      </label>
-
-      <label>
-        Section
-        <select
-          value={form.section}
-          onChange={(event) => onChange('section', event.target.value)}
-          required
-        >
-          {SECTION_OPTIONS.map((section) => (
-            <option key={section} value={section}>{section}</option>
-          ))}
-        </select>
-      </label>
-
-      <label>
-        Online menu availability
+        Customer menu visibility
         <select
           value={form.visibility}
           onChange={(event) => onChange('visibility', event.target.value)}
           required
         >
-          <option value="public">Available</option>
-          <option value="hidden">Unavailable</option>
+          <option value="public">Shown</option>
+          <option value="hidden">Hidden</option>
         </select>
         <small className="admin-field-help">
-          Unavailable items are removed from the customer menu and rejected at checkout.
+          Hidden items are removed from the customer menu. Shown items also need stock above 0 before customers can order them.
         </small>
       </label>
 
+      <details className="admin-advanced-fields">
+        <summary>Advanced Square settings</summary>
+        <label>
+          Category ID (optional)
+          <input
+            type="text"
+            value={form.categoryId}
+            placeholder={`Automatically use the ${form.section} category`}
+            readOnly
+          />
+          <small className="admin-field-help">
+            {form.categoryId
+              ? 'Filled automatically from the selected Square catalog item.'
+              : `No entry needed. The ${form.section} category will be assigned when you save.`}
+          </small>
+        </label>
+      </details>
+
       <div className="admin-variations">
         <div className="admin-variations__header">
-          <strong>Variations</strong>
-          <button type="button" onClick={onAddVariation}>+ Add variation</button>
+          <div>
+            <strong>Prices and online stock</strong>
+            <small className="admin-field-help admin-field-help--block">
+              Each price option has its own daily limit. Set the limit to 0 to mark that option sold out online.
+            </small>
+          </div>
+          <button type="button" onClick={onAddVariation}>+ Add price option</button>
         </div>
 
         {form.variations.map((variation, index) => (
           <div className="admin-variation-row" key={index}>
-            <input
-              type="text"
-              placeholder="Variation name"
-              value={variation.name}
-              onChange={(event) => onVariationChange(index, 'name', event.target.value)}
-            />
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Price (USD)"
-              value={variation.priceAmount}
-              onChange={(event) => onVariationChange(index, 'priceAmount', event.target.value)}
-              required
-            />
-            <button
-              type="button"
-              onClick={() => onRemoveVariation(index)}
-              disabled={form.variations.length === 1}
-            >
-              Remove
-            </button>
+            <div className="admin-variation-row__header">
+              <strong>Price option {index + 1}</strong>
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => onRemoveVariation(index)}
+                disabled={form.variations.length === 1}
+              >
+                Remove option
+              </button>
+            </div>
+            <label>
+              Customer-facing name
+              <input
+                type="text"
+                maxLength="100"
+                placeholder={form.name || 'Name shown on the menu'}
+                value={variation.menuName}
+                onChange={(event) => onVariationChange(index, 'menuName', event.target.value)}
+              />
+              <small className="admin-field-help">Optional wording for the weekly bakery board.</small>
+            </label>
+            <label>
+              Square option name
+              <input
+                type="text"
+                placeholder="Regular"
+                value={variation.name}
+                onChange={(event) => onVariationChange(index, 'name', event.target.value)}
+              />
+            </label>
+            <label>
+              Price (USD)
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                value={variation.priceAmount}
+                onChange={(event) => onVariationChange(index, 'priceAmount', event.target.value)}
+                required
+              />
+            </label>
+            <label>
+              Daily online stock limit
+              <input
+                type="number"
+                min="0"
+                step="1"
+                inputMode="numeric"
+                placeholder="0"
+                value={variation.stockLimit}
+                onChange={(event) => onVariationChange(index, 'stockLimit', event.target.value)}
+                required
+              />
+              <small className="admin-field-help">Maximum available to order today.</small>
+            </label>
           </div>
         ))}
       </div>
 
       <div className="admin-form__actions">
-        <button type="submit" disabled={isSaving}>{isSaving ? 'Saving...' : 'Save Item'}</button>
+        <button type="submit" disabled={isSaving}>
+          {isSaving ? 'Saving...' : `Save to ${form.section}`}
+        </button>
         <button type="button" className="secondary" onClick={onCancel}>Cancel</button>
       </div>
     </form>
@@ -235,6 +435,7 @@ function ItemForm({ form, onChange, onVariationChange, onAddVariation, onRemoveV
 
 export default function AdminPage() {
   const [menuFilter, setMenuFilter] = useState('current');
+  const [menuSectionFilter, setMenuSectionFilter] = useState('all');
   const [menuSearch, setMenuSearch] = useState('');
   const [token, setToken] = useState(() => sessionStorage.getItem(TOKEN_KEY) || '');
   const [username, setUsername] = useState('');
@@ -245,8 +446,8 @@ export default function AdminPage() {
   const [form, setForm] = useState(toFormState(null));
   const [isSaving, setIsSaving] = useState(false);
   const [togglingItemId, setTogglingItemId] = useState('');
-  const [publishSections, setPublishSections] = useState({});
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [catalogPickerEnabled, setCatalogPickerEnabled] = useState(false);
   const [globalOrderingEnabled, setGlobalOrderingEnabled] = useState(null);
   const [isGlobalOrderingLoading, setIsGlobalOrderingLoading] = useState(() => Boolean(sessionStorage.getItem(TOKEN_KEY)));
   const [orderingControlError, setOrderingControlError] = useState('');
@@ -267,7 +468,7 @@ export default function AdminPage() {
     const map = {};
 
     items.forEach((item) => {
-      const section = item?.section || 'Baked Goods';
+      const section = item?.section || 'Daily Bakes';
       const categoryId = item?.categoryId || '';
       if (!map[section] && categoryId) {
         map[section] = categoryId;
@@ -279,6 +480,11 @@ export default function AdminPage() {
 
   const unavailableCount = useMemo(() => items.filter((item) => item?.visible === false).length, [items]);
   const availableCount = items.length - unavailableCount;
+  const sectionCounts = useMemo(() => items.reduce((counts, item) => {
+    const section = item?.section || 'Daily Bakes';
+    counts[section] = (counts[section] || 0) + 1;
+    return counts;
+  }, {}), [items]);
 
   const filteredItems = useMemo(() => {
     const availabilityMatches = menuFilter === 'all'
@@ -286,19 +492,22 @@ export default function AdminPage() {
       : items.filter((item) => (
           menuFilter === 'unavailable' ? item?.visible === false : item?.visible !== false
         ));
+    const sectionMatches = menuSectionFilter === 'all'
+      ? availabilityMatches
+      : availabilityMatches.filter((item) => (item?.section || 'Daily Bakes') === menuSectionFilter);
     const query = menuSearch.trim().toLowerCase();
 
     if (!query) {
-      return availabilityMatches;
+      return sectionMatches;
     }
 
-    return availabilityMatches.filter((item) => {
+    return sectionMatches.filter((item) => {
       const searchableText = [
         item?.name,
         item?.description,
         item?.section,
         ...(Array.isArray(item?.variations)
-          ? item.variations.map((variation) => variation?.name)
+          ? item.variations.flatMap((variation) => [variation?.name, variation?.menuName])
           : []),
       ]
         .filter(Boolean)
@@ -307,7 +516,27 @@ export default function AdminPage() {
 
       return searchableText.includes(query);
     });
-  }, [items, menuFilter, menuSearch]);
+  }, [items, menuFilter, menuSearch, menuSectionFilter]);
+
+  const groupedFilteredItems = useMemo(() => {
+    const grouped = new Map();
+    filteredItems.forEach((item) => {
+      const section = item?.section || 'Daily Bakes';
+      if (!grouped.has(section)) {
+        grouped.set(section, []);
+      }
+      grouped.get(section).push(item);
+    });
+
+    const knownSections = SECTION_OPTIONS
+      .filter((section) => grouped.has(section))
+      .map((section) => ({ section, items: grouped.get(section) }));
+    const additionalSections = [...grouped.entries()]
+      .filter(([section]) => !SECTION_OPTIONS.includes(section))
+      .map(([section, sectionItems]) => ({ section, items: sectionItems }));
+
+    return [...knownSections, ...additionalSections];
+  }, [filteredItems]);
 
   const refreshItems = useCallback(async (authToken = token) => {
     setIsLoading(true);
@@ -526,6 +755,7 @@ export default function AdminPage() {
     missingOrderPollsRef.current.clear();
     suppressedOrderIdsRef.current.clear();
     setForm(toFormState(null));
+    setCatalogPickerEnabled(false);
     setError('');
   };
 
@@ -560,6 +790,7 @@ export default function AdminPage() {
 
   const handleEdit = (item) => {
     setForm(toFormState(item));
+    setCatalogPickerEnabled(false);
     setError('');
     setIsFormOpen(true);
   };
@@ -589,7 +820,7 @@ export default function AdminPage() {
     setError('');
     setTogglingItemId(item.id);
     try {
-      const selectedSection = publishSections[item.id] || item.section || 'Baked Goods';
+      const selectedSection = item.section || 'Daily Bakes';
       const payload = {
         name: item.name || '',
         description: item.description || '',
@@ -600,8 +831,11 @@ export default function AdminPage() {
           ? item.variations
               .map((variation) => ({
                 name: variation?.name || 'Regular',
+                id: variation?.id || undefined,
+                menuName: variation?.menuName || '',
                 priceAmount: Math.round(Number(variation?.priceAmount || 0)),
                 currency: variation?.currency || 'USD',
+                stockLimit: Number.isInteger(variation?.stockLimit) ? variation.stockLimit : 0,
               }))
               .filter((variation) => Number.isFinite(variation.priceAmount) && variation.priceAmount > 0)
           : [],
@@ -617,7 +851,7 @@ export default function AdminPage() {
       );
       await refreshItems();
     } catch (requestError) {
-      setError(requestError.message || 'Availability update failed');
+      setError(requestError.message || 'Menu visibility update failed');
     } finally {
       setTogglingItemId('');
     }
@@ -635,6 +869,12 @@ export default function AdminPage() {
       setError('Name and at least one variation with price are required.');
       return;
     }
+    if (payload.variations.some((variation) => (
+      !Number.isInteger(variation.stockLimit) || variation.stockLimit < 0
+    ))) {
+      setError('Every variation needs a whole-number daily stock limit of zero or more.');
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -649,6 +889,7 @@ export default function AdminPage() {
       }
 
       setForm(toFormState(null));
+      setCatalogPickerEnabled(false);
       setIsFormOpen(false);
       await refreshItems();
     } catch (requestError) {
@@ -695,6 +936,14 @@ export default function AdminPage() {
 
   const updateFormField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleCatalogItemSelect = (item) => {
+    setForm((current) => ({
+      ...toFormState(item),
+      section: current.section,
+      visibility: current.visibility,
+    }));
   };
 
   const updateVariationField = (index, field, value) => {
@@ -795,12 +1044,16 @@ export default function AdminPage() {
                 type="button"
                 className="secondary"
                 onClick={() => {
-                  setForm(toFormState(null));
+                  setForm({
+                    ...toFormState(null),
+                    section: menuSectionFilter === 'all' ? 'Daily Bakes' : menuSectionFilter,
+                  });
+                  setCatalogPickerEnabled(true);
                   setIsFormOpen(true);
                   setError('');
                 }}
               >
-                New Item
+                + Add / Choose Item
               </button>
             ) : null}
             <button type="button" className="danger" onClick={handleLogout}>Log Out</button>
@@ -821,7 +1074,7 @@ export default function AdminPage() {
             {globalOrderingEnabled === null
               ? 'Checking the shared customer ordering control.'
               : globalOrderingEnabled
-              ? 'Customers can order enabled items during normal ordering hours.'
+              ? 'Customers can order enabled items until you turn online ordering off.'
               : 'Add buttons are hidden and checkout is blocked for every customer.'}
           </p>
         </div>
@@ -849,15 +1102,36 @@ export default function AdminPage() {
         <div className="admin-layout">
           <div className="admin-list">
             <p className="admin-note">
-              Online ordering is on for {availableCount} items and off for {unavailableCount}. Customers can still see off items, but cannot add them to an order.
+              {availableCount} items are shown on the customer menu and {unavailableCount} are hidden. A shown variation is orderable only while its daily stock is above 0.
             </p>
+            <div className="admin-section-browser">
+              <label>
+                <span>Choose the section you want to manage</span>
+                <select
+                  value={menuSectionFilter}
+                  onChange={(event) => setMenuSectionFilter(event.target.value)}
+                >
+                  <option value="all">All menu sections ({items.length} items)</option>
+                  {SECTION_OPTIONS.map((section) => (
+                    <option key={section} value={section}>
+                      {section} ({sectionCounts[section] || 0})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <p>
+                {menuSectionFilter === 'all'
+                  ? 'Items are grouped by their customer-menu section below.'
+                  : `You are managing the ${menuSectionFilter} section.`}
+              </p>
+            </div>
             <div className="admin-list__header">
               <h2>
                 {menuFilter === 'unavailable'
-                  ? 'Online Ordering Off'
+                  ? 'Hidden from Menu'
                   : menuFilter === 'all'
                     ? 'All Square Items'
-                    : 'Online Ordering On'} ({filteredItems.length})
+                    : 'Shown on Menu'} ({filteredItems.length})
               </h2>
               <div className="admin-filter" role="tablist" aria-label="Filter items by availability">
                 <button
@@ -866,7 +1140,7 @@ export default function AdminPage() {
                   onClick={() => setMenuFilter('current')}
                   aria-pressed={menuFilter === 'current'}
                 >
-                  On ({availableCount})
+                  Shown ({availableCount})
                 </button>
                 <button
                   type="button"
@@ -874,7 +1148,7 @@ export default function AdminPage() {
                   onClick={() => setMenuFilter('unavailable')}
                   aria-pressed={menuFilter === 'unavailable'}
                 >
-                  Off ({unavailableCount})
+                  Hidden ({unavailableCount})
                 </button>
                 <button
                   type="button"
@@ -909,73 +1183,71 @@ export default function AdminPage() {
                 {menuSearch.trim()
                   ? `No items match “${menuSearch.trim()}” in this filter.`
                   : menuFilter === 'unavailable'
-                  ? 'Online ordering is not switched off for any items.'
+                  ? 'No items are hidden from the customer menu.'
                   : menuFilter === 'all'
                     ? 'No Square items found.'
-                    : 'Online ordering is not switched on for any items.'}
+                    : 'No items are currently shown on the customer menu.'}
               </p>
             ) : null}
-            {filteredItems.map((item) => (
-              <article key={item.id} className="admin-item">
-                <div>
-                  <strong>{item.name}</strong>
-                  <p>{item.description || 'No description'}</p>
-                  <p><em>Section: {item.section || 'Baked Goods'}</em></p>
-                  <p>
-                    <span className={item.visible === false ? 'admin-status unavailable' : 'admin-status available'}>
-                      Online ordering: {item.visible === false ? 'Off' : 'On'}
-                    </span>
-                  </p>
-                  <ul>
-                    {item.variations.map((variation) => (
-                      <li key={variation.id || variation.name}>
-                        {variation.name} — {typeof variation.priceAmount === 'number' ? `$${(variation.priceAmount / 100).toFixed(2)}` : 'N/A'}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="admin-item__actions">
-                  {item.visible === false ? (
-                    <label className="admin-item__section-label">
-                      Menu section
-                      <select
-                        value={publishSections[item.id] || item.section || 'Baked Goods'}
-                        onChange={(event) =>
-                          setPublishSections((current) => ({
-                            ...current,
-                            [item.id]: event.target.value,
-                          }))
-                        }
-                        disabled={togglingItemId === item.id}
-                      >
-                        {SECTION_OPTIONS.map((section) => (
-                          <option key={`${item.id}-${section}`} value={section}>{section}</option>
+            {groupedFilteredItems.map(({ section, items: sectionItems }) => (
+              <section className="admin-section-group" key={section} aria-label={`${section} menu section`}>
+                <header className="admin-section-group__header">
+                  <div>
+                    <p>Menu section</p>
+                    <h3>{section}</h3>
+                  </div>
+                  <span>{sectionItems.length} {sectionItems.length === 1 ? 'item' : 'items'}</span>
+                </header>
+
+                {sectionItems.map((item) => (
+                  <article key={item.id} className="admin-item">
+                    <div className="admin-item__details">
+                      <span className="admin-item__section-badge">{section}</span>
+                      <strong className="admin-item__name">{item.name}</strong>
+                      <p>{item.description || 'No description'}</p>
+                      <p>
+                        <span className={item.visible === false ? 'admin-status unavailable' : 'admin-status available'}>
+                          Customer menu: {item.visible === false ? 'Hidden' : 'Shown'}
+                        </span>
+                      </p>
+                      <ul>
+                        {item.variations.map((variation) => (
+                          <li key={variation.id || variation.name}>
+                            {variation.menuName ? `${variation.menuName} • ` : ''}
+                            {variation.name} — {typeof variation.priceAmount === 'number' ? `$${(variation.priceAmount / 100).toFixed(2)}` : 'N/A'}
+                            {' • '}
+                            {variation.stockConfigured
+                              ? `${variation.remainingStock} of ${variation.stockLimit} left today`
+                              : 'Daily stock not set'}
+                          </li>
                         ))}
-                      </select>
-                    </label>
-                  ) : null}
-                  <button type="button" onClick={() => handleEdit(item)}>Edit</button>
-                  <button
-                    type="button"
-                    className={`admin-ordering-toggle ${item.visible === false ? 'off' : 'on'}`}
-                    onClick={() => handleToggleVisibility(item)}
-                    disabled={togglingItemId === item.id}
-                    role="switch"
-                    aria-checked={item.visible !== false}
-                    aria-label={`Turn online ordering ${item.visible === false ? 'on' : 'off'} for ${item.name}`}
-                  >
-                    <span className="admin-ordering-toggle__track" aria-hidden="true">
-                      <span className="admin-ordering-toggle__thumb" />
-                    </span>
-                    <span>
-                      {togglingItemId === item.id
-                        ? 'Updating...'
-                        : `Online ordering ${item.visible === false ? 'Off' : 'On'}`}
-                    </span>
-                  </button>
-                  <button type="button" className="danger" onClick={() => handleDelete(item.id)}>Delete</button>
-                </div>
-              </article>
+                      </ul>
+                    </div>
+                    <div className="admin-item__actions">
+                      <button type="button" onClick={() => handleEdit(item)}>Edit item</button>
+                      <button
+                        type="button"
+                        className={`admin-ordering-toggle ${item.visible === false ? 'off' : 'on'}`}
+                        onClick={() => handleToggleVisibility(item)}
+                        disabled={togglingItemId === item.id}
+                        role="switch"
+                        aria-checked={item.visible !== false}
+                        aria-label={`${item.visible === false ? 'Show' : 'Hide'} ${item.name} on the customer menu`}
+                      >
+                        <span className="admin-ordering-toggle__track" aria-hidden="true">
+                          <span className="admin-ordering-toggle__thumb" />
+                        </span>
+                        <span>
+                          {togglingItemId === item.id
+                            ? 'Updating...'
+                            : item.visible === false ? 'Hidden' : 'Shown'}
+                        </span>
+                      </button>
+                      <button type="button" className="danger" onClick={() => handleDelete(item.id)}>Delete</button>
+                    </div>
+                  </article>
+                ))}
+              </section>
             ))}
           </div>
         </div>
@@ -1062,6 +1334,9 @@ export default function AdminPage() {
           <div className="admin-modal-card">
             <ItemForm
               form={form}
+              catalogItems={items}
+              catalogPickerEnabled={catalogPickerEnabled}
+              onCatalogItemSelect={handleCatalogItemSelect}
               onChange={updateFormField}
               onVariationChange={updateVariationField}
               onAddVariation={addVariation}
@@ -1069,6 +1344,7 @@ export default function AdminPage() {
               onSubmit={handleSubmit}
               onCancel={() => {
                 setForm(toFormState(null));
+                setCatalogPickerEnabled(false);
                 setIsFormOpen(false);
               }}
               isSaving={isSaving}

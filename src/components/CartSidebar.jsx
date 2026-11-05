@@ -58,7 +58,8 @@ const CartSidebar = ({ cart, onUpdateQuantity, onCheckout, isCheckingOut, checko
                 className="cart-qty-btn plus"
                 onClick={() => onUpdateQuantity(item.name, 1)}
                 aria-label={`Increase quantity of ${item.name}`}
-                title="Add one"
+                title={item.quantity >= item.maxQuantity ? 'Daily stock limit reached' : 'Add one'}
+                disabled={Number.isInteger(item.maxQuantity) && item.quantity >= item.maxQuantity}
               >
                 +
               </button>

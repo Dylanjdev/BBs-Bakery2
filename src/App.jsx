@@ -15,59 +15,13 @@ const Reviews = lazy(() => import('./components/Reviews'));
 const Menu = lazy(() => import('./components/Menu'));
 const Hours = lazy(() => import('./components/Hours'));
 const HomeHighlights = lazy(() => import('./components/HomeHighlights'));
+const LocalDessertGuide = lazy(() => import('./components/LocalDessertGuide'));
 const OrderingGuide = lazy(() => import('./components/OrderingGuide'));
 const CustomCakeForm = lazy(() => import('./components/CustomCakeForm'));
 const Catering = lazy(() => import('./components/Catering'));
 const FAQ = lazy(() => import('./components/FAQ'));
 const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
-
-// Check if ordering is allowed based on current time and day
-function getOrderingStatus() {
-  const now = new Date();
-  const day = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
-  const currentTime = now.getHours() + now.getMinutes() / 60;
-
-  const isTuesdayToFriday = day >= 2 && day <= 5;
-  const isSaturday = day === 6;
-  const OPENING_TIME = isSaturday ? 10 : 8;
-  const CUTOFF_TIME = 16;
-
-  if (day === 0 || day === 1) {
-    return {
-      isOrderingAllowed: false,
-      message: 'We are closed on Sundays and Mondays. Orders reopen Tuesday at 8:00 AM.'
-    };
-  }
-
-  if (!isTuesdayToFriday && !isSaturday) {
-    return {
-      isOrderingAllowed: false,
-      message: 'Orders are currently unavailable.'
-    };
-  }
-
-  // Check if before opening time
-  if (currentTime < OPENING_TIME) {
-    return {
-      isOrderingAllowed: false,
-      message: `Orders are not available yet. We open for online orders at ${isSaturday ? '10:00 AM' : '8:00 AM'}.`
-    };
-  }
-
-  // Check if after cutoff time
-  if (currentTime >= CUTOFF_TIME) {
-    return {
-      isOrderingAllowed: false,
-      message: 'Orders are closed for the day. The daily cutoff is 4:00 PM. Please come back during business hours.'
-    };
-  }
-
-  return {
-    isOrderingAllowed: true,
-    message: ''
-  };
-}
 
 function getIsAdminRoute() {
   if (typeof window === 'undefined') {
@@ -179,8 +133,9 @@ function App() {
     }
 
     return {
-      ...getOrderingStatus(),
+      isOrderingAllowed: true,
       isGloballyEnabled: true,
+      message: '',
     };
   }, [globalOrderingControl]);
 
@@ -284,13 +239,32 @@ function App() {
   }
 
   const addToCart = (item) => {
+    const isSeasonalPreOrder = item?.isSeasonalPreOrder === true;
+
     if (item?.isUnavailableToday) {
       setCheckoutError(`${item.name} is unavailable for online ordering.`);
       return;
     }
 
-    if (!orderingStatus.isOrderingAllowed) {
+    if (!orderingStatus.isOrderingAllowed && !isSeasonalPreOrder) {
       setCheckoutError(orderingStatus.message);
+      return;
+    }
+
+    if (
+      cart.length > 0
+      && cart.some((cartItem) => (cartItem?.isSeasonalPreOrder === true) !== isSeasonalPreOrder)
+    ) {
+      setCheckoutError('Thanksgiving pre-orders must be checked out separately from regular menu items.');
+      return;
+    }
+
+    const existingItem = cart.find((cartItem) => cartItem.name === item.name);
+    if (
+      Number.isInteger(item?.maxQuantity)
+      && (existingItem?.quantity || 0) >= item.maxQuantity
+    ) {
+      setCheckoutError(`Only ${item.maxQuantity} ${item.name} available today.`);
       return;
     }
     setCheckoutError('');
@@ -308,6 +282,15 @@ function App() {
   };
 
   const updateQuantity = (itemName, change) => {
+    const currentItem = cart.find((item) => item.name === itemName);
+    if (
+      change > 0
+      && Number.isInteger(currentItem?.maxQuantity)
+      && currentItem.quantity + change > currentItem.maxQuantity
+    ) {
+      setCheckoutError(`Only ${currentItem.maxQuantity} ${currentItem.name} available today.`);
+      return;
+    }
     setCheckoutError('');
     setCart((current) =>
       current
@@ -325,7 +308,15 @@ function App() {
       return;
     }
 
-    if (!orderingStatus.isOrderingAllowed) {
+    const hasSeasonalPreOrders = cart.some((item) => item?.isSeasonalPreOrder === true);
+    const hasRegularItems = cart.some((item) => item?.isSeasonalPreOrder !== true);
+
+    if (hasSeasonalPreOrders && hasRegularItems) {
+      setCheckoutError('Thanksgiving pre-orders must be checked out separately from regular menu items.');
+      return;
+    }
+
+    if (!orderingStatus.isOrderingAllowed && !hasSeasonalPreOrders) {
       setCheckoutError(orderingStatus.message);
       return;
     }
@@ -381,6 +372,7 @@ function App() {
           <>
             <Hero />
             <HomeHighlights />
+            <LocalDessertGuide />
             <Hours />
           </>
         );
@@ -416,6 +408,7 @@ function App() {
     <ErrorBoundary>
       <div className="App">
         <Header 
+          currentPath={currentPath}
           cart={cart}
           onUpdateQuantity={updateQuantity}
           onCheckout={handleCheckout}

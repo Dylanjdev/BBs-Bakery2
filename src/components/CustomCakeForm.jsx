@@ -16,6 +16,12 @@ const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mdabeylq';
 
 const BLOCKED_DATES = [
   '2026-05-29', // fully booked
+  '2026-11-25',
+  '2026-11-26',
+  '2026-11-27',
+  '2026-11-28',
+  '2026-11-29',
+  '2026-11-30',
 ];
 
 const processSteps = [
@@ -229,7 +235,9 @@ function CustomCakeForm() {
                 <label>
                   Event Date
                   <input type="date" name="eventDate" required min={minLeadDate} />
-                  <span className="custom-cake-inline-help">Custom cakes must be ordered at least 14 days ahead.</span>
+                  <span className="custom-cake-inline-help">
+                    Custom cakes must be ordered at least 14 days ahead. November 25–30, 2026 is unavailable.
+                  </span>
                 </label>
 
                 <label>

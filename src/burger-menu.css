@@ -4,9 +4,6 @@
   outline: none;
 }
 @media (max-width: 1180px) {
-  nav.dn.db-ns.flex.items-center {
-    display: none !important;
-  }
   .burger-toggle {
     display: flex !important;
   }
@@ -127,6 +124,22 @@
   opacity: 1;
   visibility: visible;
   transform: scaleY(1);
+}
+
+.mobile-nav-link {
+  color: #1a1a1a;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link:focus-visible,
+.mobile-nav-link.active {
+  color: #a93665;
+  background: rgba(255, 255, 255, 0.68);
 }
 
 @media (max-width: 520px) {

@@ -302,7 +302,7 @@ const About = () => (
             maxWidth: '720px',
           }}
         >
-          Visit us at 103 Main St in Pennington Gap, or check the menu page for online ordering during open hours.
+          Visit us at 103 Main St in Pennington Gap, or check the menu page for online ordering availability.
         </p>
       </div>
 

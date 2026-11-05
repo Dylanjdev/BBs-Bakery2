@@ -7,11 +7,11 @@ import '../hours-fix.css';
 const weeklyHours = [
   { day: 'Sunday', hours: 'Closed', isClosed: true },
   { day: 'Monday', hours: 'Closed', isClosed: true },
-  { day: 'Tuesday', hours: '7:00 AM - 4:00 PM' },
-  { day: 'Wednesday', hours: '7:00 AM - 4:00 PM' },
-  { day: 'Thursday', hours: '7:00 AM - 4:00 PM' },
-  { day: 'Friday', hours: '7:00 AM - 4:00 PM' },
-  { day: 'Saturday', hours: '8:00 AM - 4:00 PM' },
+  { day: 'Tuesday', hours: '7:00 AM - 3:00 PM' },
+  { day: 'Wednesday', hours: '7:00 AM - 3:00 PM' },
+  { day: 'Thursday', hours: '7:00 AM - 3:00 PM' },
+  { day: 'Friday', hours: '7:00 AM - 3:00 PM' },
+  { day: 'Saturday', hours: '8:00 AM - 3:00 PM' },
 ];
 
 function getOpenStatus() {
@@ -21,16 +21,16 @@ function getOpenStatus() {
   const isTuesdayToFriday = day >= 2 && day <= 5;
   const isSaturday = day === 6;
   const isOpen =
-    (isTuesdayToFriday && currentTime >= 7 && currentTime < 16) ||
-    (isSaturday && currentTime >= 8 && currentTime < 16);
+    (isTuesdayToFriday && currentTime >= 7 && currentTime < 15) ||
+    (isSaturday && currentTime >= 8 && currentTime < 15);
 
   let statusText = '';
   let detailText = '';
 
   if (isOpen) {
     statusText = 'Open Now';
-    detailText = 'Stop in before 4:00 PM for fresh bakery and cafe favorites.';
-  } else if (day === 0 || day === 1 || (day === 6 && currentTime >= 16)) {
+    detailText = 'Stop in before 3:00 PM for fresh bakery and cafe favorites.';
+  } else if (day === 0 || day === 1 || (day === 6 && currentTime >= 15)) {
     statusText = 'Closed Today';
     detailText = 'We open again Tuesday at 7:00 AM.';
   } else if (day === 6 && currentTime < 8) {
@@ -39,10 +39,10 @@ function getOpenStatus() {
   } else if (day >= 2 && day <= 5 && currentTime < 7) {
     statusText = 'Closed Now';
     detailText = 'We open today at 7:00 AM.';
-  } else if (day >= 2 && day <= 4 && currentTime >= 16) {
+  } else if (day >= 2 && day <= 4 && currentTime >= 15) {
     statusText = 'Closed Now';
     detailText = 'We open tomorrow at 7:00 AM.';
-  } else if (day === 5 && currentTime >= 16) {
+  } else if (day === 5 && currentTime >= 15) {
     statusText = 'Closed Now';
     detailText = 'We open Saturday at 8:00 AM.';
   } else {
