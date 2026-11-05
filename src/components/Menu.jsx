@@ -97,7 +97,6 @@ const sections = [
   {
     title: 'Daily Bakes',
     dailyMenu: true,
-    availableDays: [0, 1, 2, 3, 4, 5, 6], // All days
     items: [
       { name: 'Blueberry Scones', lookupName: 'Scone (Regular)', variationId: 'B26BFSNNVQMR2LTHWV75JJBH', fallbackAmount: 300 },
       { name: 'Pumpkin Roll Slice', variationId: 'TQ7TU26C5LVCIJVCULF5RK7L', fallbackAmount: 300 },
@@ -109,7 +108,7 @@ const sections = [
   {
     title: 'Tuesday Spotlight Bake',
     dailyMenu: true,
-    availableDays: [2], // Tuesday
+    availableDays: [2], // Tuesday only
     items: [
       { name: 'Cookie Butter Tres Leches', lookupName: 'Slice Of Cake (tres leches)', variationId: 'CZT35QGKBILYS3FD22RCHYAU', fallbackAmount: 500 },
     ],
@@ -117,7 +116,7 @@ const sections = [
   {
     title: 'Wednesday Spotlight Bake',
     dailyMenu: true,
-    availableDays: [3], // Wednesday
+    availableDays: [3], // Wednesday only
     items: [
       { name: 'Apple Butter Danishes', lookupName: 'Danish (Regular)', variationId: 'NANPTO7A32H2D2STQDXD4CEI', fallbackAmount: 400 },
       { name: 'Cinnamon Rolls', lookupName: 'Cinnamon Roll (Regular)', variationId: '4EVFHDZ3LHYZOXF4EOGMD3JZ', fallbackAmount: 500 },
@@ -126,7 +125,7 @@ const sections = [
   {
     title: 'Thursday Spotlight Bake',
     dailyMenu: true,
-    availableDays: [4], // Thursday
+    availableDays: [4], // Thursday only
     items: [
       { name: 'Little Debbie Christmas Tree Cheesecake Slice', lookupName: 'Slice Of Cake (cheesecake slice)', variationId: 'S3CPM4OGZKJPDIYCEPDLXQVM', fallbackAmount: 600 },
     ],
@@ -134,7 +133,7 @@ const sections = [
   {
     title: 'Friday Spotlight Bake',
     dailyMenu: true,
-    availableDays: [5], // Friday
+    availableDays: [5], // Friday only
     items: [
       { name: 'Little Debbie Christmas Tree Cheesecake Slice', lookupName: 'Slice Of Cake (cheesecake slice)', variationId: 'S3CPM4OGZKJPDIYCEPDLXQVM', fallbackAmount: 600 },
       { name: 'Sun Dried Tomato & Feta Quiche', lookupName: 'Quiche Slice (single)', variationId: 'BJ6WQGCEQMZV2XAPYNUUH533', fallbackAmount: 350 },
@@ -143,7 +142,7 @@ const sections = [
   {
     title: 'Saturday Spotlight Bake',
     dailyMenu: true,
-    availableDays: [6], // Saturday
+    availableDays: [6], // Saturday only
     items: [
       { name: 'Carrot Cake', lookupName: 'Slice Of Cake (3 layer/specialty)', variationId: 'XDNGFNGIS7L4ZOVUID3XGINS', fallbackAmount: 600 },
     ],
@@ -765,14 +764,6 @@ const formatPriceRange = (priceOptions = []) => {
   return uniqueLabels.join('–');
 };
 
-const isAvailableToday = (section) => {
-  if (!section.availableDays || section.availableDays.length === 0) {
-    return true; // If no availableDays specified, always available
-  }
-  const today = new Date().getDay();
-  return section.availableDays.includes(today);
-};
-
 const Menu = ({ onAddToCart, orderingStatus }) => {
   const [squareItems, setSquareItems] = useState([]);
   const [squareLookup, setSquareLookup] = useState(new Map());
@@ -936,6 +927,9 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                   ? sizeOptions.some(isSquareOptionOrderable)
                   : null;
 
+                // Check if this item is available today
+                const isItemAvailableToday = !section.availableDays || section.availableDays.includes(new Date().getDay());
+
                 return {
                   ...item,
                   name: section.dailyMenu && live?.menuName ? live.menuName : item.name,
@@ -948,13 +942,15 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                   remainingStock: orderOption?.remainingStock,
                   stockConfigured: orderOption?.stockConfigured === true,
                   isOnlineOrderable:
-                    availabilitySource?.visible !== false
+                    isItemAvailableToday
+                    && availabilitySource?.visible !== false
                     && (hasOrderableSize ?? isSquareOptionOrderable(orderOption)),
                   // Curated menu entries always stay visible. Square availability
                   // controls ordering below, not whether the published menu vanishes.
                   visible: Boolean(live) || keepCuratedVisible,
                   isUnavailableToday:
-                    availabilitySource?.visible === false
+                    !isItemAvailableToday
+                    || availabilitySource?.visible === false
                     || !(hasOrderableSize ?? isSquareOptionOrderable(orderOption)),
                   label: `${
                     section.dailyMenu
@@ -1489,7 +1485,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
 
             <div className="daily-menu-columns">
               {enrichedSections
-                .filter((section) => section.dailyMenu && isAvailableToday(section))
+                .filter((section) => section.dailyMenu)
                 .map((section, sectionIndex) => (
                   <section
                     className={`daily-menu-group${sectionIndex === 0 ? ' daily-menu-group--primary' : ''}`}
@@ -1506,6 +1502,11 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                         >
                           <div className="daily-menu-item__details">
                             <h4>{item.name}</h4>
+                            {!item.isOnlineOrderable && item.isUnavailableToday && !item.stockConfigured ? (
+                              <span className="daily-stock-chip not-available-today">
+                                Not available today
+                              </span>
+                            ) : null}
                             {item.stockConfigured ? (
                               <span className={`daily-stock-chip${item.remainingStock > 0 ? '' : ' sold-out'}`}>
                                 {item.remainingStock > 0

@@ -550,6 +550,11 @@
   color: #9f1239;
 }
 
+.daily-stock-chip.not-available-today {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .daily-menu-board {
   --daily-menu-frame-width: clamp(16px, 2.2vw, 22px);
   --daily-menu-flower-width: 42px;
