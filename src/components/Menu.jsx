@@ -99,7 +99,7 @@ const sections = [
     dailyMenu: true,
     items: [
       { name: 'Blueberry Scones', lookupName: 'Scone (Regular)', variationId: 'B26BFSNNVQMR2LTHWV75JJBH', fallbackAmount: 300 },
-      { name: 'Pumpkin Roll Slice', lookupName: 'Pumpkin Roll (roll slice)', variationId: 'TQ7TU26C5LVCIJVCULF5RK7L', fallbackAmount: 300 },
+      { name: 'Pumpkin Roll Slice', variationId: 'TQ7TU26C5LVCIJVCULF5RK7L', fallbackAmount: 300 },
       { name: 'Chocolate Chip Banana Muffins', lookupName: 'Muffin (single)', variationId: 'YATUUQKWZKNHIJAL5PKKXWQH', fallbackAmount: 300 },
       { name: 'Chocolate Chip Cookies', lookupName: 'Cookie (Regular)', variationId: '7WCHB3ZABC72COZYGSSTF2SS', fallbackAmount: 250 },
       { name: 'Ham & Swiss Croissants', lookupName: 'Croissant (specialty)', variationId: 'IU5OOQJJI5XQD3YQ2O7TFAEC', fallbackAmount: 500 },
