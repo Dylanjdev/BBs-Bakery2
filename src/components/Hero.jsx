@@ -223,10 +223,10 @@ const Hero = () => (
         }}
       >
         <img
-          src="/assets/images/CoverPhoto.webp"
-          alt="Fresh baked pastries and breads at BB's Bakery & Cafe in Pennington Gap, Virginia"
-          width="1200"
-          height="600"
+          src="/assets/images/berry-danishes.jpg"
+          alt="Fresh berry danishes with icing at BB's Bakery & Cafe in Pennington Gap, Virginia"
+          width="900"
+          height="1200"
           loading="eager"
           fetchPriority="high"
           decoding="sync"
@@ -235,7 +235,7 @@ const Hero = () => (
             height: '100%',
             minHeight: 'inherit',
             objectFit: 'cover',
-            objectPosition: 'center',
+            objectPosition: 'center 46%',
             display: 'block',
             filter: 'saturate(1.05) contrast(1.04)'
           }}

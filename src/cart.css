@@ -584,6 +584,34 @@
   font-style: italic;
 }
 
+.cart-pickup-note {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.8rem 0;
+  padding: 0.8rem 0.9rem;
+  color: #31552d;
+  background: #f1f8ee;
+  border: 1px solid #9aba8d;
+  border-radius: 10px;
+}
+
+.cart-pickup-note.preorder {
+  color: #7a294b;
+  background: #fff5f8;
+  border-color: #f3b7ce;
+}
+
+.cart-pickup-note strong {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+}
+
+.cart-pickup-note span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 .cart-customer-field {
   display: flex;
   flex-direction: column;

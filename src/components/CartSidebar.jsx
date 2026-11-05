@@ -23,6 +23,8 @@ const CartSidebar = ({ cart, onUpdateQuantity, onCheckout, isCheckingOut, checko
     );
   }
 
+  const isPreOrderCart = cart.every((item) => item?.isSeasonalPreOrder === true);
+
   return (
     <div className="cart-container">
       <div className="cart-header">
@@ -85,6 +87,15 @@ const CartSidebar = ({ cart, onUpdateQuantity, onCheckout, isCheckingOut, checko
         <p className="cart-tax-note">
           Sales tax added at checkout
         </p>
+
+        <div className={`cart-pickup-note${isPreOrderCart ? ' preorder' : ''}`}>
+          <strong>{isPreOrderCart ? 'Preorder pickup' : 'Ready in 15 minutes'}</strong>
+          <span>
+            {isPreOrderCart
+              ? 'These items keep their scheduled preorder pickup date.'
+              : 'Your curbside order will be ready in 15 minutes after checkout.'}
+          </span>
+        </div>
 
         <button
           type="button"

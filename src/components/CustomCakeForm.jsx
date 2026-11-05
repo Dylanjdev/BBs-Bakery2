@@ -38,7 +38,7 @@ const processSteps = [
   {
     icon: faCakeCandles,
     title: 'Pick Up & Celebrate',
-    text: 'Custom cakes are pickup only from BB\'s Bakery & Cafe on Main Street.',
+    text: 'Custom cakes are preorder only and picked up from BB\'s Bakery & Cafe on Main Street.',
   },
 ];
 
@@ -46,6 +46,128 @@ const cakeNotes = [
   { icon: faClock, text: 'Please request custom cakes at least 14 days ahead.' },
   { icon: faCamera, text: 'Upload a few photos so we can understand your style.' },
   { icon: faPhone, text: 'Need help before submitting? Call (276) 537-0189.' },
+];
+
+const cakeGallery = [
+  {
+    src: '/assets/images/white-vintage-tiered-cake.jpg',
+    alt: 'Two-tier white vintage piped celebration cake made by BB\'s Bakery',
+    label: 'Vintage tiered cake',
+  },
+  {
+    src: '/assets/images/pink-vintage-cake.jpg',
+    alt: 'Pink and white vintage piped custom cake',
+    label: 'Pink vintage piping',
+  },
+  {
+    src: '/assets/images/strawberry-cat-cake.jpg',
+    alt: 'Cat-themed custom cake with strawberries and buttercream decorations',
+    label: 'Themed birthday cake',
+  },
+  {
+    src: '/assets/images/chocolate-candy-cake.jpg',
+    alt: 'Chocolate birthday cake covered in chocolate candy pieces',
+    label: 'Chocolate candy cake',
+  },
+  {
+    src: '/assets/images/oatmeal-cream-pie-cake.jpg',
+    alt: 'Custom cake topped with oatmeal cream pies and piped buttercream',
+    label: 'Oatmeal cream pie cake',
+  },
+  {
+    src: '/assets/images/race-car-birthday-cake.jpg',
+    alt: 'Custom race car birthday cake with toy cars and checkered flags',
+    label: 'Race car birthday cake',
+  },
+];
+
+const cakeFaqs = [
+  {
+    question: 'How far ahead should I order a custom cake?',
+    answer: 'Please submit your request at least 14 days before your event. More notice is helpful for larger, tiered, or highly detailed designs.',
+  },
+  {
+    question: 'Where do I pick up my custom cake?',
+    answer: "Custom cake pickup is at BB's Bakery & Cafe, 103 Main St in Pennington Gap, Virginia. We will confirm the pickup time with your order.",
+  },
+  {
+    question: 'Can I send inspiration photos?',
+    answer: 'Yes. Use the request form to upload a few photos and tell us which colors, piping, theme, or design details you like.',
+  },
+  {
+    question: 'Is submitting the form a confirmed order?',
+    answer: 'Not yet. The bakery will follow up to confirm availability, final design, price, and pickup details before your order is booked.',
+  },
+  {
+    question: 'Do custom cakes ship or get delivered?',
+    answer: "Custom cakes are pickup-only from BB's Bakery & Cafe on Main Street in Pennington Gap. Your confirmed order will include a pickup time.",
+  },
+  {
+    question: 'Can you copy an inspiration cake exactly?',
+    answer: 'Inspiration photos help us understand the look you love. We will use them as a direction and confirm the design BB\'s Bakery can create for your cake.',
+  },
+  {
+    question: 'What affects the price of a custom cake?',
+    answer: 'Serving count, number of tiers, design complexity, flavor and filling choices, and specialty decorative details all help determine the final quote.',
+  },
+  {
+    question: 'Can I ask about an allergy or dietary need?',
+    answer: 'Yes. Include the details in your request so the bakery can discuss ingredients and what may be possible. A request does not guarantee an allergen-free cake.',
+  },
+];
+
+const cakeStyles = [
+  {
+    number: '01',
+    title: 'Vintage Piping',
+    text: 'Layered borders, delicate swags, shell details, and a color palette that can feel romantic, playful, or wonderfully retro.',
+  },
+  {
+    number: '02',
+    title: 'Themed Birthdays',
+    text: 'Build the design around a favorite character, hobby, color story, or party theme, then add personalized wording for the guest of honor.',
+  },
+  {
+    number: '03',
+    title: 'Tiered Celebrations',
+    text: 'Create extra presence for showers, anniversaries, milestone birthdays, and larger gatherings with a coordinated tiered design.',
+  },
+  {
+    number: '04',
+    title: 'Cake & Cupcake Sets',
+    text: 'Ask about pairing a centerpiece cake with coordinated cupcakes when you want easier serving or a little more variety on the dessert table.',
+  },
+];
+
+const servingRanges = [
+  {
+    range: '10–15',
+    label: 'Small gathering',
+    text: 'A close family birthday, dinner, or intimate celebration.',
+  },
+  {
+    range: '16–25',
+    label: 'Classic party',
+    text: 'A typical birthday, shower, or small office celebration.',
+  },
+  {
+    range: '26–40',
+    label: 'Bigger celebration',
+    text: 'More guests, more design room, and possible tiered options.',
+  },
+  {
+    range: '41–60+',
+    label: 'Large event',
+    text: 'A larger guest list that needs early planning and a custom recommendation.',
+  },
+];
+
+const quoteFactors = [
+  'How many guests the cake should serve',
+  'Single-tier or multi-tier construction',
+  'Piping, colors, artwork, and design complexity',
+  'Cake flavor, filling, and frosting requests',
+  'Specialty decorations and personalized details',
 ];
 
 function getMinLeadDateString() {
@@ -130,10 +252,11 @@ function CustomCakeForm() {
         <div className="custom-cake-hero">
           <div className="custom-cake-intro">
             <p className="custom-cake-kicker">Custom Cakes In Pennington Gap</p>
-            <h2 id="custom-cakes-heading">Let BB's Bakery & Cafe make the cake everyone talks about.</h2>
+            <h1 id="custom-cakes-heading">Custom cakes made for your biggest moments.</h1>
             <p>
-              Birthdays, showers, office celebrations, themed cakes, and sweet little surprises all start here.
-              Tell us what you are dreaming up and we will follow up to confirm availability, pricing, and pickup timing.
+              Request custom birthday cakes, themed cakes, tiered celebration cakes, and cupcakes from our bakery in
+              Pennington Gap, Virginia. Tell us what you are dreaming up and we will follow up to confirm availability,
+              pricing, design details, and pickup timing.
             </p>
 
             <div className="custom-cake-actions" aria-label="Custom cake contact actions">
@@ -151,17 +274,21 @@ function CustomCakeForm() {
           <div className="custom-cake-photo-stack" aria-label="Custom cake examples">
             <figure className="custom-cake-feature-photo">
               <img
-                src="/assets/images/dotcake.webp"
-                alt="Viral dot cake from BB's Bakery & Cafe"
+                src="/assets/images/blackberry-pomegranate-tiered-cake.jpg"
+                alt="Custom tiered cake with blackberries and pomegranate made by BB's Bakery"
+                width="900"
+                height="1200"
                 loading="eager"
                 decoding="async"
               />
-              <figcaption>Viral dot cakes and celebration sweets</figcaption>
+              <figcaption>Custom cakes handcrafted in Pennington Gap</figcaption>
             </figure>
             <figure className="custom-cake-small-photo">
               <img
-                src="/assets/images/cupcakes.webp"
-                alt="Fresh cupcakes from BB's Bakery & Cafe"
+                src="/assets/images/pink-vintage-cake.jpg"
+                alt="Pink vintage piped custom cake from BB's Bakery"
+                width="900"
+                height="1200"
                 loading="lazy"
                 decoding="async"
               />
@@ -180,6 +307,97 @@ function CustomCakeForm() {
             </article>
           ))}
         </div>
+
+        <section className="custom-cake-showcase" aria-labelledby="custom-cake-showcase-heading">
+          <div className="custom-cake-showcase-copy">
+            <p className="custom-cake-kicker">Made Locally</p>
+            <h2 id="custom-cake-showcase-heading">Custom birthday and celebration cakes in Pennington Gap, VA</h2>
+            <p>
+              Every request begins with your occasion, guest count, favorite flavors, and design inspiration. We make
+              cakes for birthdays, baby showers, anniversaries, office celebrations, and other special events for
+              customers across Lee County and Southwest Virginia.
+            </p>
+            <p>
+              Custom cakes are preorder-only and available for pickup at our Main Street bakery. Share your ideas below,
+              and our team will help shape the size, style, colors, and details into a cake that fits your celebration.
+            </p>
+          </div>
+
+          <div className="custom-cake-gallery" aria-label="Recent custom cake designs">
+            {cakeGallery.map((cake) => (
+              <figure key={cake.src}>
+                <img
+                  src={cake.src}
+                  alt={cake.alt}
+                  width="900"
+                  height="1200"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>{cake.label}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+
+        <section className="custom-cake-styles" aria-labelledby="custom-cake-styles-heading">
+          <div className="custom-cake-section-heading">
+            <p className="custom-cake-kicker">Find Your Direction</p>
+            <h2 id="custom-cake-styles-heading">Start with a style, then make it completely yours.</h2>
+            <p>
+              You do not need to know every detail before reaching out. Choose the kind of feeling you want, share a few
+              references, and tell us which parts matter most. We will confirm what works for your date, servings, and budget.
+            </p>
+          </div>
+
+          <div className="custom-cake-style-grid">
+            {cakeStyles.map((style) => (
+              <article key={style.title}>
+                <span>{style.number}</span>
+                <h3>{style.title}</h3>
+                <p>{style.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="custom-cake-planning" aria-label="Custom cake serving and quote planning">
+          <div className="custom-cake-serving-panel">
+            <p className="custom-cake-kicker">Plan The Servings</p>
+            <h2>How much cake do you need?</h2>
+            <p className="custom-cake-planning-intro">
+              Start with the number of people you expect to serve. Final cake size depends on the design and how each cake
+              is cut, so the bakery will recommend the right format after reviewing your request.
+            </p>
+
+            <div className="custom-cake-serving-grid">
+              {servingRanges.map((item) => (
+                <article key={item.range}>
+                  <strong>{item.range}</strong>
+                  <div>
+                    <h3>{item.label}</h3>
+                    <p>{item.text}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <aside className="custom-cake-quote-panel">
+            <p className="custom-cake-kicker">Your Custom Quote</p>
+            <h2>What shapes the price?</h2>
+            <p>
+              Custom cake pricing is based on the complete request rather than one flat price. These are the details that
+              help us prepare an accurate quote:
+            </p>
+            <ul>
+              {quoteFactors.map((factor) => (
+                <li key={factor}>{factor}</li>
+              ))}
+            </ul>
+            <a href="#custom-cake-request-form">Request a Cake Quote</a>
+          </aside>
+        </section>
 
         <div className="custom-cake-request-layout">
           <aside className="custom-cake-notes" aria-label="Custom cake notes">
@@ -328,6 +546,21 @@ function CustomCakeForm() {
             </form>
           </div>
         </div>
+
+        <section className="custom-cake-faq" aria-labelledby="custom-cake-faq-heading">
+          <div>
+            <p className="custom-cake-kicker">Custom Cake FAQ</p>
+            <h2 id="custom-cake-faq-heading">Before you send your request</h2>
+          </div>
+          <div className="custom-cake-faq-list">
+            {cakeFaqs.map((item) => (
+              <article key={item.question}>
+                <h3>{item.question}</h3>
+                <p>{item.answer}</p>
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
     </section>
   );

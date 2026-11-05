@@ -28,24 +28,57 @@ const specialties = [
 
 const gallery = [
   {
-    src: '/assets/images/CoverPhoto.webp',
-    alt: "BB's Bakery & Cafe shop display",
-    label: 'Cafe favorites',
+    src: '/assets/images/berry-danishes.jpg',
+    alt: 'Fresh berry danishes with icing in the bakery case',
+    label: 'Fresh berry danishes',
   },
   {
-    src: '/assets/images/cupcakes.webp',
-    alt: 'Fresh cupcakes with piped frosting',
-    label: 'Fresh cupcakes',
+    src: '/assets/images/sea-salt-chocolate-chip-cookies.jpg',
+    alt: 'Fresh chocolate chip cookies finished with flaky sea salt',
+    label: 'Sea salt cookies',
   },
   {
-    src: '/assets/images/blueberryglazeddonuts.webp',
-    alt: 'Blueberry glazed donuts',
-    label: 'Blueberry glazed donuts',
+    src: '/assets/images/fresh-cinnamon-rolls.jpg',
+    alt: 'A pan of freshly baked cinnamon rolls',
+    label: 'Cinnamon rolls',
   },
   {
-    src: '/assets/images/dotcake.webp',
-    alt: 'Viral sprinkle-covered dot cakes',
-    label: 'Viral dot cakes',
+    src: '/assets/images/savory-quiche.jpg',
+    alt: 'Slices of savory quiche in a flaky pastry crust',
+    label: 'Savory quiche',
+  },
+];
+
+const bakeryGallery = [
+  {
+    src: '/assets/images/raspberry-scones.jpg',
+    alt: 'Glazed raspberry scones arranged in a bakery tray',
+    label: 'Raspberry scones',
+  },
+  {
+    src: '/assets/images/carrot-cake-cupcakes.jpg',
+    alt: 'Carrot cake cupcakes with cream cheese frosting and piped carrots',
+    label: 'Carrot cake cupcakes',
+  },
+  {
+    src: '/assets/images/pumpkin-cheesecake-slices.jpg',
+    alt: 'Pumpkin cheesecake sliced and topped with whipped cream',
+    label: 'Pumpkin cheesecake',
+  },
+  {
+    src: '/assets/images/chocolate-candy-cake.jpg',
+    alt: 'Chocolate celebration cake covered with chocolate candy pieces',
+    label: 'Chocolate candy cake',
+  },
+  {
+    src: '/assets/images/oatmeal-cream-pie-cake.jpg',
+    alt: 'Custom cake decorated with oatmeal cream pies and piped frosting',
+    label: 'Oatmeal cream pie cake',
+  },
+  {
+    src: '/assets/images/strawberry-chocolate-cake.jpg',
+    alt: 'Chocolate cake topped with fresh sliced strawberries',
+    label: 'Strawberry chocolate cake',
   },
 ];
 
@@ -86,7 +119,7 @@ const About = () => (
           Our Story
         </p>
 
-        <h2
+        <h1
           id="about-heading"
           style={{
             margin: '0 0 1.1rem',
@@ -98,7 +131,7 @@ const About = () => (
           }}
         >
           A bakery and cafe built around better mornings.
-        </h2>
+        </h1>
 
         <p
           style={{
@@ -192,6 +225,8 @@ const About = () => (
             <img
               src={item.src}
               alt={item.alt}
+              width="900"
+              height="1200"
               loading={index === 0 ? 'eager' : 'lazy'}
               decoding="async"
               style={{
@@ -267,6 +302,32 @@ const About = () => (
         </article>
       ))}
     </div>
+
+    <section className="bakery-gallery-section" aria-labelledby="bakery-gallery-heading">
+      <div className="bakery-gallery-heading">
+        <p>From Our Bakery</p>
+        <h2 id="bakery-gallery-heading">A little look at what we make.</h2>
+        <span>
+          The bakery case changes, but you can always expect something fresh, colorful, and made to share.
+        </span>
+      </div>
+
+      <div className="bakery-gallery-grid">
+        {bakeryGallery.map((item) => (
+          <figure key={item.src}>
+            <img
+              src={item.src}
+              alt={item.alt}
+              width="900"
+              height="1200"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>{item.label}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
 
     <div
       className="about-community"
@@ -345,6 +406,10 @@ const About = () => (
         .about-values {
           grid-template-columns: 1fr !important;
         }
+
+        .bakery-gallery-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
       }
 
       @media (max-width: 640px) {
@@ -373,9 +438,100 @@ const About = () => (
           grid-template-columns: 1fr !important;
         }
 
+        .bakery-gallery-grid {
+          grid-template-columns: 1fr !important;
+        }
+
+        .bakery-gallery-grid figure:nth-child(n) {
+          min-height: 300px !important;
+          grid-column: auto !important;
+        }
+
         .about-menu-link {
           width: 100%;
         }
+      }
+
+      .bakery-gallery-section {
+        margin-bottom: clamp(2rem, 6vw, 4rem);
+      }
+
+      .bakery-gallery-heading {
+        max-width: 720px;
+        margin-bottom: 1.5rem;
+      }
+
+      .bakery-gallery-heading > p {
+        margin: 0 0 0.55rem;
+        color: #d65a8c;
+        font-family: Quicksand, sans-serif;
+        font-size: 0.9rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .bakery-gallery-heading h2 {
+        margin: 0 0 0.65rem;
+        color: #1a1a1a;
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2rem, 5vw, 3rem);
+        line-height: 1.08;
+      }
+
+      .bakery-gallery-heading > span {
+        display: block;
+        color: #6d6d6d;
+        font-family: Quicksand, sans-serif;
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .bakery-gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-auto-rows: 260px;
+        gap: 1rem;
+      }
+
+      .bakery-gallery-grid figure {
+        position: relative;
+        min-width: 0;
+        margin: 0;
+        overflow: hidden;
+        border-radius: 18px;
+        background: #f8f1f5;
+        box-shadow: 0 14px 34px rgba(42, 42, 42, 0.11);
+      }
+
+      .bakery-gallery-grid figure:nth-child(1),
+      .bakery-gallery-grid figure:nth-child(6) {
+        grid-column: span 2;
+      }
+
+      .bakery-gallery-grid img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.35s ease;
+      }
+
+      .bakery-gallery-grid figure:hover img {
+        transform: scale(1.025);
+      }
+
+      .bakery-gallery-grid figcaption {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        padding: 2.5rem 1rem 0.85rem;
+        color: #fff;
+        background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.66) 100%);
+        font-family: Quicksand, sans-serif;
+        font-size: 0.94rem;
+        font-weight: 800;
       }
     `}</style>
   </section>

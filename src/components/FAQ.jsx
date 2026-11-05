@@ -29,7 +29,7 @@ const faqGroups = [
       },
       {
         question: 'Can I pre-order items?',
-        answer: 'Yes. We offer pre-ordering for special items and occasions. Check the menu page for current pre-order items or call us to place your order in advance.',
+        answer: 'Yes. Whole and custom cakes remain preorder only and are not available for 15-minute pickup. Check the menu page for current preorder items or call us to order in advance.',
       },
       {
         question: 'When do I pick up an online order?',

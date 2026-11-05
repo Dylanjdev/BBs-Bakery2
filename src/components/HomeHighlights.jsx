@@ -2,29 +2,34 @@
 
 const featuredItems = [
   {
-    title: 'Blueberry Glazed Donuts',
-    description: 'Soft donuts finished with a glossy blueberry glaze.',
-    image: '/assets/images/blueberryglazeddonuts.webp',
+    title: 'Raspberry Scones',
+    description: 'Tender berry scones finished with a sweet glaze.',
+    image: '/assets/images/raspberry-scones.jpg',
+    alt: 'Fresh glazed raspberry scones in a bakery tray',
   },
   {
-    title: 'Loaded Brownies',
-    description: 'Rich chocolate brownies with toasted marshmallow and sweet crunch.',
-    image: '/assets/images/brownies.webp',
+    title: 'Sea Salt Chocolate Chip Cookies',
+    description: 'Thick chocolate chip cookies with a flaky sea salt finish.',
+    image: '/assets/images/sea-salt-chocolate-chip-cookies.jpg',
+    alt: 'Freshly baked chocolate chip cookies topped with flaky sea salt',
   },
   {
-    title: 'Fresh Cookies',
-    description: 'Small-batch cookies with deep chocolate flavor and flaky salt.',
-    image: '/assets/images/cookies.webp',
+    title: 'Cinnamon Rolls',
+    description: 'Soft, spiraled rolls baked until golden and gooey.',
+    image: '/assets/images/fresh-cinnamon-rolls.jpg',
+    alt: 'A pan of fresh golden cinnamon rolls',
   },
   {
-    title: 'Cupcakes',
-    description: 'Swirled buttercream cupcakes for everyday treats and celebrations.',
-    image: '/assets/images/cupcakes.webp',
+    title: 'Savory Quiche',
+    description: 'Flaky pastry filled with a rich, savory baked custard.',
+    image: '/assets/images/savory-quiche.jpg',
+    alt: 'Slices of savory quiche with a flaky pastry crust',
   },
   {
-    title: 'Viral Dot Cakes',
-    description: 'The colorful sprinkle-covered dot cakes that went viral.',
-    image: '/assets/images/dotcake.webp',
+    title: 'Pumpkin Cheesecake',
+    description: 'Creamy seasonal cheesecake with a spiced pumpkin layer.',
+    image: '/assets/images/pumpkin-cheesecake-slices.jpg',
+    alt: 'Pumpkin cheesecake sliced and topped with whipped cream',
   },
 ];
 
@@ -169,7 +174,9 @@ const HomeHighlights = () => (
           >
             <img
               src={item.image}
-              alt={item.title}
+              alt={item.alt}
+              width="900"
+              height="1200"
               loading={index < 2 ? 'eager' : 'lazy'}
               decoding="async"
               style={{

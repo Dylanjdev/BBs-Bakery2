@@ -45,6 +45,9 @@ const CartModal = ({
 
   if (!isOpen) return null;
 
+  const isPreOrderCart = cart.length > 0
+    && cart.every((item) => item?.isSeasonalPreOrder === true);
+
   return (
     <div className="cart-modal-overlay" onClick={onClose}>
       <div className="cart-modal" onClick={(e) => e.stopPropagation()}>
@@ -127,8 +130,19 @@ const CartModal = ({
                   Sales tax added at checkout
                 </p>
 
+                <div className={`cart-pickup-note${isPreOrderCart ? ' preorder' : ''}`}>
+                  <strong>
+                    {isPreOrderCart ? 'Preorder pickup' : 'Ready in 15 minutes'}
+                  </strong>
+                  <span>
+                    {isPreOrderCart
+                      ? 'These items keep their scheduled preorder pickup date and are not available for 15-minute pickup.'
+                      : 'Your curbside order will be ready in 15 minutes after checkout.'}
+                  </span>
+                </div>
+
                 <label className="cart-customer-field">
-                  <span>Name for pickup</span>
+                  <span>Name for curbside pickup</span>
                   <input
                     type="text"
                     value={customerName}

@@ -17,6 +17,34 @@ import { squareVariationMap } from '../data/squareVariationMap';
 
 const API_BASE_URL = getApiBaseUrl();
 const THANKSGIVING_PICKUP_NOTE = 'Thanksgiving pre-order · Pickup November 25 by 2 PM';
+const SPECIALTY_COFFEE_PREPARATIONS = [
+  {
+    key: 'hot',
+    label: 'Hot',
+    sizeOptions: [
+      { key: '12-oz', label: '12 oz', lookupName: 'Hot Latte (Regular)', variationId: 'C2ZYCTDM2RNI7L6Z63TTBPGH', fallbackAmount: 500 },
+      { key: '20-oz', label: '20 oz', lookupName: 'Hot Latte (Large)', variationId: 'PYWQNX66A6GAA72SYA4AHQI5', fallbackAmount: 600 },
+    ],
+  },
+  {
+    key: 'iced',
+    label: 'Iced',
+    sizeOptions: [
+      { key: '16-oz', label: '16 oz', lookupName: 'Iced Latte (16 oz)', variationId: 'NKI77BCAPTLLGNK5QWHZVHPI', fallbackAmount: 550 },
+      { key: '20-oz', label: '20 oz', lookupName: 'Iced Latte (20 oz)', variationId: 'EOYF3LMYIPWE2U2MWZFSWSWL', fallbackAmount: 650 },
+      { key: '32-oz', label: '32 oz', lookupName: 'Iced Latte (32 oz)', variationId: 'MSLYGJ2QUQYEUTS2JNCCJFIC', fallbackAmount: 750 },
+    ],
+  },
+  {
+    key: 'blended',
+    label: 'Blended',
+    sizeOptions: [
+      { key: '16-oz', label: '16 oz', lookupName: 'Frappe (16 oz)', variationId: '6ISQUXJRZKDF5WW25X5QX4UY', fallbackAmount: 600 },
+      { key: '20-oz', label: '20 oz', lookupName: 'Frappe (20 oz)', variationId: 'JKCQECBTKMCPJBGOGTZGNDZO', fallbackAmount: 700 },
+      { key: '32-oz', label: '32 oz', lookupName: 'Frappe (32 oz)', variationId: 'T7AMKF6IWJZBUW6TWNL6UYBJ', fallbackAmount: 800 },
+    ],
+  },
+];
 const thanksgivingPreOrderItems = [
   {
     name: 'Pumpkin Pie',
@@ -28,17 +56,20 @@ const thanksgivingPreOrderItems = [
     description: '8 inch · 3 layers',
     variationId: 'UAXGS4GAP54A4KQQQ3YVN5G3',
     fallbackAmount: 6500,
+    preorderOnly: true,
   },
   {
     name: 'Brown Butter Pecan Cake',
     description: '8 inch · 3 layers',
     variationId: '7SUP6N44FVRWKHUDHCM74RTJ',
     fallbackAmount: 6500,
+    preorderOnly: true,
   },
   {
     name: 'Pumpkin Pie Cheesecake',
     variationId: 'XCTRTZVC2WW456E24PT57DRY',
     fallbackAmount: 6500,
+    preorderOnly: true,
   },
   {
     name: 'Mini Butter Croissants',
@@ -241,20 +272,14 @@ const sections = [
   },
   {
     title: 'Specialty Coffee',
-    note: 'Pricing & Sizes',
-    priceLookupName: 'Iced Latte (medium)',
-    pricingOptions: [
-      { label: '12 oz', lookupName: 'Iced Latte (small)', fallbackAmount: 550 },
-      { label: '20 oz', lookupName: 'Iced Latte (medium)', fallbackAmount: 650 },
-      { label: '32 oz', lookupName: 'Iced Latte (large)', fallbackAmount: 750 },
-    ],
+    note: 'Available hot, iced, or blended',
+    pricingLines: ['Choose your style and size when ordering'],
     items: [
       { name: 'Tiramisu', lookupName: 'Tiramisu (20 oz)', description: 'mocha + espresso + cream cheese mixture + cold foam + chocolate drizzle', fallbackAmount: 650 },
       { name: 'Cookies & Cream', lookupName: 'Cookies & Cream (20 oz)', description: 'white chocolate vanilla + espresso + oreo cream mixture + chocolate drizzle', fallbackAmount: 650 },
       { name: "Smore's", lookupName: "Smore's (20 oz)", description: 'mocha + espresso + brown sugar + marshmallow fluff mixture + chocolate drizzle', fallbackAmount: 650 },
       { name: 'White Chocolate Raspberry', lookupName: 'White Chocolate Raspberry (20 oz)', description: 'white chocolate + espresso + raspberry cold foam', fallbackAmount: 650 },
       { name: 'Caramel Kolb', lookupName: 'Caramel Kolb (20 oz)', description: 'caramel base + espresso + brown sugar + cookie mixture + caramel drizzle', fallbackAmount: 650 },
-      { name: 'Conor McGregor', lookupName: 'Conor McGregor (20 oz)', description: 'caramel + espresso + irish cream + brown sugar', fallbackAmount: 650 },
       { name: 'Blackstone', lookupName: 'Blackstone (20 oz)', description: 'vanilla + caramel + brown sugar + espresso', fallbackAmount: 650 },
       { name: 'Caramel Fluff', lookupName: 'Caramel Fluff (20 oz)', description: 'espresso + caramel drizzle + cheesecake + marshmallow', fallbackAmount: 650 },
       { name: 'Caramel Toast Crunch', lookupName: 'Caramel Toast Crunch (20 oz)', description: 'espresso + caramel + brown sugar, CTC powder + caramel drizzle', fallbackAmount: 650 },
@@ -732,6 +757,8 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
   const [squareLookup, setSquareLookup] = useState(new Map());
   const [error, setError] = useState('');
   const [selectedProteins, setSelectedProteins] = useState({});
+  const [selectedCoffeePreparations, setSelectedCoffeePreparations] = useState({});
+  const [selectedCoffeeSizes, setSelectedCoffeeSizes] = useState({});
   const [isPreOrderWindowOpen, setIsPreOrderWindowOpen] = useState(() => isWithinPreOrderWindow());
   const [thanksgivingStatus, setThanksgivingStatus] = useState(() => getThanksgivingPreOrderStatus());
   const [thanksgivingOptions, setThanksgivingOptions] = useState({
@@ -784,6 +811,15 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       window.clearInterval(intervalId);
     };
   }, []);
+
+  const specialtyCoffeePreparations = useMemo(
+    () => SPECIALTY_COFFEE_PREPARATIONS.map((preparation) => ({
+      ...preparation,
+      sizeOptions: preparation.sizeOptions.map((option) =>
+        resolvePriceOption(option, squareLookup)),
+    })),
+    [squareLookup],
+  );
 
   const enrichedSections = useMemo(
     () => {
@@ -979,6 +1015,65 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
     }));
   };
 
+  const getSpecialtyCoffeeSelection = (item) => {
+    const itemKey = item.lookupName || item.name;
+    const preparationKey = selectedCoffeePreparations[itemKey] || 'iced';
+    const preparation = specialtyCoffeePreparations.find(
+      (candidate) => candidate.key === preparationKey,
+    ) || specialtyCoffeePreparations[0];
+    const requestedSizeKey = selectedCoffeeSizes[itemKey] || '20-oz';
+    const sizeOption = preparation?.sizeOptions.find(
+      (candidate) => candidate.key === requestedSizeKey,
+    ) || preparation?.sizeOptions.find((candidate) => candidate.key === '20-oz')
+      || preparation?.sizeOptions[0];
+
+    return {
+      itemKey,
+      preparation,
+      sizeOption,
+      isOrderable:
+        sizeOption?.visible !== false
+        && isSquareOptionOrderable(sizeOption),
+    };
+  };
+
+  const handleCoffeePreparationChange = (item, value) => {
+    const itemKey = item.lookupName || item.name;
+    setSelectedCoffeePreparations((current) => ({
+      ...current,
+      [itemKey]: value,
+    }));
+  };
+
+  const handleCoffeeSizeChange = (item, value) => {
+    const itemKey = item.lookupName || item.name;
+    setSelectedCoffeeSizes((current) => ({
+      ...current,
+      [itemKey]: value,
+    }));
+  };
+
+  const handleSpecialtyCoffeeAdd = (item) => {
+    const { preparation, sizeOption, isOrderable } = getSpecialtyCoffeeSelection(item);
+    if (!isOrderable || !orderingStatus?.isOrderingAllowed) {
+      return;
+    }
+
+    const preparationLabel = preparation.label;
+    const sizeLabel = sizeOption.label;
+    const stockConfigured = sizeOption.stockConfigured === true;
+
+    onAddToCart({
+      name: `${item.name} (${preparationLabel}, ${sizeLabel})`,
+      amount: sizeOption.amount,
+      label: formatPriceLabel(sizeOption.amount, sizeOption.currency),
+      variationId: sizeOption.variationId,
+      note: `Specialty coffee: ${item.name} · Preparation: ${preparationLabel} · Size: ${sizeLabel}`,
+      isUnavailableToday: false,
+      maxQuantity: stockConfigured ? sizeOption.remainingStock : undefined,
+    });
+  };
+
   const getThanksgivingSelection = (item) => {
     const option = item.options?.find(
       (candidate) => candidate.key === thanksgivingOptions[item.name],
@@ -1013,6 +1108,82 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       isSeasonalPreOrder: true,
       isUnavailableToday: false,
     });
+  };
+
+  const renderSpecialtyCoffeeItem = (item, key) => {
+    const { preparation, sizeOption, isOrderable } = getSpecialtyCoffeeSelection(item);
+    const canShowOrderControls =
+      isOrderable
+      && orderingStatus?.isGloballyEnabled !== false;
+
+    return (
+      <div className="coffee-item specialty-coffee-item" role="listitem" key={key}>
+        <div className="coffee-item__text">
+          <h4>{item.name}</h4>
+          <p>{item.description}</p>
+        </div>
+        <div className="specialty-coffee-order">
+          <div className="specialty-coffee-selects">
+            <label>
+              <span>Style</span>
+              <select
+                className="coffee-option-select"
+                value={preparation.key}
+                onChange={(event) => handleCoffeePreparationChange(item, event.target.value)}
+                aria-label={`${item.name} preparation`}
+              >
+                {specialtyCoffeePreparations.map((option) => (
+                  <option
+                    key={option.key}
+                    value={option.key}
+                    disabled={!option.sizeOptions.some(
+                      (candidate) => candidate.visible !== false && isSquareOptionOrderable(candidate),
+                    )}
+                  >
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              <span>Size</span>
+              <select
+                className="coffee-option-select"
+                value={sizeOption.key}
+                onChange={(event) => handleCoffeeSizeChange(item, event.target.value)}
+                aria-label={`${item.name} size`}
+              >
+                {preparation.sizeOptions.map((option) => (
+                  <option
+                    key={option.key}
+                    value={option.key}
+                    disabled={option.visible === false || !isSquareOptionOrderable(option)}
+                  >
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="specialty-coffee-add-row">
+            <span className="price">
+              {formatPriceLabel(sizeOption.amount, sizeOption.currency)}
+            </span>
+            <button
+              className="add-to-cart-btn"
+              style={{ display: canShowOrderControls ? undefined : 'none' }}
+              onClick={() => handleSpecialtyCoffeeAdd(item)}
+              aria-label={`Add ${item.name}, ${preparation.label}, ${sizeOption.label} to cart`}
+              disabled={!orderingStatus?.isOrderingAllowed || !isOrderable}
+            >
+              <FontAwesomeIcon icon={faPlus} />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -1068,8 +1239,8 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             aria-hidden="true"
           />
           <div className="curbside-pickup-banner__copy">
-            <strong>Curbside pickup is available across our full menu</strong>
-            <span>Choose “Add to cart” beside any available item, then check out online for curbside pickup.</span>
+            <strong>Regular menu orders are ready in 15 minutes</strong>
+            <span>Choose “Add to cart” for curbside pickup. Whole cakes remain preorder only.</span>
           </div>
         </div>
         <p className="menu-availability-note">
@@ -1104,6 +1275,11 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                 <div className="thanksgiving-menu__item-copy">
                   <h4>{item.name}</h4>
                   {item.description ? <p>{item.description}</p> : null}
+                  {item.preorderOnly ? (
+                    <p className="thanksgiving-menu__preorder-only">
+                      Preorder only · Not available for 15-minute pickup
+                    </p>
+                  ) : null}
                   {item.flavors?.length ? (
                     <label className="thanksgiving-menu__field">
                       <span>Flavor</span>
@@ -1728,57 +1904,28 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                   </div>
                 </div>
 
+                <div className="coffee-style-banner" aria-label="Specialty coffee preparation options">
+                  <strong>Available in</strong>
+                  <span>Hot</span>
+                  <span>Iced</span>
+                  <span>Blended</span>
+                </div>
+
                 <div className="coffee-grid" role="list" aria-label="Specialty coffee items">
                   <div className="coffee-list-column">
-                    {leftColumnItems.map((item, itemIndex) => (
-                      <div
-                        className="coffee-item"
-                        role="listitem"
-                        key={`${section.title}-left-${item.variationId || item.lookupName || item.name}-${itemIndex}`}
-                      >
-                        <div className="coffee-item__text">
-                          <h4>{item.name}</h4>
-                          <p>{item.description}</p>
-                        </div>
-                        <div className="coffee-item__actions">
-                          <button
-                            className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
-                            onClick={() => handleAddToCart(item)}
-                            aria-label={`Add ${item.name} to cart`}
-                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
-                          >
-                            <FontAwesomeIcon icon={faPlus} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                    {leftColumnItems.map((item, itemIndex) =>
+                      renderSpecialtyCoffeeItem(
+                        item,
+                        `${section.title}-left-${item.variationId || item.lookupName || item.name}-${itemIndex}`,
+                      ))}
                   </div>
 
                   <div className="coffee-list-column">
-                    {rightColumnItems.map((item, itemIndex) => (
-                      <div
-                        className="coffee-item"
-                        role="listitem"
-                        key={`${section.title}-right-${item.variationId || item.lookupName || item.name}-${itemIndex}`}
-                      >
-                        <div className="coffee-item__text">
-                          <h4>{item.name}</h4>
-                          <p>{item.description}</p>
-                        </div>
-                        <div className="coffee-item__actions">
-                          <button
-                            className="add-to-cart-btn"
-                          style={{ display: item.isOnlineOrderable && !item.isUnavailableToday && orderingStatus?.isGloballyEnabled !== false ? undefined : 'none' }}
-                            onClick={() => handleAddToCart(item)}
-                            aria-label={`Add ${item.name} to cart`}
-                            disabled={!orderingStatus?.isOrderingAllowed || item.isUnavailableToday || !item.isOnlineOrderable || !(item.sizeOptions?.[0]?.variationId || item.variationId)}
-                          >
-                            <FontAwesomeIcon icon={faPlus} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                    {rightColumnItems.map((item, itemIndex) =>
+                      renderSpecialtyCoffeeItem(
+                        item,
+                        `${section.title}-right-${item.variationId || item.lookupName || item.name}-${itemIndex}`,
+                      ))}
                   </div>
                 </div>
               </div>

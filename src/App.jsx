@@ -51,11 +51,40 @@ function normalizePath(path) {
   return path;
 }
 
+const getClientOrderingWindowStatus = (value = new Date()) => {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    weekday: 'short',
+    hour: 'numeric',
+    minute: 'numeric',
+    hourCycle: 'h23',
+  }).formatToParts(value);
+  const clock = Object.fromEntries(
+    parts
+      .filter((part) => part.type !== 'literal')
+      .map((part) => [part.type, part.value]),
+  );
+  const currentMinutes = (Number(clock.hour) * 60) + Number(clock.minute);
+  const isOrderingDay = ['Tue', 'Wed', 'Thu', 'Fri', 'Sat'].includes(clock.weekday);
+  const isWithinOrderingWindow =
+    isOrderingDay
+    && currentMinutes >= ((7 * 60) + 30)
+    && currentMinutes < ((14 * 60) + 15);
+
+  return {
+    isWithinOrderingWindow,
+    message: isWithinOrderingWindow
+      ? 'Online ordering is open until 2:15 PM.'
+      : 'Online ordering is open Tuesday through Saturday, 7:30 AM–2:15 PM.',
+  };
+};
+
 const routeMetadata = {
   '/': {
     title: "BB's Bakery & Cafe - Pennington Gap, Lee County & Southwest Virginia",
     description: "Fresh-baked goodness made with love daily in Pennington Gap, VA. Browse our menu, hours, reviews, and ordering information.",
     urlPath: '/',
+    image: '/assets/images/berry-danishes.jpg',
   },
   '/about': {
     title: "About BB's Bakery & Cafe | Pennington Gap VA bakery",
@@ -83,9 +112,10 @@ const routeMetadata = {
     urlPath: '/ordering-guide',
   },
   '/custom-cakes': {
-    title: "Custom Cakes | BB's Bakery & Cafe",
-    description: "Order a custom cake from BB's Bakery & Cafe with fresh designs, local ingredients, and pickup in Pennington Gap.",
+    title: "Custom Cakes in Pennington Gap, VA | BB's Bakery",
+    description: "Request custom birthday cakes, tiered celebration cakes, cupcakes, and themed designs from BB's Bakery & Cafe in Pennington Gap, Virginia.",
     urlPath: '/custom-cakes',
+    image: '/assets/images/blackberry-pomegranate-tiered-cake.jpg',
   },
   '/catering': {
     title: "Catering in Pennington Gap, VA | BB's Bakery & Cafe",
@@ -107,6 +137,81 @@ const routeMetadata = {
     description: "Manage BB's Bakery & Cafe online ordering and menu availability.",
     urlPath: '/admin',
   },
+};
+
+const customCakeStructuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Service',
+      '@id': 'https://bbs-bakery.com/custom-cakes#service',
+      name: 'Custom Cakes in Pennington Gap, Virginia',
+      serviceType: 'Custom birthday and celebration cakes',
+      url: 'https://bbs-bakery.com/custom-cakes',
+      image: 'https://bbs-bakery.com/assets/images/blackberry-pomegranate-tiered-cake.jpg',
+      provider: {
+        '@id': 'https://bbs-bakery.com/#bakery',
+      },
+      areaServed: [
+        { '@type': 'City', name: 'Pennington Gap, Virginia' },
+        { '@type': 'AdministrativeArea', name: 'Lee County, Virginia' },
+        { '@type': 'Place', name: 'Southwest Virginia' },
+      ],
+      availableChannel: {
+        '@type': 'ServiceChannel',
+        serviceLocation: {
+          '@type': 'Place',
+          name: "BB's Bakery & Cafe",
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: '103 Main St',
+            addressLocality: 'Pennington Gap',
+            addressRegion: 'VA',
+            postalCode: '24277',
+            addressCountry: 'US',
+          },
+        },
+      },
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': 'https://bbs-bakery.com/custom-cakes#faq',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How far ahead should I order a custom cake?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Please submit your request at least 14 days before your event. More notice is helpful for larger, tiered, or highly detailed designs.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Where do I pick up my custom cake?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: "Custom cake pickup is at BB's Bakery & Cafe, 103 Main St in Pennington Gap, Virginia. The bakery will confirm the pickup time with your order.",
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I send inspiration photos?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. Use the request form to upload a few photos and describe the colors, piping, theme, or design details you like.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is submitting the form a confirmed order?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No. The bakery will follow up to confirm availability, final design, price, and pickup details before the order is booked.',
+          },
+        },
+      ],
+    },
+  ],
 };
 
 function App() {
@@ -131,7 +236,7 @@ function App() {
     if (!isOrderingAllowed) {
       return {
         isOrderingAllowed: false,
-        isGloballyEnabled: false,
+        isGloballyEnabled: globalOrderingControl.enabled,
         message: globalOrderingControl.hasLoaded
           ? globalOrderingControl.message
             || 'Online ordering is temporarily unavailable. Please call the cafe to place an order.'
@@ -159,11 +264,16 @@ function App() {
         }
 
         if (isCurrent) {
+          const clientSchedule = getClientOrderingWindowStatus();
+          const hasServerSchedule = typeof data?.isWithinOrderingWindow === 'boolean';
+          const isWithinOrderingWindow = hasServerSchedule
+            ? data.isWithinOrderingWindow
+            : clientSchedule.isWithinOrderingWindow;
           setGlobalOrderingControl({
             enabled: data?.enabled === true,
-            isWithinOrderingWindow: data?.isWithinOrderingWindow === true,
+            isWithinOrderingWindow,
             message: data?.enabled === true
-              ? data?.message || ''
+              ? data?.message || clientSchedule.message
               : 'Online ordering has been temporarily turned off. Please call the cafe to place an order.',
             hasLoaded: true,
           });
@@ -222,16 +332,34 @@ function App() {
     };
 
     const url = `${window.location.origin}${meta.urlPath}`;
+    const image = `${window.location.origin}${meta.image || '/assets/images/berry-danishes.jpg'}`;
     setMetaContent('meta[name="description"]', meta.description);
     setMetaContent('meta[property="og:title"]', meta.title);
     setMetaContent('meta[property="og:description"]', meta.description);
     setMetaContent('meta[property="og:url"]', url);
+    setMetaContent('meta[property="og:image"]', image);
+    setMetaContent('meta[property="og:image:alt"]', meta.title);
     setMetaContent('meta[name="twitter:title"]', meta.title);
     setMetaContent('meta[name="twitter:description"]', meta.description);
+    setMetaContent('meta[name="twitter:image"]', image);
+    setMetaContent('meta[name="twitter:image:alt"]', meta.title);
 
     const canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) {
       canonical.setAttribute('href', url);
+    }
+
+    const existingStructuredData = document.getElementById('route-structured-data');
+    if (currentPath === '/custom-cakes') {
+      const structuredData = existingStructuredData || document.createElement('script');
+      structuredData.id = 'route-structured-data';
+      structuredData.type = 'application/ld+json';
+      structuredData.textContent = JSON.stringify(customCakeStructuredData);
+      if (!existingStructuredData) {
+        document.head.appendChild(structuredData);
+      }
+    } else if (existingStructuredData) {
+      existingStructuredData.remove();
     }
   }, [currentPath]);
 
