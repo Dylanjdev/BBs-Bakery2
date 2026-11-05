@@ -98,47 +98,48 @@ const sections = [
     title: 'Daily Bakes',
     dailyMenu: true,
     items: [
-      { name: 'Double Chocolate Brownies', variationId: 'BCSSMOTHSCZF5RILWMPKGVBI', fallbackAmount: 300 },
-      { name: 'Double Chocolate Cookies', variationId: '7WCHB3ZABC72COZYGSSTF2SS', fallbackAmount: 250 },
-      { name: 'Pumpkin Muffins', variationId: 'YATUUQKWZKNHIJAL5PKKXWQH', fallbackAmount: 350 },
-      { name: 'Cran-Orange Scones', variationId: 'B26BFSNNVQMR2LTHWV75JJBH', fallbackAmount: 350 },
-      { name: 'Apple Crumb Cake', variationId: 'DHU62MYYBTNIHLQFV5NG4Q4L', fallbackAmount: 400 },
+      { name: 'Blueberry Scones', lookupName: 'Scone (Regular)', variationId: 'B26BFSNNVQMR2LTHWV75JJBH', fallbackAmount: 300 },
+      { name: 'Pumpkin Roll Slice', lookupName: 'Pumpkin Roll (roll slice)', variationId: 'TQ7TU26C5LVCIJVCULF5RK7L', fallbackAmount: 300 },
+      { name: 'Chocolate Chip Banana Muffins', lookupName: 'Muffin (single)', variationId: 'YATUUQKWZKNHIJAL5PKKXWQH', fallbackAmount: 300 },
+      { name: 'Chocolate Chip Cookies', lookupName: 'Cookie (Regular)', variationId: '7WCHB3ZABC72COZYGSSTF2SS', fallbackAmount: 250 },
+      { name: 'Ham & Swiss Croissants', lookupName: 'Croissant (specialty)', variationId: 'IU5OOQJJI5XQD3YQ2O7TFAEC', fallbackAmount: 500 },
     ],
   },
   {
     title: 'Tuesday Spotlight Bake',
     dailyMenu: true,
     items: [
-      { name: 'Carrot Cupcakes with Cream Cheese Buttercream', variationId: 'K6NFLCWFO7T53G2V6Z72E5TK', fallbackAmount: 350 },
+      { name: 'Cookie Butter Tres Leches', lookupName: 'Slice Of Cake (tres leches)', variationId: 'CZT35QGKBILYS3FD22RCHYAU', fallbackAmount: 500 },
     ],
   },
   {
     title: 'Wednesday Spotlight Bake',
     dailyMenu: true,
     items: [
-      { name: 'Maple Pecan Cream Cheese Danishes', variationId: 'NANPTO7A32H2D2STQDXD4CEI', fallbackAmount: 400 },
+      { name: 'Apple Butter Danishes', lookupName: 'Danish (Regular)', variationId: 'NANPTO7A32H2D2STQDXD4CEI', fallbackAmount: 400 },
+      { name: 'Cinnamon Rolls', lookupName: 'Cinnamon Roll (Regular)', variationId: '4EVFHDZ3LHYZOXF4EOGMD3JZ', fallbackAmount: 500 },
     ],
   },
   {
     title: 'Thursday Spotlight Bake',
     dailyMenu: true,
     items: [
-      { name: 'Cinnamon Rolls', variationId: '4EVFHDZ3LHYZOXF4EOGMD3JZ', fallbackAmount: 500 },
+      { name: 'Little Debbie Christmas Tree Cheesecake Slice', lookupName: 'Slice Of Cake (cheesecake slice)', variationId: 'S3CPM4OGZKJPDIYCEPDLXQVM', fallbackAmount: 600 },
     ],
   },
   {
     title: 'Friday Spotlight Bake',
     dailyMenu: true,
     items: [
-      { name: 'Southwest Quiche', variationId: 'BJ6WQGCEQMZV2XAPYNUUH533', fallbackAmount: 350 },
-      { name: 'Brown Butter Pecan Cheesecake', variationId: '3LMSDYWNKQESPH3ESB6NHWVS', fallbackAmount: 600 },
+      { name: 'Little Debbie Christmas Tree Cheesecake Slice', lookupName: 'Slice Of Cake (cheesecake slice)', variationId: 'S3CPM4OGZKJPDIYCEPDLXQVM', fallbackAmount: 600 },
+      { name: 'Sun Dried Tomato & Feta Quiche', lookupName: 'Quiche Slice (single)', variationId: 'BJ6WQGCEQMZV2XAPYNUUH533', fallbackAmount: 350 },
     ],
   },
   {
     title: 'Saturday Spotlight Bake',
     dailyMenu: true,
     items: [
-      { name: 'Nutella Croissants', variationId: 'IU5OOQJJI5XQD3YQ2O7TFAEC', fallbackAmount: 500 },
+      { name: 'Carrot Cake', lookupName: 'Slice Of Cake (3 layer/specialty)', variationId: 'XDNGFNGIS7L4ZOVUID3XGINS', fallbackAmount: 600 },
     ],
   },
   {
