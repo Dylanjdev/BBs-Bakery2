@@ -33,7 +33,7 @@ const faqGroups = [
       },
       {
         question: 'When do I pick up an online order?',
-        answer: 'Pickup windows follow our ordering hours. Tuesday through Friday pickup is 8:00 AM to 3:00 PM, and Saturday pickup is 10:00 AM to 3:00 PM.',
+        answer: 'Online ordering is open Tuesday through Saturday from 7:30 AM to 2:15 PM. Curbside pickup is available Tuesday through Friday from 8:00 AM to 3:00 PM and Saturday from 10:00 AM to 3:00 PM.',
       },
     ],
   },

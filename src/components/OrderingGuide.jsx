@@ -59,13 +59,13 @@ function OrderingGuide() {
             
             <div style={{marginBottom: '1.5rem'}}>
               <p style={{fontSize: 'clamp(0.75rem, 2vw, 0.85rem)', color: '#999', textTransform: 'uppercase', fontWeight: '600', margin: '0 0 0.5rem 0', letterSpacing: '0.5px'}}>Orders Open</p>
-              <p style={{fontSize: 'clamp(1.1rem, 3vw, 1.35rem)', fontWeight: '700', color: '#d65a8c', margin: '0', fontFamily: 'Playfair Display, serif'}}>8:00 AM</p>
+              <p style={{fontSize: 'clamp(1.1rem, 3vw, 1.35rem)', fontWeight: '700', color: '#d65a8c', margin: '0', fontFamily: 'Playfair Display, serif'}}>7:30 AM</p>
             </div>
 
             <div style={{marginBottom: '1.5rem'}}>
               <p style={{fontSize: 'clamp(0.75rem, 2vw, 0.85rem)', color: '#999', textTransform: 'uppercase', fontWeight: '600', margin: '0 0 0.5rem 0', letterSpacing: '0.5px'}}>Order Cutoff</p>
-              <p style={{fontSize: 'clamp(1.1rem, 3vw, 1.35rem)', fontWeight: '700', color: '#d65a8c', margin: '0', fontFamily: 'Playfair Display, serif'}}>3:00 PM</p>
-              <p style={{fontSize: 'clamp(0.75rem, 2vw, 0.85rem)', color: '#666', margin: '0.5rem 0 0 0'}}>Orders placed after this time will roll to the next open day</p>
+              <p style={{fontSize: 'clamp(1.1rem, 3vw, 1.35rem)', fontWeight: '700', color: '#d65a8c', margin: '0', fontFamily: 'Playfair Display, serif'}}>2:15 PM</p>
+              <p style={{fontSize: 'clamp(0.75rem, 2vw, 0.85rem)', color: '#666', margin: '0.5rem 0 0 0'}}>Online checkout closes at this time</p>
             </div>
 
             <div>
@@ -92,13 +92,13 @@ function OrderingGuide() {
             
             <div style={{marginBottom: '1.5rem'}}>
               <p style={{fontSize: 'clamp(0.75rem, 2vw, 0.85rem)', color: '#999', textTransform: 'uppercase', fontWeight: '600', margin: '0 0 0.5rem 0', letterSpacing: '0.5px'}}>Orders Open</p>
-              <p style={{fontSize: 'clamp(1.1rem, 3vw, 1.35rem)', fontWeight: '700', color: '#6b8e6f', margin: '0', fontFamily: 'Playfair Display, serif'}}>10:00 AM</p>
+              <p style={{fontSize: 'clamp(1.1rem, 3vw, 1.35rem)', fontWeight: '700', color: '#6b8e6f', margin: '0', fontFamily: 'Playfair Display, serif'}}>7:30 AM</p>
             </div>
 
             <div style={{marginBottom: '1.5rem'}}>
               <p style={{fontSize: 'clamp(0.75rem, 2vw, 0.85rem)', color: '#999', textTransform: 'uppercase', fontWeight: '600', margin: '0 0 0.5rem 0', letterSpacing: '0.5px'}}>Order Cutoff</p>
-              <p style={{fontSize: 'clamp(1.1rem, 3vw, 1.35rem)', fontWeight: '700', color: '#6b8e6f', margin: '0', fontFamily: 'Playfair Display, serif'}}>3:00 PM</p>
-              <p style={{fontSize: 'clamp(0.75rem, 2vw, 0.85rem)', color: '#666', margin: '0.5rem 0 0 0'}}>Orders placed after this time will roll to the next open day</p>
+              <p style={{fontSize: 'clamp(1.1rem, 3vw, 1.35rem)', fontWeight: '700', color: '#6b8e6f', margin: '0', fontFamily: 'Playfair Display, serif'}}>2:15 PM</p>
+              <p style={{fontSize: 'clamp(0.75rem, 2vw, 0.85rem)', color: '#666', margin: '0.5rem 0 0 0'}}>Online checkout closes at this time</p>
             </div>
 
             <div>

@@ -6,6 +6,7 @@ import {
   faBurger,
   faUtensils,
   faBolt,
+  faCarSide,
   faGlassWater,
   faMugHot,
 } from '@fortawesome/free-solid-svg-icons';
@@ -63,7 +64,7 @@ const sections = [
     items: [
       { name: 'Double Chocolate Brownies', lookupName: 'Brownie (Regular)', variationId: 'BCSSMOTHSCZF5RILWMPKGVBI', fallbackAmount: 300 },
       { name: 'Double Chocolate Cookies', lookupName: 'Cookie (Regular)', variationId: '7WCHB3ZABC72COZYGSSTF2SS', fallbackAmount: 250 },
-      { name: 'Pumpkin Muffins', fallbackAmount: 300 },
+      { name: 'Pumpkin Muffins', lookupName: 'Muffin (single)', variationId: 'YATUUQKWZKNHIJAL5PKKXWQH', fallbackAmount: 300 },
       { name: 'Cran-Orange Scones', lookupName: 'Scone (Regular)', variationId: 'B26BFSNNVQMR2LTHWV75JJBH', fallbackAmount: 350 },
       { name: 'Apple Crumb Cake', lookupName: 'Slice Of Cake (1 layer/ Regular)', variationId: 'DHU62MYYBTNIHLQFV5NG4Q4L', fallbackAmount: 400 },
     ],
@@ -693,6 +694,10 @@ const findSquarePrice = (squareLookup, lookupName, variationId) => {
   return nameMatch || (variationId ? squareLookup.get(`variation:${variationId}`) : null);
 };
 
+const isSquareOptionOrderable = (option) =>
+  Boolean(option?.variationId)
+  && (option.stockConfigured !== true || option.remainingStock > 0);
+
 const resolvePriceOption = (option, squareLookup) => {
   const fallbackVariationId =
     option.variationId
@@ -827,11 +832,14 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
             stockLimit: variation?.stockLimit,
             remainingStock: variation?.remainingStock,
             stockConfigured: variation?.stockConfigured === true,
-            isOnlineOrderable:
-              variation?.stockConfigured === true && variation?.remainingStock > 0,
+            isOnlineOrderable: isSquareOptionOrderable({
+              variationId: variation?.id,
+              stockConfigured: variation?.stockConfigured,
+              remainingStock: variation?.remainingStock,
+            }),
             visible: true,
             isUnavailableToday:
-              variation?.stockConfigured !== true || variation?.remainingStock <= 0,
+              variation?.stockConfigured === true && variation?.remainingStock <= 0,
             label: formatPriceLabel(variation.priceAmount, variation.currency || 'USD'),
           });
           extrasBySection.set(targetSection, existing);
@@ -847,7 +855,8 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                 const keepCuratedVisible = lockedCuratedSections.has(section.title);
                 const priceLookupName = item.priceLookupName || section.priceLookupName || item.lookupName || item.name;
                 const fallbackVariationId =
-                  squareVariationMap[priceLookupName]
+                  item.variationId
+                  || squareVariationMap[priceLookupName]
                   || squareVariationMap[item.lookupName || item.name]
                   || squareVariationMap[item.name]
                   || null;
@@ -875,14 +884,14 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
                   remainingStock: orderOption?.remainingStock,
                   stockConfigured: orderOption?.stockConfigured === true,
                   isOnlineOrderable:
-                    orderOption?.stockConfigured === true && orderOption?.remainingStock > 0,
+                    availabilitySource?.visible !== false
+                    && isSquareOptionOrderable(orderOption),
                   // Curated menu entries always stay visible. Square availability
                   // controls ordering below, not whether the published menu vanishes.
                   visible: Boolean(live) || keepCuratedVisible,
                   isUnavailableToday:
                     availabilitySource?.visible === false
-                    || orderOption?.stockConfigured !== true
-                    || orderOption?.remainingStock <= 0,
+                    || !isSquareOptionOrderable(orderOption),
                   label: `${
                     section.dailyMenu
                       ? formatDailyMenuPrice(amount)
@@ -940,8 +949,10 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       : null;
     const resolvedVariationId = selectedSizeOption?.variationId || item.variationId;
     const remainingStock = selectedSizeOption?.remainingStock ?? item.remainingStock ?? 0;
+    const stockConfigured = selectedSizeOption?.stockConfigured === true
+      || item.stockConfigured === true;
 
-    if (!resolvedVariationId || remainingStock <= 0) {
+    if (!resolvedVariationId || (stockConfigured && remainingStock <= 0)) {
       return;
     }
 
@@ -956,7 +967,7 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       variationId: resolvedVariationId,
       note: selectedProtein ? `Protein: ${selectedProtein}` : '',
       isUnavailableToday: item.isUnavailableToday,
-      maxQuantity: remainingStock,
+      maxQuantity: stockConfigured ? remainingStock : undefined,
     });
   };
 
@@ -1005,7 +1016,11 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
   };
 
   return (
-    <section id="menu" className="menu-section" aria-labelledby="menu-heading">
+    <section
+      id="menu"
+      className={`menu-section${orderingStatus?.isOrderingAllowed ? '' : ' ordering-closed'}`}
+      aria-labelledby="menu-heading"
+    >
       {!orderingStatus?.isOrderingAllowed && (
         <div
           style={{
@@ -1046,6 +1061,17 @@ const Menu = ({ onAddToCart, orderingStatus }) => {
       <header className="menu-header">
         <h2 id="menu-heading">Our Menu</h2>
         <p className="tagline">Bringing the best bites to your day</p>
+        <div className="curbside-pickup-banner" aria-label="Curbside pickup availability">
+          <FontAwesomeIcon
+            icon={faCarSide}
+            className="curbside-pickup-banner__icon"
+            aria-hidden="true"
+          />
+          <div className="curbside-pickup-banner__copy">
+            <strong>Curbside pickup is available across our full menu</strong>
+            <span>Choose “Add to cart” beside any available item, then check out online for curbside pickup.</span>
+          </div>
+        </div>
         <p className="menu-availability-note">
           Today&apos;s quantities come directly from the bakery. Items can only be added while daily stock remains.
         </p>

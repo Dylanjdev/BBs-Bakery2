@@ -191,7 +191,7 @@ function Hours() {
             <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
               <FontAwesomeIcon icon={faShoppingBag} style={{ color: '#6b8e6f', marginTop: '0.25rem' }} />
               <p style={{ margin: 0, color: '#6d6d6d', fontFamily: 'Quicksand, sans-serif', lineHeight: 1.55 }}>
-                Online ordering starts at 8:00 AM Tuesday-Friday and 10:00 AM Saturday.
+                Online ordering is open from 7:30 AM to 2:15 PM Tuesday-Saturday.
               </p>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>

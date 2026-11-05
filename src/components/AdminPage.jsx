@@ -1074,8 +1074,8 @@ export default function AdminPage() {
             {globalOrderingEnabled === null
               ? 'Checking the shared customer ordering control.'
               : globalOrderingEnabled
-              ? 'Customers can order enabled items until you turn online ordering off.'
-              : 'Add buttons are hidden and checkout is blocked for every customer.'}
+              ? 'The master switch is on. Customers can order Tuesday–Saturday from 7:30 AM to 2:15 PM.'
+              : 'The emergency switch is off. Checkout is blocked for every customer regardless of schedule.'}
           </p>
         </div>
         <button

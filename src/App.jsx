@@ -119,15 +119,22 @@ function App() {
   const [checkoutError, setCheckoutError] = useState('');
   const [globalOrderingControl, setGlobalOrderingControl] = useState({
     enabled: false,
+    isWithinOrderingWindow: false,
+    message: '',
     hasLoaded: false,
   });
   const orderingStatus = useMemo(() => {
-    if (!globalOrderingControl.enabled) {
+    const isOrderingAllowed =
+      globalOrderingControl.enabled
+      && globalOrderingControl.isWithinOrderingWindow;
+
+    if (!isOrderingAllowed) {
       return {
         isOrderingAllowed: false,
         isGloballyEnabled: false,
         message: globalOrderingControl.hasLoaded
-          ? 'Online ordering is temporarily unavailable. Please call the cafe to place an order.'
+          ? globalOrderingControl.message
+            || 'Online ordering is temporarily unavailable. Please call the cafe to place an order.'
           : 'Checking online ordering availability...',
       };
     }
@@ -152,12 +159,26 @@ function App() {
         }
 
         if (isCurrent) {
-          setGlobalOrderingControl({ enabled: data?.enabled === true, hasLoaded: true });
+          setGlobalOrderingControl({
+            enabled: data?.enabled === true,
+            isWithinOrderingWindow: data?.isWithinOrderingWindow === true,
+            message: data?.enabled === true
+              ? data?.message || ''
+              : 'Online ordering has been temporarily turned off. Please call the cafe to place an order.',
+            hasLoaded: true,
+          });
         }
       } catch {
         if (isCurrent) {
           setGlobalOrderingControl((current) => (
-            current.hasLoaded ? current : { enabled: false, hasLoaded: true }
+            current.hasLoaded
+              ? current
+              : {
+                  enabled: false,
+                  isWithinOrderingWindow: false,
+                  message: 'Online ordering status is unavailable. Please call the cafe to place an order.',
+                  hasLoaded: true,
+                }
           ));
         }
       } finally {

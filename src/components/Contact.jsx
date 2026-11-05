@@ -48,7 +48,7 @@ const quickInfo = [
   {
     icon: faMugHot,
     title: 'Ordering Notes',
-    lines: ['Online ordering starts at 8:00 AM Tue-Fri.', 'Saturday online ordering starts at 10:00 AM.', 'Custom requests are best discussed before 3:00 PM.'],
+    lines: ['Online ordering: 7:30 AM-2:15 PM Tuesday-Saturday.', 'Curbside pickup is available across the full menu.', 'Custom requests are best discussed before 3:00 PM.'],
   },
 ];
 

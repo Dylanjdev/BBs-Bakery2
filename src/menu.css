@@ -35,6 +35,47 @@
   letter-spacing: 0.5px;
 }
 
+.curbside-pickup-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  width: min(720px, 100%);
+  margin: 1.25rem auto 0;
+  padding: 1rem 1.25rem;
+  color: #31552d;
+  background: linear-gradient(135deg, #f3f9ef 0%, #e5f2df 100%);
+  border: 2px solid #86a978;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(77, 112, 64, 0.12);
+  text-align: left;
+}
+
+.curbside-pickup-banner__icon {
+  flex: 0 0 auto;
+  color: #4f7a45;
+  font-size: 1.65rem;
+}
+
+.curbside-pickup-banner__copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.curbside-pickup-banner__copy strong {
+  color: #31552d;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.curbside-pickup-banner__copy span {
+  color: #4d6848;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 .menu-availability-note {
   width: min(680px, 100%);
   margin: 1rem auto 0;
@@ -46,6 +87,18 @@
   font-size: 0.92rem;
   font-weight: 650;
   line-height: 1.45;
+}
+
+@media (max-width: 560px) {
+  .curbside-pickup-banner {
+    align-items: flex-start;
+    padding: 0.9rem 1rem;
+  }
+
+  .curbside-pickup-banner__icon {
+    margin-top: 0.15rem;
+    font-size: 1.4rem;
+  }
 }
 
 .menu-divider {
